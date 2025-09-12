@@ -15,7 +15,7 @@ export interface OrderItem {
 export interface Order {
   orderId: string;
   userId: string;
-  status: 'PENDING' | 'PROCESSING' | 'PARTIALLY_FULFILLED' | 'FULFILLED' | 'CANCELLED' | 'REFUNDED';
+  status: 'PENDING' | 'PROCESSING' | 'PARTIALLY_FULFILLED' | 'FULFILLED' | 'CANCELLED' | 'FAILED';
   totalAmount: number;
   paidAmount: number;
   refundAmount: number;
