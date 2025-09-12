@@ -1,11 +1,7 @@
 import { walletTransactionRepository } from '../../repositories/walletTransactionRepository';
 import { PaginationParams, PaginatedResponse } from '../../types/api';
 import { WalletTransaction } from '../../types/wallet';
-
-const formatCurrency = (amountInCents: number): string => {
-  const amount = amountInCents / 100;
-  return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+import { formatCurrency } from '../../utils/currency';
 
 export const getTransactionsService = async (
   userId: string, 

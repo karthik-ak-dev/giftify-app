@@ -1,11 +1,7 @@
 import { cartRepository } from '../../repositories/cartRepository';
 import { productVariantRepository } from '../../repositories/productVariantRepository';
 import { CartSummary } from '../../types/cart';
-
-const formatCurrency = (amountInCents: number): string => {
-  const amount = amountInCents / 100;
-  return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+import { formatCurrency } from '../../utils/currency';
 
 export const getCartService = async (userId: string): Promise<{ items: any[]; summary: CartSummary }> => {
   const cart = await cartRepository.findByUserId(userId);

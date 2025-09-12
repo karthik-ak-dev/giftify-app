@@ -2,11 +2,7 @@ import { cartRepository } from '../../repositories/cartRepository';
 import { productVariantRepository } from '../../repositories/productVariantRepository';
 import { productRepository } from '../../repositories/productRepository';
 import { AppError } from '../../middleware/errorHandler';
-
-const formatCurrency = (amountInCents: number): string => {
-  const amount = amountInCents / 100;
-  return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+import { formatCurrency } from '../../utils/currency';
 
 const calculateTotals = (items: any[]): { totalAmount: number; totalItems: number } => {
   const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);

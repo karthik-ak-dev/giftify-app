@@ -1,11 +1,7 @@
 import { userRepository } from '../../repositories/userRepository';
 import { WalletBalance } from '../../types/wallet';
 import { AppError } from '../../middleware/errorHandler';
-
-const formatCurrency = (amountInCents: number): string => {
-  const amount = amountInCents / 100;
-  return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+import { formatCurrency } from '../../utils/currency';
 
 export const getBalanceService = async (userId: string): Promise<WalletBalance> => {
   const user = await userRepository.findById(userId);
