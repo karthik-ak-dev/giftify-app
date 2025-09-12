@@ -1,0 +1,300 @@
+service: giftify-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 256
+  timeout: 30
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    USERS_TABLE: ${self:service}-${self:provider.stage}-users
+    WALLET_TRANSACTIONS_TABLE: ${self:service}-${self:provider.stage}-wallet-transactions
+    PRODUCTS_TABLE: ${self:service}-${self:provider.stage}-products
+    PRODUCT_VARIANTS_TABLE: ${self:service}-${self:provider.stage}-product-variants
+    CART_TABLE: ${self:service}-${self:provider.stage}-cart
+    ORDERS_TABLE: ${self:service}-${self:provider.stage}-orders
+    GIFT_CARDS_TABLE: ${self:service}-${self:provider.stage}-gift-cards
+    JWT_SECRET: ${env:JWT_SECRET, 'your-jwt-secret-key'}
+    JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-jwt-refresh-secret-key'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WALLET_TRANSACTIONS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WALLET_TRANSACTIONS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCT_VARIANTS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCT_VARIANTS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CART_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GIFT_CARDS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GIFT_CARDS_TABLE}/index/*"
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+  serverless-offline:
+    httpPort: 3000
+    host: 0.0.0.0
+
+functions:
+  api:
+    handler: src/app.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /
+          method: ANY
+          cors: true
+
+resources:
+  Resources:
+    # Users Table
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: EmailIndex
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    # Wallet Transactions Table
+    WalletTransactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.WALLET_TRANSACTIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: transactionId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: transactionId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: TransactionIdIndex
+            KeySchema:
+              - AttributeName: transactionId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: UserTransactionHistoryIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    # Products Table
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+          - AttributeName: category
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: isActive
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: CategoryIndex
+            KeySchema:
+              - AttributeName: category
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ActiveProductsIndex
+            KeySchema:
+              - AttributeName: isActive
+                KeyType: HASH
+              - AttributeName: name
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    # Product Variants Table
+    ProductVariantsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCT_VARIANTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+          - AttributeName: variantId
+            AttributeType: S
+          - AttributeName: isActive
+            AttributeType: S
+          - AttributeName: denomination
+            AttributeType: N
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH
+          - AttributeName: variantId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: VariantIdIndex
+            KeySchema:
+              - AttributeName: variantId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ActiveVariantsIndex
+            KeySchema:
+              - AttributeName: productId
+                KeyType: HASH
+              - AttributeName: denomination
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    # Cart Table
+    CartTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CART_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+
+    # Orders Table
+    OrdersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.ORDERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: orderId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: orderId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserOrdersIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: OrderStatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    # Gift Cards Table
+    GiftCardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.GIFT_CARDS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: giftCardId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: issuedAt
+            AttributeType: S
+          - AttributeName: orderId
+            AttributeType: S
+          - AttributeName: giftCardNumber
+            AttributeType: S
+        KeySchema:
+          - AttributeName: giftCardId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserGiftCardsIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: issuedAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: OrderGiftCardsIndex
+            KeySchema:
+              - AttributeName: orderId
+                KeyType: HASH
+              - AttributeName: giftCardId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: GiftCardNumberIndex
+            KeySchema:
+              - AttributeName: giftCardNumber
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL 
