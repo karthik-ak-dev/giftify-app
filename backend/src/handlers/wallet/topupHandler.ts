@@ -2,7 +2,6 @@ import { Response, NextFunction } from 'express';
 import { topupService } from '../../services/wallet/topupService';
 import { ApiResponse } from '../../types/api';
 import { AuthenticatedRequest } from '../../types/auth';
-import { AppError } from '../../middleware/errorHandler';
 
 export const topupHandler = async (
   req: AuthenticatedRequest,
@@ -15,10 +14,6 @@ export const topupHandler = async (
     
     if (!userId) {
       throw new Error('User ID not found in request');
-    }
-
-    if (!amount || amount <= 0) {
-      throw new AppError('Valid amount is required', 400, 'VALIDATION_ERROR');
     }
 
     const result = await topupService(userId, amount, description);

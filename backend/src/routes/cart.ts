@@ -3,6 +3,7 @@ import { authenticateToken } from '../middleware/auth';
 import { getCartHandler } from '../handlers/cart/getCartHandler';
 import { manageCartHandler } from '../handlers/cart/manageCartHandler';
 import { clearCartHandler } from '../handlers/cart/clearCartHandler';
+import { createValidationMiddleware, cartSchemas } from '../utils/validation';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ const router = Router();
 router.get('/', authenticateToken, getCartHandler);
 
 // PUT /cart/manage
-router.put('/manage', authenticateToken, manageCartHandler);
+router.put('/manage', authenticateToken, createValidationMiddleware(cartSchemas.manageCart, 'body'), manageCartHandler);
 
 // DELETE /cart/clear
 router.delete('/clear', authenticateToken, clearCartHandler);

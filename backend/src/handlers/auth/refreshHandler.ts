@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { refreshService } from '../../services/auth/refreshService';
 import { ApiResponse } from '../../types/api';
-import { AppError } from '../../middleware/errorHandler';
 
 export const refreshHandler = async (
   req: Request,
@@ -10,11 +9,6 @@ export const refreshHandler = async (
 ): Promise<void> => {
   try {
     const { refreshToken } = req.body;
-
-    // TODO: Add validation
-    if (!refreshToken) {
-      throw new AppError('Refresh token is required', 400, 'VALIDATION_ERROR');
-    }
 
     const result = await refreshService(refreshToken);
 
