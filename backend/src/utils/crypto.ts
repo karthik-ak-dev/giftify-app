@@ -57,32 +57,4 @@ export const decrypt = (encryptedText: string): string => {
   }
 };
 
-// Additional crypto utilities
-export const generateSecureToken = (length: number = 32): string => {
-  return crypto.randomBytes(length).toString('hex');
-};
-
-export const generateGiftCardNumber = (): string => {
-  // Generate a 16-digit gift card number
-  const randomBytes = crypto.randomBytes(8);
-  const number = randomBytes.readBigUInt64BE(0).toString();
-  return number.padStart(16, '0').substring(0, 16);
-};
-
-export const generateGiftCardPin = (): string => {
-  // Generate a 6-digit PIN
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-export const hashSensitiveData = (data: string): string => {
-  return crypto.createHash('sha256').update(data).digest('hex');
-};
-
-export const createHmac = (data: string, secret: string = ENV_CONFIG.ENCRYPTION_KEY): string => {
-  return crypto.createHmac('sha256', secret).update(data).digest('hex');
-};
-
-export const verifyHmac = (data: string, signature: string, secret: string = ENV_CONFIG.ENCRYPTION_KEY): boolean => {
-  const expectedSignature = createHmac(data, secret);
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
-}; 
+ 

@@ -86,22 +86,7 @@ export class WalletTransactionRepository {
     );
   }
 
-  async findByOrderId(orderId: string): Promise<WalletTransaction[]> {
-    // This would require a GSI on orderId for efficient querying
-    // For now, we'll scan the table (not ideal for production)
-    const items = await db.scan(WalletTransactionModel.tableName, {
-      FilterExpression: 'orderId = :orderId',
-      ExpressionAttributeValues: {
-        ':orderId': orderId
-      }
-    });
-    
-    return items.map(item => WalletTransactionModel.toWalletTransaction(item));
-  }
 
-  async delete(userId: string, transactionId: string): Promise<void> {
-    await db.delete(WalletTransactionModel.tableName, { userId, transactionId });
-  }
 }
 
 export const walletTransactionRepository = new WalletTransactionRepository(); 

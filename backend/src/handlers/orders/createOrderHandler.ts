@@ -26,10 +26,10 @@ export const createOrderHandler = async (
       message = 'Order could not be fulfilled due to stock unavailability. Full refund processed.';
       statusCode = 200;
     } else if (orderResult.status === 'PARTIALLY_FULFILLED') {
-      message = `Order partially fulfilled. ${orderResult.fulfillmentDetails.totalGiftCardsGenerated} gift cards generated. Refund processed for unavailable items.`;
+      message = `Order partially fulfilled. ${orderResult.fulfillmentDetails.totalGiftCardsAllocated} gift cards allocated. Refund processed for unavailable items.`;
       statusCode = 200;
     } else if (orderResult.status === 'FULFILLED') {
-      message = `Order fulfilled successfully. ${orderResult.fulfillmentDetails.totalGiftCardsGenerated} gift cards generated.`;
+      message = `Order fulfilled successfully. ${orderResult.fulfillmentDetails.totalGiftCardsAllocated} gift cards allocated.`;
       statusCode = 201;
     }
 
@@ -50,13 +50,13 @@ export const createOrderHandler = async (
           summary: orderResult.fulfillmentDetails.fulfillmentSummary,
           giftCards: orderResult.fulfillmentDetails.giftCards,
           unavailableItems: orderResult.fulfillmentDetails.unavailableItems,
-          statistics: {
-            totalItemsRequested: orderResult.fulfillmentDetails.totalItemsRequested,
-            totalItemsFulfilled: orderResult.fulfillmentDetails.totalItemsFulfilled,
-            totalGiftCardsGenerated: orderResult.fulfillmentDetails.totalGiftCardsGenerated,
-            partialFulfillment: orderResult.fulfillmentDetails.partialFulfillment,
-            refundProcessed: orderResult.fulfillmentDetails.refundProcessed
-          }
+                     statistics: {
+             totalItemsRequested: orderResult.fulfillmentDetails.totalItemsRequested,
+             totalItemsFulfilled: orderResult.fulfillmentDetails.totalItemsFulfilled,
+             totalGiftCardsAllocated: orderResult.fulfillmentDetails.totalGiftCardsAllocated,
+             partialFulfillment: orderResult.fulfillmentDetails.partialFulfillment,
+             refundProcessed: orderResult.fulfillmentDetails.refundProcessed
+           }
         }
       },
       message,

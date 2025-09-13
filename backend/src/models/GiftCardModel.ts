@@ -7,13 +7,9 @@ export class GiftCardModel {
   static readonly partitionKey = 'giftCardId';
   
   // GSI Keys
-  static readonly userGiftCardsGSI = 'UserGiftCardsIndex';
-  static readonly userGiftCardsGSIPartitionKey = 'userId';
-  static readonly userGiftCardsGSISortKey = 'issuedAt';
-  
-  static readonly orderGiftCardsGSI = 'OrderGiftCardsIndex';
-  static readonly orderGiftCardsGSIPartitionKey = 'orderId';
-  static readonly orderGiftCardsGSISortKey = 'giftCardId';
+  static readonly variantGSI = 'VariantIndex';
+  static readonly variantGSIPartitionKey = 'variantId';
+  static readonly variantGSISortKey = 'createdAt';
   
   static readonly giftCardNumberGSI = 'GiftCardNumberIndex';
   static readonly giftCardNumberGSIKey = 'giftCardNumber';
@@ -21,35 +17,24 @@ export class GiftCardModel {
   // Table schema definition
   static readonly schema = {
     giftCardId: 'string',       // ULID - Primary Key
-    orderId: 'string',          // GSI2 Partition Key
-    userId: 'string',           // GSI1 Partition Key
     productId: 'string',
-    variantId: 'string',
+    variantId: 'string',        // GSI1 Partition Key
     productName: 'string',
     variantName: 'string',
     denomination: 'number',     // Face value in rupees
-    giftCardNumber: 'string',   // Encrypted - GSI3 Partition Key
+    giftCardNumber: 'string',   // Encrypted - GSI2 Partition Key
     giftCardPin: 'string',      // Encrypted
-    expiryDate: 'string',       // Date string (YYYY-MM-DD)
-    status: 'string',           // ACTIVE, REDEEMED, EXPIRED, CANCELLED
+    expiryTime: 'string',       // ISO timestamp when card expires
     purchasePrice: 'number',    // Purchase price in cents/paise
-    issuedAt: 'string',         // ISO timestamp - GSI1 Sort Key
-    redeemedAt: 'string',       // Optional - ISO timestamp
-    createdAt: 'string',        // ISO timestamp
+    usedByOrder: 'string',      // Optional - Order ID if used
+    usedByUser: 'string',       // Optional - User ID if used
+    usedAt: 'string',           // Optional - ISO timestamp when used
+    createdAt: 'string',        // ISO timestamp - GSI1 Sort Key
     updatedAt: 'string'         // ISO timestamp
-  };
-  
-  // Default values
-  static readonly defaults = {
-    status: 'ACTIVE'
   };
   
   // Validation rules
   static readonly validation = {
-    status: {
-      required: true,
-      enum: ['ACTIVE', 'REDEEMED', 'EXPIRED', 'CANCELLED']
-    },
     denomination: {
       required: true,
       min: 1
@@ -58,9 +43,9 @@ export class GiftCardModel {
       required: true,
       min: 1
     },
-    expiryDate: {
+    expiryTime: {
       required: true,
-      pattern: /^\d{4}-\d{2}-\d{2}$/
+      pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/
     }
   };
   
@@ -68,8 +53,6 @@ export class GiftCardModel {
   static toGiftCard(item: any): GiftCard {
     return {
       giftCardId: item.giftCardId,
-      orderId: item.orderId,
-      userId: item.userId,
       productId: item.productId,
       variantId: item.variantId,
       productName: item.productName,
@@ -77,20 +60,20 @@ export class GiftCardModel {
       denomination: item.denomination,
       giftCardNumber: item.giftCardNumber,
       giftCardPin: item.giftCardPin,
-      expiryDate: item.expiryDate,
-      status: item.status,
+      expiryTime: item.expiryTime,
       purchasePrice: item.purchasePrice,
-      issuedAt: item.issuedAt,
-      redeemedAt: item.redeemedAt,
+      usedByOrder: item.usedByOrder,
+      usedByUser: item.usedByUser,
+      usedAt: item.usedAt,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt
     };
   }
   
-  // Generate expiry date (1 year from now)
-  static generateExpiryDate(): string {
+  // Generate expiry time (1 year from now)
+  static generateExpiryTime(): string {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
-    return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    return date.toISOString(); // Full ISO timestamp
   }
 } 

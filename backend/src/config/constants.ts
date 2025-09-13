@@ -28,11 +28,8 @@ export const APP_CONSTANTS = {
   
   // Order Status
   ORDER_STATUS: {
-    PENDING: 'PENDING',
-    PROCESSING: 'PROCESSING',
     FULFILLED: 'FULFILLED',
     PARTIALLY_FULFILLED: 'PARTIALLY_FULFILLED',
-    CANCELLED: 'CANCELLED',
     FAILED: 'FAILED'
   } as const,
   
@@ -49,22 +46,7 @@ export const APP_CONSTANTS = {
     COMPLETED: 'COMPLETED',
     FAILED: 'FAILED'
   } as const,
-  
-  // Gift Card Status
-  GIFT_CARD_STATUS: {
-    ACTIVE: 'ACTIVE',
-    REDEEMED: 'REDEEMED',
-    EXPIRED: 'EXPIRED',
-    CANCELLED: 'CANCELLED'
-  } as const,
-  
-  // Product Status
-  PRODUCT_STATUS: {
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE',
-    DISCONTINUED: 'DISCONTINUED'
-  } as const,
-  
+    
   // Currency
   CURRENCY: {
     CODE: 'INR',
@@ -151,6 +133,5 @@ export type UserStatus = typeof APP_CONSTANTS.USER_STATUS[keyof typeof APP_CONST
 export type OrderStatus = typeof APP_CONSTANTS.ORDER_STATUS[keyof typeof APP_CONSTANTS.ORDER_STATUS];
 export type TransactionType = typeof APP_CONSTANTS.TRANSACTION_TYPES[keyof typeof APP_CONSTANTS.TRANSACTION_TYPES];
 export type TransactionStatus = typeof APP_CONSTANTS.TRANSACTION_STATUS[keyof typeof APP_CONSTANTS.TRANSACTION_STATUS];
-export type GiftCardStatus = typeof APP_CONSTANTS.GIFT_CARD_STATUS[keyof typeof APP_CONSTANTS.GIFT_CARD_STATUS];
-export type ProductStatus = typeof APP_CONSTANTS.PRODUCT_STATUS[keyof typeof APP_CONSTANTS.PRODUCT_STATUS];
+
 export type ErrorCode = typeof APP_CONSTANTS.ERROR_CODES[keyof typeof APP_CONSTANTS.ERROR_CODES]; 

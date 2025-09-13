@@ -1,8 +1,6 @@
 // Gift Card types
 export interface GiftCard {
   giftCardId: string;
-  orderId: string;
-  userId: string;
   productId: string;
   variantId: string;
   productName: string;
@@ -10,11 +8,11 @@ export interface GiftCard {
   denomination: number;
   giftCardNumber: string;
   giftCardPin: string;
-  expiryDate: string;
-  status: 'ACTIVE' | 'REDEEMED' | 'EXPIRED' | 'CANCELLED';
+  expiryTime: string;        // ISO timestamp when card expires
   purchasePrice: number;
-  issuedAt: string;
-  redeemedAt?: string;
+  usedByOrder?: string;      // Order ID if used, null/undefined if available
+  usedByUser?: string;       // User ID if used, null/undefined if available
+  usedAt?: string;           // ISO timestamp when used
   createdAt: string;
   updatedAt: string;
 } 

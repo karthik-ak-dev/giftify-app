@@ -7,15 +7,14 @@ import { giftCardRepository } from '../../repositories/giftCardRepository';
 import { CreateOrderRequest, Order } from '../../types/order';
 import { AppError } from '../../middleware/errorHandler';
 import { formatCurrency } from '../../utils/currency';
-import { generateGiftCardNumber, generateGiftCardPin, encrypt } from '../../utils/crypto';
-import { GiftCardModel } from '../../models/GiftCardModel';
+import { decrypt } from '../../utils/crypto';
 import { APP_CONSTANTS } from '../../config/constants';
 import { ulid } from 'ulid';
 
 /**
- * Validates stock availability for cart items
+ * Validates gift card availability for cart items
  */
-const validateStockAvailability = async (cartItems: any[]): Promise<{ availableItems: any[], unavailableItems: any[] }> => {
+const validateGiftCardAvailability = async (cartItems: any[]): Promise<{ availableItems: any[], unavailableItems: any[] }> => {
   const availableItems: any[] = [];
   const unavailableItems: any[] = [];
 
@@ -38,30 +37,37 @@ const validateStockAvailability = async (cartItems: any[]): Promise<{ availableI
       continue;
     }
 
-    if (variant.stockQuantity < item.quantity) {
+    // Check available gift cards for this variant
+    const availableGiftCards = await giftCardRepository.findAvailableByVariant(item.variantId, item.quantity);
+    
+    if (availableGiftCards.length < item.quantity) {
       // Partial availability
-      if (variant.stockQuantity > 0) {
+      if (availableGiftCards.length > 0) {
         availableItems.push({
           ...item,
-          quantity: variant.stockQuantity,
-          totalPrice: variant.sellingPrice * variant.stockQuantity,
-          originalQuantity: item.quantity
+          quantity: availableGiftCards.length,
+          totalPrice: variant.sellingPrice * availableGiftCards.length,
+          originalQuantity: item.quantity,
+          availableGiftCards
         });
         unavailableItems.push({
           ...item,
-          quantity: item.quantity - variant.stockQuantity,
-          totalPrice: variant.sellingPrice * (item.quantity - variant.stockQuantity),
-          reason: `Only ${variant.stockQuantity} available, requested ${item.quantity}`
+          quantity: item.quantity - availableGiftCards.length,
+          totalPrice: variant.sellingPrice * (item.quantity - availableGiftCards.length),
+          reason: `Only ${availableGiftCards.length} gift cards available, requested ${item.quantity}`
         });
       } else {
         unavailableItems.push({
           ...item,
-          reason: 'Out of stock'
+          reason: 'No gift cards available'
         });
       }
     } else {
       // Fully available
-      availableItems.push(item);
+      availableItems.push({
+        ...item,
+        availableGiftCards: availableGiftCards.slice(0, item.quantity)
+      });
     }
   }
 
@@ -69,63 +75,12 @@ const validateStockAvailability = async (cartItems: any[]): Promise<{ availableI
 };
 
 /**
- * Generates gift cards for fulfilled items
+ * Mark gift cards as used for fulfilled items
  */
-const generateGiftCards = async (orderId: string, userId: string, fulfilledItems: any[]): Promise<any[]> => {
-  const giftCards: any[] = [];
-  const now = new Date().toISOString();
-
+const markGiftCardsAsUsed = async (orderId: string, userId: string, fulfilledItems: any[]): Promise<void> => {
   for (const item of fulfilledItems) {
-    for (let i = 0; i < item.quantity; i++) {
-      const giftCardId = ulid();
-      const giftCardNumber = generateGiftCardNumber();
-      const giftCardPin = generateGiftCardPin();
-      
-      // Get variant details for denomination
-      const variant = await productVariantRepository.findById(item.variantId);
-      if (!variant) continue;
-
-      const giftCardData = {
-        giftCardId,
-        orderId,
-        userId,
-        productId: item.productId,
-        variantId: item.variantId,
-        productName: item.productName,
-        variantName: item.variantName,
-        denomination: variant.denomination,
-        giftCardNumber: encrypt(giftCardNumber),
-        giftCardPin: encrypt(giftCardPin),
-        expiryDate: GiftCardModel.generateExpiryDate(),
-        status: APP_CONSTANTS.GIFT_CARD_STATUS.ACTIVE,
-        purchasePrice: variant.sellingPrice,
-        issuedAt: now,
-        createdAt: now,
-        updatedAt: now
-      };
-
-      const giftCard = await giftCardRepository.create(giftCardData);
-      giftCards.push({
-        ...giftCard,
-        giftCardNumber, // Return unencrypted for response
-        giftCardPin     // Return unencrypted for response
-      });
-    }
-  }
-
-  return giftCards;
-};
-
-/**
- * Updates stock quantities for fulfilled items
- */
-const updateStockQuantities = async (fulfilledItems: any[]): Promise<void> => {
-  for (const item of fulfilledItems) {
-    const variant = await productVariantRepository.findById(item.variantId);
-    if (variant) {
-      const newStock = variant.stockQuantity - item.quantity;
-      await productVariantRepository.updateStock(item.variantId, newStock);
-    }
+    const giftCardIds = item.availableGiftCards.map((gc: any) => gc.giftCardId);
+    await giftCardRepository.markAsUsedByOrder(giftCardIds, orderId, userId);
   }
 };
 
@@ -149,7 +104,7 @@ const processRefund = async (userId: string, orderId: string, refundAmount: numb
     type: APP_CONSTANTS.TRANSACTION_TYPES.REFUND,
     amount: refundAmount,
     balanceAfter: newBalance,
-    description: `Refund for unfulfilled items - Order ${orderId}`,
+    description: `Refund for unavailable items - Order ${orderId}`,
     orderId,
     status: APP_CONSTANTS.TRANSACTION_STATUS.COMPLETED,
     createdAt: now,
@@ -170,7 +125,7 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
     refundProcessed: boolean;
     totalItemsRequested: number;
     totalItemsFulfilled: number;
-    totalGiftCardsGenerated: number;
+    totalGiftCardsAllocated: number;
     fulfillmentSummary: {
       fulfilledAmount: number;
       fulfilledAmountFormatted: string;
@@ -186,7 +141,7 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
       denomination: number;
       giftCardNumber: string;
       giftCardPin: string;
-      expiryDate: string;
+      expiryTime: string;
       denominationFormatted: string;
     }>;
     unavailableItems: Array<{
@@ -245,25 +200,22 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
 
     await userRepository.updateWalletBalance(userId, newBalance);
 
-    // Step 2: Validate stock availability
-    const { availableItems, unavailableItems } = await validateStockAvailability(cart.items);
+    // Step 2: Validate gift card availability
+    const { availableItems, unavailableItems } = await validateGiftCardAvailability(cart.items);
     
     // Step 3: Calculate fulfillment amounts
     const totalFulfilled = availableItems.reduce((sum, item) => sum + item.totalPrice, 0);
     const totalUnfulfilled = unavailableItems.reduce((sum, item) => sum + item.totalPrice, 0);
     
-    // Step 4: Generate gift cards for fulfilled items
-    const giftCards = await generateGiftCards(orderId, userId, availableItems);
+    // Step 4: Mark gift cards as used for fulfilled items
+    await markGiftCardsAsUsed(orderId, userId, availableItems);
     
-    // Step 5: Update stock quantities
-    await updateStockQuantities(availableItems);
-    
-    // Step 6: Process refund for unfulfilled items
+    // Step 5: Process refund for unfulfilled items
     if (totalUnfulfilled > 0) {
       await processRefund(userId, orderId, totalUnfulfilled);
     }
     
-    // Step 7: Determine order status
+    // Step 6: Determine order status
     let orderStatus: string;
     if (availableItems.length === 0) {
       orderStatus = APP_CONSTANTS.ORDER_STATUS.FAILED;
@@ -273,7 +225,7 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
       orderStatus = APP_CONSTANTS.ORDER_STATUS.PARTIALLY_FULFILLED;
     }
 
-    // Step 8: Create order record
+    // Step 7: Create order record
     const orderData = {
       orderId,
       userId,
@@ -299,21 +251,10 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
           refundedPrice: item.totalPrice - fulfilledPrice
         };
       }),
-             fulfillmentDetails: {
-         attemptedAt: now,
-         partialFulfillment: unavailableItems.length > 0 ? true : false,
-         refundProcessed: totalUnfulfilled > 0 ? true : false,
-        totalItemsRequested: cart.items.reduce((sum, item) => sum + item.quantity, 0),
-        totalItemsFulfilled: availableItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalGiftCardsGenerated: giftCards.length,
-        fulfillmentSummary: {
-          fulfilledAmount: totalFulfilled,
-          fulfilledAmountFormatted: formatCurrency(totalFulfilled),
-          refundedAmount: totalUnfulfilled,
-          refundedAmountFormatted: formatCurrency(totalUnfulfilled),
-          totalPaidAmount: totalAmount,
-          totalPaidAmountFormatted: formatCurrency(totalAmount)
-        }
+      fulfillmentDetails: {
+        attemptedAt: now,
+        partialFulfillment: unavailableItems.length > 0 ? true : false,
+        refundProcessed: totalUnfulfilled > 0 ? true : false,
       },
       createdAt: now,
       updatedAt: now
@@ -321,50 +262,55 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
 
     const order = await orderRepository.create(orderData);
 
+    // Step 8: Get gift cards used for this order
+    const usedGiftCards = await giftCardRepository.findByOrderId(orderId);
+
     // Step 9: Clear cart
     await cartRepository.delete(userId);
 
-         // Step 10: Return comprehensive order details
-     return {
-       ...order,
-       fulfillmentDetails: {
-         attemptedAt: now,
-         partialFulfillment: unavailableItems.length > 0,
-         refundProcessed: totalUnfulfilled > 0,
-         totalItemsRequested: cart.items.reduce((sum, item) => sum + item.quantity, 0),
-         totalItemsFulfilled: availableItems.reduce((sum, item) => sum + item.quantity, 0),
-         totalGiftCardsGenerated: giftCards.length,
-         fulfillmentSummary: {
-           fulfilledAmount: totalFulfilled,
-           fulfilledAmountFormatted: formatCurrency(totalFulfilled),
-           refundedAmount: totalUnfulfilled,
-           refundedAmountFormatted: formatCurrency(totalUnfulfilled),
-           totalPaidAmount: totalAmount,
-           totalPaidAmountFormatted: formatCurrency(totalAmount)
-         },
-         giftCards: giftCards.map(gc => ({
-           giftCardId: gc.giftCardId,
-           productName: gc.productName,
-           variantName: gc.variantName,
-           denomination: gc.denomination,
-           giftCardNumber: gc.giftCardNumber,
-           giftCardPin: gc.giftCardPin,
-           expiryDate: gc.expiryDate,
-           denominationFormatted: formatCurrency(gc.denomination * 100) // Convert rupees to paise for formatting
-         })),
-         unavailableItems: unavailableItems.map(item => ({
-           productName: item.productName,
-           variantName: item.variantName,
-           requestedQuantity: item.quantity,
-           reason: item.reason,
-           refundAmount: item.totalPrice,
-           refundAmountFormatted: formatCurrency(item.totalPrice)
-         }))
-       }
-     };
+    // Step 10: Return comprehensive order details
+    const totalGiftCardsAllocated = usedGiftCards.length;
+
+    return {
+      ...order,
+      fulfillmentDetails: {
+        attemptedAt: now,
+        partialFulfillment: unavailableItems.length > 0,
+        refundProcessed: totalUnfulfilled > 0,
+        totalItemsRequested: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+        totalItemsFulfilled: availableItems.reduce((sum, item) => sum + item.quantity, 0),
+        totalGiftCardsAllocated,
+        fulfillmentSummary: {
+          fulfilledAmount: totalFulfilled,
+          fulfilledAmountFormatted: formatCurrency(totalFulfilled),
+          refundedAmount: totalUnfulfilled,
+          refundedAmountFormatted: formatCurrency(totalUnfulfilled),
+          totalPaidAmount: totalAmount,
+          totalPaidAmountFormatted: formatCurrency(totalAmount)
+        },
+        giftCards: usedGiftCards.map((gc: any) => ({
+          giftCardId: gc.giftCardId,
+          productName: gc.productName,
+          variantName: gc.variantName,
+          denomination: gc.denomination,
+          giftCardNumber: decrypt(gc.giftCardNumber),
+          giftCardPin: decrypt(gc.giftCardPin),
+          expiryTime: gc.expiryTime,
+          denominationFormatted: formatCurrency(gc.denomination * 100) // Convert rupees to paise for formatting
+        })),
+        unavailableItems: unavailableItems.map(item => ({
+          productName: item.productName,
+          variantName: item.variantName,
+          requestedQuantity: item.quantity,
+          reason: item.reason,
+          refundAmount: item.totalPrice,
+          refundAmountFormatted: formatCurrency(item.totalPrice)
+        }))
+      }
+    };
 
   } catch (error) {
-    // If anything fails after payment, attempt to refund the full amount
+    // If anything fails after payment, attempt to refund the full amount and release allocated cards
     try {
       const fullRefundTransactionId = ulid();
       await walletTransactionRepository.create({
@@ -381,8 +327,11 @@ export const createOrderService = async (userId: string, orderItems: CreateOrder
       });
       
       await userRepository.updateWalletBalance(userId, user.walletBalance);
+      
+      // Release any used gift cards back to available
+      await giftCardRepository.releaseGiftCards(orderId);
     } catch (refundError) {
-      console.error('Critical: Failed to refund after order creation failure:', refundError);
+      console.error('Critical: Failed to refund and release cards after order creation failure:', refundError);
       // In production, this should trigger an alert for manual intervention
     }
     

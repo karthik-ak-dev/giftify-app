@@ -72,13 +72,6 @@ export class OrderRepository {
     return OrderModel.toOrder(updatedItem);
   }
 
-  async updateStatus(orderId: string, status: string): Promise<void> {
-    await db.update(OrderModel.tableName, { orderId }, {
-      status,
-      updatedAt: new Date().toISOString()
-    });
-  }
-
   async findByStatus(status: string): Promise<Order[]> {
     const items = await db.queryGSI(
       OrderModel.tableName,
@@ -87,18 +80,6 @@ export class OrderRepository {
       status
     );
     return items.map(item => OrderModel.toOrder(item));
-  }
-
-  async delete(orderId: string): Promise<void> {
-    await db.delete(OrderModel.tableName, { orderId });
-  }
-
-  async findPendingOrders(): Promise<Order[]> {
-    return await this.findByStatus('PENDING');
-  }
-
-  async findProcessingOrders(): Promise<Order[]> {
-    return await this.findByStatus('PROCESSING');
   }
 }
 

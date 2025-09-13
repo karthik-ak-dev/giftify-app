@@ -46,7 +46,6 @@ export const manageCartService = async (userId: string, variantId: string, quant
   if (!variant) {
     throw new AppError('Product variant not found', 404, 'VARIANT_NOT_FOUND');
   }
-
   if (!variant.isActive) {
     throw new AppError('Product variant is not active', 400, 'VARIANT_INACTIVE');
   }

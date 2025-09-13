@@ -45,16 +45,7 @@ export class UserRepository {
     return UserModel.toUser(updatedItem);
   }
 
-  async delete(userId: string): Promise<void> {
-    await db.delete(UserModel.tableName, { userId });
-  }
 
-  async updateStatus(userId: string, status: string): Promise<void> {
-    await db.update(UserModel.tableName, { userId }, {
-      status,
-      updatedAt: new Date().toISOString()
-    });
-  }
 }
 
 export const userRepository = new UserRepository(); 
