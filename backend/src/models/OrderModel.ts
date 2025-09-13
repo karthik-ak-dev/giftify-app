@@ -10,6 +10,16 @@ export enum OrderStatus {
   FAILED = 'FAILED'
 }
 
+// Status display names mapping
+export const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatus, string> = {
+  [OrderStatus.PENDING]: 'Pending',
+  [OrderStatus.PROCESSING]: 'Processing',
+  [OrderStatus.PARTIALLY_FULFILLED]: 'Partially Fulfilled',
+  [OrderStatus.FULFILLED]: 'Fulfilled',
+  [OrderStatus.CANCELLED]: 'Cancelled',
+  [OrderStatus.FAILED]: 'Failed'
+};
+
 // Order item interface for type safety
 export interface OrderItem {
   variantId: string;
@@ -104,6 +114,11 @@ export class Order {
       ...data,
       items: orderItems
     });
+  }
+
+  // Get display name for order status
+  static getStatusDisplayName(status: OrderStatus): string {
+    return ORDER_STATUS_DISPLAY_NAMES[status] || status;
   }
 
   // Update order status with validation
@@ -233,6 +248,11 @@ export class Order {
 
   get formattedRefundAmount(): string {
     return this.formatAmount(this.refundAmount);
+  }
+
+  // Get display name for current status
+  get statusDisplayName(): string {
+    return Order.getStatusDisplayName(this.status);
   }
 
   // Get order summary
