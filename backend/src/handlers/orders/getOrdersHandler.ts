@@ -10,17 +10,17 @@ export const getOrdersHandler = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.userId;
-    const { page, limit, status } = req.query;
+    const { page, limit } = req.query;
     
     if (!userId) {
       throw new Error('User ID not found in request');
     }
 
-    const orders = await getOrdersService(userId, {
-      page: page ? parseInt(page as string) : 1,
-      limit: limit ? parseInt(limit as string) : 10,
-      status: status as string
-    });
+    const orders = await getOrdersService(
+      userId,
+      page ? parseInt(page as string) : 1,
+      limit ? parseInt(limit as string) : 10
+    );
 
     const response: ApiResponse = {
       success: true,

@@ -46,10 +46,6 @@ export const ENV_CONFIG = {
       : '*'
   ),
   
-  // Rate Limiting
-  RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
-  
   // Logging
   LOG_LEVEL: process.env.LOG_LEVEL || (
     process.env.NODE_ENV === 'production' ? 'info' : 'debug'

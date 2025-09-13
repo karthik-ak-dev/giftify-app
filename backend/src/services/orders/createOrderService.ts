@@ -9,7 +9,6 @@ import { WalletTransaction, TransactionType } from '../../models/WalletTransacti
 import { CreateOrderResponse } from '../../types/order';
 import { AppError } from '../../middleware/errorHandler';
 import { formatCurrency } from '../../utils/currency';
-import { decrypt } from '../../utils/crypto';
 
 /**
  * Production-ready order creation service
@@ -350,8 +349,8 @@ function buildOrderResponse(
         productName: gc.productName || 'Gift Card',
         variantName: gc.variantName || 'Standard',
         denomination: gc.denomination,
-        giftCardNumber: decrypt(gc.giftCardNumber),
-        giftCardPin: decrypt(gc.giftCardPin),
+        giftCardNumber: gc.giftCardNumber,
+        giftCardPin: gc.giftCardPin,
         expiryTime: gc.expiryTime,
         denominationFormatted: formatCurrency(gc.denomination)
       })),

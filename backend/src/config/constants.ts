@@ -19,58 +19,10 @@ export const APP_CONSTANTS = {
   DEFAULT_JWT_ACCESS_EXPIRES_IN: '15m',
   DEFAULT_JWT_REFRESH_EXPIRES_IN: '7d',
   
-  // User Status
-  USER_STATUS: {
-    ACTIVE: 'ACTIVE',
-    SUSPENDED: 'SUSPENDED',
-    DELETED: 'DELETED'
-  } as const,
-  
-  // Order Status
-  ORDER_STATUS: {
-    FULFILLED: 'FULFILLED',
-    PARTIALLY_FULFILLED: 'PARTIALLY_FULFILLED',
-    FAILED: 'FAILED'
-  } as const,
-  
-  // Transaction Types
-  TRANSACTION_TYPES: {
-    CREDIT: 'CREDIT',
-    DEBIT: 'DEBIT',
-    REFUND: 'REFUND'
-  } as const,
-  
-  // Transaction Status
-  TRANSACTION_STATUS: {
-    PENDING: 'PENDING',
-    COMPLETED: 'COMPLETED',
-    FAILED: 'FAILED'
-  } as const,
-    
   // Currency
   CURRENCY: {
     CODE: 'INR',
     SYMBOL: '₹'
-  } as const,
-  
-  // DynamoDB Table Names
-  TABLE_NAMES: {
-    USERS: 'giftify-users',
-    WALLET_TRANSACTIONS: 'giftify-wallet-transactions',
-    PRODUCTS: 'giftify-products',
-    PRODUCT_VARIANTS: 'giftify-product-variants',
-    CART: 'giftify-cart',
-    ORDERS: 'giftify-orders',
-    GIFT_CARDS: 'giftify-gift-cards'
-  } as const,
-  
-  // GSI Names
-  GSI_NAMES: {
-    WALLET_TRANSACTIONS_BY_ID: 'TransactionIdIndex',
-    PRODUCT_VARIANTS_BY_ID: 'VariantIdIndex',
-    ORDERS_BY_ID: 'OrderIdIndex',
-    GIFT_CARDS_BY_ID: 'GiftCardIdIndex',
-    GIFT_CARDS_BY_NUMBER: 'GiftCardNumberIndex'
   } as const,
   
   // Error Codes
@@ -129,9 +81,4 @@ export const APP_CONSTANTS = {
 };
 
 // Type exports for better type safety
-export type UserStatus = typeof APP_CONSTANTS.USER_STATUS[keyof typeof APP_CONSTANTS.USER_STATUS];
-export type OrderStatus = typeof APP_CONSTANTS.ORDER_STATUS[keyof typeof APP_CONSTANTS.ORDER_STATUS];
-export type TransactionType = typeof APP_CONSTANTS.TRANSACTION_TYPES[keyof typeof APP_CONSTANTS.TRANSACTION_TYPES];
-export type TransactionStatus = typeof APP_CONSTANTS.TRANSACTION_STATUS[keyof typeof APP_CONSTANTS.TRANSACTION_STATUS];
-
 export type ErrorCode = typeof APP_CONSTANTS.ERROR_CODES[keyof typeof APP_CONSTANTS.ERROR_CODES]; 

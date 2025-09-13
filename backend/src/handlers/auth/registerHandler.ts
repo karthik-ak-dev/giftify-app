@@ -15,7 +15,6 @@ export const registerHandler = async (
       password,
       firstName,
       lastName,
-      phoneNumber
     });
 
     const response: ApiResponse = {

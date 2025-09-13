@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { getTransactionsService } from '../../services/wallet/getTransactionsService';
 import { ApiResponse } from '../../types/api';
 import { AuthenticatedRequest } from '../../types/auth';
+import { TransactionType } from '../../models/WalletTransactionModel';
 
 export const getTransactionsHandler = async (
   req: AuthenticatedRequest,
@@ -19,7 +20,7 @@ export const getTransactionsHandler = async (
     const transactions = await getTransactionsService(userId, {
       page: page ? parseInt(page as string) : 1,
       limit: limit ? parseInt(limit as string) : 20,
-      type: type as string
+      type: type ? type as TransactionType : undefined
     });
 
     const response: ApiResponse = {

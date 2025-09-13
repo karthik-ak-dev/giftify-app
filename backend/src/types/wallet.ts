@@ -48,9 +48,3 @@ export interface GetTransactionsOptions {
   startDate?: string;
   endDate?: string;
 }
-
-// Request interfaces
-export interface TopupRequest {
-  amount: number;
-  description?: string;
-} 

@@ -10,13 +10,12 @@ export const createOrderHandler = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.userId;
-    const { items } = req.body;
     
     if (!userId) {
       throw new Error('User ID not found in request');
     }
 
-    const orderResult = await createOrderService(userId, items);
+    const orderResult = await createOrderService(userId);
 
     // Determine response message based on fulfillment status
     let message = 'Order created successfully';
@@ -39,24 +38,27 @@ export const createOrderHandler = async (
         order: {
           orderId: orderResult.orderId,
           status: orderResult.status,
+          statusDisplayName: orderResult.statusDisplayName,
           totalAmount: orderResult.totalAmount,
           paidAmount: orderResult.paidAmount,
           refundAmount: orderResult.refundAmount,
-          items: orderResult.items,
-          createdAt: orderResult.createdAt,
-          updatedAt: orderResult.updatedAt
+          formattedTotalAmount: orderResult.formattedTotalAmount,
+          formattedPaidAmount: orderResult.formattedPaidAmount,
+          formattedRefundAmount: orderResult.formattedRefundAmount,
+          createdAt: orderResult.createdAt
         },
         fulfillment: {
+          attemptedAt: orderResult.fulfillmentDetails.attemptedAt,
+          partialFulfillment: orderResult.fulfillmentDetails.partialFulfillment,
+          refundProcessed: orderResult.fulfillmentDetails.refundProcessed,
           summary: orderResult.fulfillmentDetails.fulfillmentSummary,
           giftCards: orderResult.fulfillmentDetails.giftCards,
           unavailableItems: orderResult.fulfillmentDetails.unavailableItems,
-                     statistics: {
-             totalItemsRequested: orderResult.fulfillmentDetails.totalItemsRequested,
-             totalItemsFulfilled: orderResult.fulfillmentDetails.totalItemsFulfilled,
-             totalGiftCardsAllocated: orderResult.fulfillmentDetails.totalGiftCardsAllocated,
-             partialFulfillment: orderResult.fulfillmentDetails.partialFulfillment,
-             refundProcessed: orderResult.fulfillmentDetails.refundProcessed
-           }
+          statistics: {
+            totalItemsRequested: orderResult.fulfillmentDetails.totalItemsRequested,
+            totalItemsFulfilled: orderResult.fulfillmentDetails.totalItemsFulfilled,
+            totalGiftCardsAllocated: orderResult.fulfillmentDetails.totalGiftCardsAllocated
+          }
         }
       },
       message,

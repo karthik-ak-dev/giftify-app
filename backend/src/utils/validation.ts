@@ -1,5 +1,7 @@
 import Joi from 'joi';
 import { APP_CONSTANTS } from '../config/constants';
+import { TransactionType } from '../models/WalletTransactionModel';
+import { OrderStatus } from '../models/OrderModel';
 
 /**
  * Validation Schemas using Joi
@@ -163,10 +165,10 @@ export const walletSchemas = {
     page: commonPatterns.pagination.page,
     limit: commonPatterns.pagination.limit,
     type: Joi.string()
-      .valid(...Object.values(APP_CONSTANTS.TRANSACTION_TYPES))
+      .valid(...Object.values(TransactionType))
       .optional()
       .messages({
-        'any.only': `Transaction type must be one of: ${Object.values(APP_CONSTANTS.TRANSACTION_TYPES).join(', ')}`
+        'any.only': `Transaction type must be one of: ${Object.values(TransactionType).join(', ')}`
       })
   })
 };
@@ -214,10 +216,10 @@ export const orderSchemas = {
       .max(50)
       .default(APP_CONSTANTS.DEFAULT_ORDER_PAGE_SIZE),
     status: Joi.string()
-      .valid(...Object.values(APP_CONSTANTS.ORDER_STATUS))
+      .valid(...Object.values(OrderStatus))
       .optional()
       .messages({
-        'any.only': `Order status must be one of: ${Object.values(APP_CONSTANTS.ORDER_STATUS).join(', ')}`
+        'any.only': `Order status must be one of: ${Object.values(OrderStatus).join(', ')}`
       })
   }),
   
