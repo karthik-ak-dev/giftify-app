@@ -1,0 +1,317 @@
+service: giftify-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: stage
+  memorySize: 256
+  timeout: 30
+  environment:
+    NODE_ENV: development
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    # Table Names (Stage Environment)
+    USERS_TABLE: ${self:service}-${self:provider.stage}-users
+    WALLET_TRANSACTIONS_TABLE: ${self:service}-${self:provider.stage}-wallet-transactions
+    PRODUCTS_TABLE: ${self:service}-${self:provider.stage}-products
+    PRODUCT_VARIANTS_TABLE: ${self:service}-${self:provider.stage}-product-variants
+    CART_TABLE: ${self:service}-${self:provider.stage}-cart
+    ORDERS_TABLE: ${self:service}-${self:provider.stage}-orders
+    GIFT_CARDS_TABLE: ${self:service}-${self:provider.stage}-gift-cards
+    # Security (Development Keys - Override with env vars)
+    JWT_ACCESS_SECRET: ${env:JWT_ACCESS_SECRET, 'stage-jwt-access-secret-key-change-in-production'}
+    JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'stage-jwt-refresh-secret-key-change-in-production'}
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, 'stage-encryption-key-32-chars-long'}
+    # Development Features
+    ENABLE_REQUEST_LOGGING: true
+    ENABLE_DETAILED_ERRORS: true
+    LOG_LEVEL: debug
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WALLET_TRANSACTIONS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WALLET_TRANSACTIONS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCT_VARIANTS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCT_VARIANTS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CART_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GIFT_CARDS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GIFT_CARDS_TABLE}/index/*"
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+  serverless-offline:
+    httpPort: 3000
+    host: 0.0.0.0
+
+functions:
+  api:
+    handler: src/app.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /
+          method: ANY
+          cors: true
+
+resources:
+  Resources:
+    # Users Table
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: EmailIndex
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify
+
+    # Wallet Transactions Table
+    WalletTransactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.WALLET_TRANSACTIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: transactionId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: transactionId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: TransactionIdIndex
+            KeySchema:
+              - AttributeName: transactionId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: UserTransactionHistoryIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify
+
+    # Products Table
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+          - AttributeName: isActive
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: ActiveProductsIndex
+            KeySchema:
+              - AttributeName: isActive
+                KeyType: HASH
+              - AttributeName: name
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify
+
+    # Product Variants Table
+    ProductVariantsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCT_VARIANTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+          - AttributeName: variantId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH
+          - AttributeName: variantId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: VariantIdIndex
+            KeySchema:
+              - AttributeName: variantId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify
+
+    # Cart Table
+    CartTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CART_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify
+
+    # Orders Table
+    OrdersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.ORDERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: orderId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: orderId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserOrdersIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: OrderStatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify
+
+    # Gift Cards Table
+    GiftCardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.GIFT_CARDS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: giftCardId
+            AttributeType: S
+          - AttributeName: variantId
+            AttributeType: S
+          - AttributeName: expiryTime
+            AttributeType: S
+          - AttributeName: usedByOrder
+            AttributeType: S
+          - AttributeName: usedByUser
+            AttributeType: S
+        KeySchema:
+          - AttributeName: giftCardId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: VariantExpiryIndex
+            KeySchema:
+              - AttributeName: variantId
+                KeyType: HASH
+              - AttributeName: expiryTime
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: OrderCardsIndex
+            KeySchema:
+              - AttributeName: usedByOrder
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: UserCardsIndex
+            KeySchema:
+              - AttributeName: usedByUser
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: Stage
+          - Key: Service
+            Value: Giftify 

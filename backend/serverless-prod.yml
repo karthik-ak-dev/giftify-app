@@ -6,12 +6,14 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: ${opt:region, 'us-east-1'}
-  stage: ${opt:stage, 'dev'}
-  memorySize: 256
+  stage: prod
+  memorySize: 512  # Higher memory for production
   timeout: 30
   environment:
+    NODE_ENV: production
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
+    # Table Names (Production Environment)
     USERS_TABLE: ${self:service}-${self:provider.stage}-users
     WALLET_TRANSACTIONS_TABLE: ${self:service}-${self:provider.stage}-wallet-transactions
     PRODUCTS_TABLE: ${self:service}-${self:provider.stage}-products
@@ -19,9 +21,14 @@ provider:
     CART_TABLE: ${self:service}-${self:provider.stage}-cart
     ORDERS_TABLE: ${self:service}-${self:provider.stage}-orders
     GIFT_CARDS_TABLE: ${self:service}-${self:provider.stage}-gift-cards
-    JWT_ACCESS_SECRET: ${env:JWT_ACCESS_SECRET, 'your-jwt-access-secret-key'}
-    JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-jwt-refresh-secret-key'}
-    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, 'your-encryption-key-32-chars-long'}
+    # Security (Production - MUST be set via environment variables)
+    JWT_ACCESS_SECRET: ${env:JWT_ACCESS_SECRET}
+    JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET}
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY}
+    # Production Features
+    ENABLE_REQUEST_LOGGING: false
+    ENABLE_DETAILED_ERRORS: false
+    LOG_LEVEL: info
   iam:
     role:
       statements:
@@ -52,19 +59,16 @@ provider:
 
 plugins:
   - serverless-webpack
-  - serverless-offline
 
 custom:
   webpack:
     webpackConfig: webpack.config.js
     includeModules: true
-  serverless-offline:
-    httpPort: 3000
-    host: 0.0.0.0
 
 functions:
   api:
     handler: src/app.handler
+    reservedConcurrency: 100  # Limit concurrent executions in production
     events:
       - http:
           path: /{proxy+}
@@ -98,6 +102,15 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
+          - Key: BackupRequired
+            Value: "true"
 
     # Wallet Transactions Table
     WalletTransactionsTable:
@@ -132,6 +145,15 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
+          - Key: BackupRequired
+            Value: "true"
 
     # Products Table
     ProductsTable:
@@ -158,6 +180,15 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
+          - Key: BackupRequired
+            Value: "true"
 
     # Product Variants Table
     ProductVariantsTable:
@@ -182,6 +213,15 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
+          - Key: BackupRequired
+            Value: "true"
 
     # Cart Table
     CartTable:
@@ -195,6 +235,11 @@ resources:
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
 
     # Orders Table
     OrdersTable:
@@ -231,6 +276,15 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
+          - Key: BackupRequired
+            Value: "true"
 
     # Gift Cards Table
     GiftCardsTable:
@@ -272,4 +326,13 @@ resources:
               - AttributeName: usedByUser
                 KeyType: HASH
             Projection:
-              ProjectionType: ALL 
+              ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Environment
+            Value: Production
+          - Key: Service
+            Value: Giftify
+          - Key: BackupRequired
+            Value: "true" 
