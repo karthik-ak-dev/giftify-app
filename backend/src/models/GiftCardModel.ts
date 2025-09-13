@@ -4,18 +4,18 @@ import { ulid } from 'ulid';
 export class GiftCard {
   readonly giftCardId: string;       // ULID - Primary Key (immutable)
   readonly productId: string;        // Product reference (immutable)
-  readonly variantId: string;        // Variant reference (immutable)
+  readonly variantId: string;        // Variant reference (immutable) - GSI1 PK
   readonly productName: string;      // Product name (immutable)
   readonly variantName: string;      // Variant name (immutable)
   readonly denomination: number;     // Face value in rupees (immutable)
   readonly giftCardNumber: string;   // Encrypted card number (immutable)
   readonly giftCardPin: string;      // Encrypted PIN (immutable)
-  readonly expiryTime: string;       // ISO timestamp when card expires (immutable)
+  readonly expiryTime: string;       // ISO timestamp when card expires (immutable) - GSI1 SK
   readonly purchasePrice: number;    // Purchase price in cents/paise (immutable)
   readonly createdAt: string;        // ISO timestamp (immutable)
   
-  usedByOrder?: string;              // Order ID if used
-  usedByUser?: string;               // User ID if used
+  usedByOrder?: string;              // Order ID if used - GSI2 PK
+  usedByUser?: string;               // User ID if used - GSI3 PK
   usedAt?: string;                   // ISO timestamp when used
   updatedAt: string;                 // ISO timestamp
 
@@ -249,4 +249,9 @@ export class GiftCard {
 }
 
 // Table configuration
-export const GIFT_CARD_TABLE = process.env.GIFT_CARDS_TABLE || 'giftify-gift-cards'; 
+export const GIFT_CARD_TABLE = process.env.GIFT_CARDS_TABLE || 'giftify-gift-cards';
+
+// GSI configurations for optimized queries
+export const VARIANT_EXPIRY_GSI = 'VariantExpiryIndex';        // variantId + expiryTime
+export const ORDER_CARDS_GSI = 'OrderCardsIndex';              // usedByOrder
+export const USER_CARDS_GSI = 'UserCardsIndex';                // usedByUser 

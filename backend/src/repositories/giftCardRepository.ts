@@ -1,5 +1,5 @@
-import { PutCommand, GetCommand, DeleteCommand, ScanCommand, UpdateCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
-import { GiftCard, GIFT_CARD_TABLE } from '../models/GiftCardModel';
+import { PutCommand, GetCommand, DeleteCommand, ScanCommand, UpdateCommand, QueryCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
+import { GiftCard, GIFT_CARD_TABLE, VARIANT_EXPIRY_GSI, ORDER_CARDS_GSI, USER_CARDS_GSI } from '../models/GiftCardModel';
 import { docClient } from '../utils/database';
 
 export class GiftCardRepository {
@@ -31,10 +31,14 @@ export class GiftCardRepository {
     return result.Item ? new GiftCard(result.Item as any) : null;
   }
 
+  /**
+   * Find gift cards by order ID using GSI (no scan)
+   */
   async findByOrderId(orderId: string): Promise<GiftCard[]> {
-    const command = new ScanCommand({
+    const command = new QueryCommand({
       TableName: GIFT_CARD_TABLE,
-      FilterExpression: 'usedByOrder = :orderId',
+      IndexName: ORDER_CARDS_GSI,
+      KeyConditionExpression: 'usedByOrder = :orderId',
       ExpressionAttributeValues: {
         ':orderId': orderId
       }
@@ -44,13 +48,18 @@ export class GiftCardRepository {
     return (result.Items || []).map(item => new GiftCard(item as any));
   }
 
+  /**
+   * Find gift cards by user ID using GSI (no scan)
+   */
   async findByUserId(userId: string): Promise<GiftCard[]> {
-    const command = new ScanCommand({
+    const command = new QueryCommand({
       TableName: GIFT_CARD_TABLE,
-      FilterExpression: 'usedByUser = :userId',
+      IndexName: USER_CARDS_GSI,
+      KeyConditionExpression: 'usedByUser = :userId',
       ExpressionAttributeValues: {
         ':userId': userId
-      }
+      },
+      ScanIndexForward: false // Most recent first
     });
     
     const result = await docClient.send(command);
@@ -58,29 +67,95 @@ export class GiftCardRepository {
   }
 
   /**
-   * Find available (unused and not expired) gift cards for a specific variant
-   * Returns cards sorted by expiry time (expiring first) for FIFO allocation
+   * Find available gift cards for a specific variant using GSI (no scan)
+   * Uses variantId + expiryTime GSI for efficient FIFO allocation
    */
   async findAvailableByVariant(variantId: string, quantity: number): Promise<GiftCard[]> {
     const now = new Date().toISOString();
     
-    const command = new ScanCommand({
+    const command = new QueryCommand({
       TableName: GIFT_CARD_TABLE,
-      FilterExpression: 'variantId = :variantId AND attribute_not_exists(usedByOrder) AND expiryTime > :now',
+      IndexName: VARIANT_EXPIRY_GSI,
+      KeyConditionExpression: 'variantId = :variantId AND expiryTime > :now',
+      FilterExpression: 'attribute_not_exists(usedByOrder)', // Only unused cards
       ExpressionAttributeValues: {
         ':variantId': variantId,
         ':now': now
       },
-      Limit: quantity * 2 // Get more than needed for sorting
+      Limit: quantity,
+      ScanIndexForward: true // Sort by expiryTime ascending (FIFO - expiring first)
     });
     
     const result = await docClient.send(command);
+    return (result.Items || []).map(item => new GiftCard(item as any));
+  }
+
+  /**
+   * Find expiring soon cards for a variant using GSI (no scan)
+   */
+  async findExpiringSoonByVariant(variantId: string, daysFromNow: number = 30): Promise<GiftCard[]> {
+    const now = new Date();
+    const futureDate = new Date(now.getTime() + (daysFromNow * 24 * 60 * 60 * 1000));
+    const futureISOString = futureDate.toISOString();
+    const nowISOString = now.toISOString();
     
-    // Convert to GiftCard instances and sort by expiry time (FIFO)
+    const command = new QueryCommand({
+      TableName: GIFT_CARD_TABLE,
+      IndexName: VARIANT_EXPIRY_GSI,
+      KeyConditionExpression: 'variantId = :variantId AND expiryTime BETWEEN :now AND :future',
+      FilterExpression: 'attribute_not_exists(usedByOrder)', // Only unused cards
+      ExpressionAttributeValues: {
+        ':variantId': variantId,
+        ':now': nowISOString,
+        ':future': futureISOString
+      },
+      ScanIndexForward: true // Sort by expiryTime ascending
+    });
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new GiftCard(item as any));
+  }
+
+  /**
+   * Get variant availability stats using GSI (no scan)
+   */
+  async getVariantAvailabilityStats(variantId: string): Promise<{
+    total: number;
+    available: number;
+    used: number;
+    expired: number;
+  }> {
+    // Query all cards for this variant using GSI
+    const command = new QueryCommand({
+      TableName: GIFT_CARD_TABLE,
+      IndexName: VARIANT_EXPIRY_GSI,
+      KeyConditionExpression: 'variantId = :variantId',
+      ExpressionAttributeValues: {
+        ':variantId': variantId
+      }
+    });
+    
+    const result = await docClient.send(command);
     const giftCards = (result.Items || []).map(item => new GiftCard(item as any));
-    giftCards.sort((a, b) => a.expiryTime.localeCompare(b.expiryTime));
     
-    return giftCards.slice(0, quantity);
+    const stats = {
+      total: giftCards.length,
+      available: 0,
+      used: 0,
+      expired: 0
+    };
+    
+    giftCards.forEach(card => {
+      if (card.isExpired) {
+        stats.expired++;
+      } else if (card.isUsed) {
+        stats.used++;
+      } else {
+        stats.available++;
+      }
+    });
+    
+    return stats;
   }
 
   /**
@@ -151,9 +226,7 @@ export class GiftCardRepository {
             ':updatedAt': giftCard.updatedAt
           },
           ConditionExpression: 'usedByOrder = :orderId', // Ensure card belongs to this order
-          ExpressionAttributeNames: {
-            '#orderId': 'usedByOrder'
-          }
+          ExpressionAttributeNames: {}
         });
         
         // Add orderId to condition
@@ -188,7 +261,10 @@ export class GiftCardRepository {
     return giftCard;
   }
 
-  // Business query methods with optimized scans
+  /**
+   * Find expired cards - this requires a scan as we need to check all variants
+   * Consider running this as a scheduled job rather than real-time queries
+   */
   async findExpiredCards(): Promise<GiftCard[]> {
     const now = new Date().toISOString();
     const command = new ScanCommand({
@@ -196,79 +272,6 @@ export class GiftCardRepository {
       FilterExpression: 'expiryTime <= :now',
       ExpressionAttributeValues: {
         ':now': now
-      }
-    });
-    
-    const result = await docClient.send(command);
-    return (result.Items || []).map(item => new GiftCard(item as any));
-  }
-
-  async findExpiringSoonByVariant(variantId: string, daysFromNow: number = 30): Promise<GiftCard[]> {
-    const now = new Date();
-    const futureDate = new Date(now.getTime() + (daysFromNow * 24 * 60 * 60 * 1000));
-    const futureISOString = futureDate.toISOString();
-    const nowISOString = now.toISOString();
-    
-    const command = new ScanCommand({
-      TableName: GIFT_CARD_TABLE,
-      FilterExpression: 'variantId = :variantId AND attribute_not_exists(usedByOrder) AND expiryTime > :now AND expiryTime <= :future',
-      ExpressionAttributeValues: {
-        ':variantId': variantId,
-        ':now': nowISOString,
-        ':future': futureISOString
-      }
-    });
-    
-    const result = await docClient.send(command);
-    const giftCards = (result.Items || []).map(item => new GiftCard(item as any));
-    giftCards.sort((a, b) => a.expiryTime.localeCompare(b.expiryTime));
-    
-    return giftCards;
-  }
-
-  async getVariantAvailabilityStats(variantId: string): Promise<{
-    total: number;
-    available: number;
-    used: number;
-    expired: number;
-  }> {
-    const command = new ScanCommand({
-      TableName: GIFT_CARD_TABLE,
-      FilterExpression: 'variantId = :variantId',
-      ExpressionAttributeValues: {
-        ':variantId': variantId
-      }
-    });
-    
-    const result = await docClient.send(command);
-    const giftCards = (result.Items || []).map(item => new GiftCard(item as any));
-    
-    const stats = {
-      total: giftCards.length,
-      available: 0,
-      used: 0,
-      expired: 0
-    };
-    
-    giftCards.forEach(card => {
-      if (card.isExpired) {
-        stats.expired++;
-      } else if (card.isUsed) {
-        stats.used++;
-      } else {
-        stats.available++;
-      }
-    });
-    
-    return stats;
-  }
-
-  async findByProductId(productId: string): Promise<GiftCard[]> {
-    const command = new ScanCommand({
-      TableName: GIFT_CARD_TABLE,
-      FilterExpression: 'productId = :productId',
-      ExpressionAttributeValues: {
-        ':productId': productId
       }
     });
     
@@ -324,6 +327,32 @@ export class GiftCardRepository {
     if (availableCards.length < quantity) {
       throw new Error(`Only ${availableCards.length} gift cards available for variant ${variantId}, but ${quantity} requested`);
     }
+  }
+
+  /**
+   * Get gift cards that are about to expire across all variants
+   * This is a scan operation - consider running as a scheduled job
+   */
+  async findAllExpiringSoonCards(daysFromNow: number = 30): Promise<GiftCard[]> {
+    const now = new Date();
+    const futureDate = new Date(now.getTime() + (daysFromNow * 24 * 60 * 60 * 1000));
+    const futureISOString = futureDate.toISOString();
+    const nowISOString = now.toISOString();
+    
+    const command = new ScanCommand({
+      TableName: GIFT_CARD_TABLE,
+      FilterExpression: 'attribute_not_exists(usedByOrder) AND expiryTime > :now AND expiryTime <= :future',
+      ExpressionAttributeValues: {
+        ':now': nowISOString,
+        ':future': futureISOString
+      }
+    });
+    
+    const result = await docClient.send(command);
+    const giftCards = (result.Items || []).map(item => new GiftCard(item as any));
+    giftCards.sort((a, b) => a.expiryTime.localeCompare(b.expiryTime));
+    
+    return giftCards;
   }
 }
 
