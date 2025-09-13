@@ -7,10 +7,6 @@ export class ProductModel {
   static readonly partitionKey = 'productId';
   
   // GSI Keys
-  static readonly categoryGSI = 'CategoryIndex';
-  static readonly categoryGSIPartitionKey = 'category';
-  static readonly categoryGSISortKey = 'createdAt';
-  
   static readonly activeProductsGSI = 'ActiveProductsIndex';
   static readonly activeProductsGSIPartitionKey = 'isActive';
   static readonly activeProductsGSISortKey = 'name';
@@ -18,16 +14,16 @@ export class ProductModel {
   // Table schema definition
   static readonly schema = {
     productId: 'string',        // ULID - Primary Key
-    name: 'string',             // GSI2 Sort Key
+    name: 'string',             // GSI Sort Key
     description: 'string',
     brand: 'string',
-    category: 'string',         // GSI1 Partition Key
+    category: 'string',
     imageUrl: 'string',
     thumbnailUrl: 'string',
-    isActive: 'string',         // GSI2 Partition Key (stored as string for GSI)
+    isActive: 'string',         // GSI Partition Key (stored as string for GSI)
     termsAndConditions: 'string',
     howToRedeem: 'string',
-    createdAt: 'string',        // ISO timestamp - GSI1 Sort Key
+    createdAt: 'string',        // ISO timestamp
     updatedAt: 'string'         // ISO timestamp
   };
   

@@ -11,16 +11,12 @@ export class ProductVariantModel {
   static readonly variantIdGSI = 'VariantIdIndex';
   static readonly variantIdGSIKey = 'variantId';
   
-  static readonly activeVariantsGSI = 'ActiveVariantsIndex';
-  static readonly activeVariantsGSIPartitionKey = 'productId';
-  static readonly activeVariantsGSISortKey = 'denomination';
-  
   // Table schema definition
   static readonly schema = {
     productId: 'string',        // Partition Key
     variantId: 'string',        // Sort Key - ULID
     name: 'string',
-    denomination: 'number',     // Face value in rupees - GSI2 Sort Key
+    denomination: 'number',     // Face value in rupees
     mrp: 'number',              // MRP in cents/paise
     costPrice: 'number',        // Cost price in cents/paise
     discountPercent: 'number',  // Discount percentage

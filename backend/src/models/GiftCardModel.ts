@@ -6,30 +6,24 @@ export class GiftCardModel {
   // Primary Key
   static readonly partitionKey = 'giftCardId';
   
-  // GSI Keys
-  static readonly variantGSI = 'VariantIndex';
-  static readonly variantGSIPartitionKey = 'variantId';
-  static readonly variantGSISortKey = 'createdAt';
-  
-  static readonly giftCardNumberGSI = 'GiftCardNumberIndex';
-  static readonly giftCardNumberGSIKey = 'giftCardNumber';
+
   
   // Table schema definition
   static readonly schema = {
     giftCardId: 'string',       // ULID - Primary Key
     productId: 'string',
-    variantId: 'string',        // GSI1 Partition Key
+    variantId: 'string',
     productName: 'string',
     variantName: 'string',
     denomination: 'number',     // Face value in rupees
-    giftCardNumber: 'string',   // Encrypted - GSI2 Partition Key
+    giftCardNumber: 'string',   // Encrypted
     giftCardPin: 'string',      // Encrypted
     expiryTime: 'string',       // ISO timestamp when card expires
     purchasePrice: 'number',    // Purchase price in cents/paise
     usedByOrder: 'string',      // Optional - Order ID if used
     usedByUser: 'string',       // Optional - User ID if used
     usedAt: 'string',           // Optional - ISO timestamp when used
-    createdAt: 'string',        // ISO timestamp - GSI1 Sort Key
+    createdAt: 'string',        // ISO timestamp
     updatedAt: 'string'         // ISO timestamp
   };
   
