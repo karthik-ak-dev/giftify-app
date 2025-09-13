@@ -17,6 +17,10 @@ export class GiftCard {
   usedByOrder?: string;              // Order ID if used - GSI2 PK
   usedByUser?: string;               // User ID if used - GSI3 PK
   usedAt?: string;                   // ISO timestamp when used
+  reservedByOrder?: string;          // Order ID if reserved (temporary allocation)
+  reservedByUser?: string;           // User ID if reserved
+  reservedAt?: string;               // ISO timestamp when reserved
+  reservationExpiresAt?: string;     // ISO timestamp when reservation expires
   updatedAt: string;                 // ISO timestamp
 
   constructor(data: {
@@ -33,6 +37,10 @@ export class GiftCard {
     usedByOrder?: string;
     usedByUser?: string;
     usedAt?: string;
+    reservedByOrder?: string;
+    reservedByUser?: string;
+    reservedAt?: string;
+    reservationExpiresAt?: string;
     createdAt?: string;
     updatedAt?: string;
   }) {
@@ -56,6 +64,10 @@ export class GiftCard {
     this.usedByOrder = data.usedByOrder;
     this.usedByUser = data.usedByUser;
     this.usedAt = data.usedAt;
+    this.reservedByOrder = data.reservedByOrder;
+    this.reservedByUser = data.reservedByUser;
+    this.reservedAt = data.reservedAt;
+    this.reservationExpiresAt = data.reservationExpiresAt;
     this.updatedAt = data.updatedAt ?? new Date().toISOString();
   }
 
@@ -80,10 +92,78 @@ export class GiftCard {
     });
   }
 
-  // Mark gift card as used
+  // Reserve gift card atomically (temporary allocation)
+  reserve(orderId: string, userId: string, reservationMinutes: number = 10): GiftCard {
+    if (this.isUsed) {
+      throw new Error('Gift card is already used');
+    }
+    
+    if (this.isReserved && !this.isReservationExpired) {
+      throw new Error('Gift card is already reserved');
+    }
+    
+    if (this.isExpired) {
+      throw new Error('Gift card has expired');
+    }
+
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + (reservationMinutes * 60 * 1000));
+
+    this.reservedByOrder = orderId;
+    this.reservedByUser = userId;
+    this.reservedAt = now.toISOString();
+    this.reservationExpiresAt = expiresAt.toISOString();
+    this.updatedAt = now.toISOString();
+    return this;
+  }
+
+  // Confirm reservation and mark as used
+  confirmReservation(): GiftCard {
+    if (!this.isReserved) {
+      throw new Error('Gift card is not reserved');
+    }
+    
+    if (this.isReservationExpired) {
+      throw new Error('Reservation has expired');
+    }
+
+    // Move from reserved to used
+    this.usedByOrder = this.reservedByOrder;
+    this.usedByUser = this.reservedByUser;
+    this.usedAt = new Date().toISOString();
+    
+    // Clear reservation fields
+    this.reservedByOrder = undefined;
+    this.reservedByUser = undefined;
+    this.reservedAt = undefined;
+    this.reservationExpiresAt = undefined;
+    
+    this.updatedAt = new Date().toISOString();
+    return this;
+  }
+
+  // Release reservation (make available again)
+  releaseReservation(): GiftCard {
+    if (!this.isReserved) {
+      throw new Error('Gift card is not reserved');
+    }
+
+    this.reservedByOrder = undefined;
+    this.reservedByUser = undefined;
+    this.reservedAt = undefined;
+    this.reservationExpiresAt = undefined;
+    this.updatedAt = new Date().toISOString();
+    return this;
+  }
+
+  // Mark gift card as used (direct usage without reservation)
   markAsUsed(orderId: string, userId: string): GiftCard {
     if (this.isUsed) {
       throw new Error('Gift card is already used');
+    }
+    
+    if (this.isReserved && !this.isReservationExpired) {
+      throw new Error('Gift card is reserved by another order');
     }
     
     if (this.isExpired) {
@@ -93,6 +173,15 @@ export class GiftCard {
     this.usedByOrder = orderId;
     this.usedByUser = userId;
     this.usedAt = new Date().toISOString();
+    
+    // Clear any expired reservation
+    if (this.isReservationExpired) {
+      this.reservedByOrder = undefined;
+      this.reservedByUser = undefined;
+      this.reservedAt = undefined;
+      this.reservationExpiresAt = undefined;
+    }
+    
     this.updatedAt = new Date().toISOString();
     return this;
   }
@@ -115,8 +204,19 @@ export class GiftCard {
     return !!this.usedByOrder;
   }
 
+  get isReserved(): boolean {
+    return !!this.reservedByOrder;
+  }
+
+  get isReservationExpired(): boolean {
+    if (!this.isReserved || !this.reservationExpiresAt) {
+      return false;
+    }
+    return new Date(this.reservationExpiresAt) <= new Date();
+  }
+
   get isAvailable(): boolean {
-    return !this.isUsed && !this.isExpired;
+    return !this.isUsed && !this.isExpired && (!this.isReserved || this.isReservationExpired);
   }
 
   get isExpired(): boolean {

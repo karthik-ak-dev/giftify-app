@@ -24,6 +24,7 @@ export const createOrderService = async (userId: string): Promise<CreateOrderRes
   let paymentTransaction: WalletTransaction | null = null;
   let allocatedGiftCards: string[] = [];
   let orderCreated = false;
+  let tempOrderId: string | null = null;
 
   try {
     // Step 1: Validate user and get cart
@@ -41,9 +42,10 @@ export const createOrderService = async (userId: string): Promise<CreateOrderRes
       throw new AppError('Cart is empty', 400, 'EMPTY_CART');
     }
 
-    // Step 2: Validate cart items and check gift card availability
-    const validationResults = await validateCartAndAvailability(cart.items);
-    const { availableItems, unavailableItems, totalAvailableAmount, totalUnavailableAmount } = validationResults;
+    // Step 2: Validate cart items and atomically reserve gift cards
+    tempOrderId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const validationResults = await validateCartAndReserveGiftCards(cart.items, tempOrderId, userId);
+    const { availableItems, unavailableItems, totalAvailableAmount, totalUnavailableAmount, reservedCardsByVariant } = validationResults;
 
     if (availableItems.length === 0) {
       throw new AppError('No items available for fulfillment', 400, 'NO_ITEMS_AVAILABLE');
@@ -105,9 +107,10 @@ export const createOrderService = async (userId: string): Promise<CreateOrderRes
     paymentTransaction.markAsCompleted();
     await walletTransactionRepository.create(paymentTransaction);
 
-    // Step 7: Allocate gift cards for available items
-    const giftCardAllocationResults = await allocateGiftCards(availableItems, savedOrder.orderId, userId);
-    allocatedGiftCards = giftCardAllocationResults.allocatedCardIds;
+    // Step 7: Update reservations to use the real order ID and confirm them
+    await updateReservationsToOrder(tempOrderId, savedOrder.orderId);
+    const confirmedCards = await giftCardRepository.confirmReservations(savedOrder.orderId);
+    allocatedGiftCards = confirmedCards.map(card => card.giftCardId);
 
     // Step 8: Process refund for unavailable items if needed
     if (totalUnavailableAmount > 0) {
@@ -125,7 +128,7 @@ export const createOrderService = async (userId: string): Promise<CreateOrderRes
 
   } catch (error) {
     // Comprehensive error recovery
-    await handleOrderCreationFailure(userId, paymentTransaction, allocatedGiftCards, orderCreated, error);
+    await handleOrderCreationFailure(userId, paymentTransaction, tempOrderId, orderCreated, error);
     
     // Re-throw the original error or a wrapped error
     if (error instanceof AppError) {
@@ -137,13 +140,15 @@ export const createOrderService = async (userId: string): Promise<CreateOrderRes
 };
 
 /**
- * Validates cart items and checks gift card availability
+ * Validates cart items and atomically reserves gift cards
+ * This prevents concurrent orders from getting the same vouchers
  */
-async function validateCartAndAvailability(cartItems: any[]) {
+async function validateCartAndReserveGiftCards(cartItems: any[], orderId: string, userId: string) {
   const availableItems: any[] = [];
   const unavailableItems: any[] = [];
   let totalAvailableAmount = 0;
   let totalUnavailableAmount = 0;
+  const reservedCardsByVariant: { [variantId: string]: any[] } = {};
 
   for (const item of cartItems) {
     try {
@@ -169,30 +174,40 @@ async function validateCartAndAvailability(cartItems: any[]) {
         continue;
       }
 
-      // Check gift card availability
-      const availableGiftCards = await giftCardRepository.findAvailableByVariant(item.variantId, item.quantity);
+      // Atomically reserve gift cards for this item
+      // The repository will return whatever cards it can reserve (0 to requested quantity)
+      const reservedCards = await giftCardRepository.reserveGiftCards(
+        item.variantId, 
+        item.quantity, 
+        orderId, 
+        userId, 
+        5 // 5 minute reservation
+      );
       
-      if (availableGiftCards.length === 0) {
+      if (reservedCards.length === 0) {
+        // No cards could be reserved
         unavailableItems.push({
           ...item,
-          reason: 'No gift cards available',
+          reason: 'No gift cards available due to high demand',
           refundAmount: item.totalPrice
         });
         totalUnavailableAmount += item.totalPrice;
-      } else if (availableGiftCards.length < item.quantity) {
-        // Partial availability
-        const availableQuantity = availableGiftCards.length;
+      } else if (reservedCards.length < item.quantity) {
+        // Partial reservation - split the item
+        const availableQuantity = reservedCards.length;
         const unavailableQuantity = item.quantity - availableQuantity;
         const availableAmount = variant.sellingPrice * availableQuantity;
         const unavailableAmount = variant.sellingPrice * unavailableQuantity;
 
+        // Add available portion
         availableItems.push({
           ...item,
           quantity: availableQuantity,
           totalPrice: availableAmount,
-          availableGiftCards: availableGiftCards
+          reservedGiftCards: reservedCards
         });
 
+        // Add unavailable portion
         unavailableItems.push({
           ...item,
           quantity: unavailableQuantity,
@@ -203,40 +218,46 @@ async function validateCartAndAvailability(cartItems: any[]) {
 
         totalAvailableAmount += availableAmount;
         totalUnavailableAmount += unavailableAmount;
+        reservedCardsByVariant[item.variantId] = reservedCards;
       } else {
-        // Full availability
+        // Full reservation successful
         availableItems.push({
           ...item,
-          availableGiftCards: availableGiftCards.slice(0, item.quantity)
+          reservedGiftCards: reservedCards
         });
         totalAvailableAmount += item.totalPrice;
+        reservedCardsByVariant[item.variantId] = reservedCards;
       }
-    } catch (error) {
+    } catch (error: any) {
+      // If there's any error during validation/reservation, mark item as unavailable
       unavailableItems.push({
         ...item,
-        reason: 'Error validating item availability',
+        reason: `Error processing item: ${error.message || 'Unknown error'}`,
         refundAmount: item.totalPrice
       });
       totalUnavailableAmount += item.totalPrice;
     }
   }
 
-  return { availableItems, unavailableItems, totalAvailableAmount, totalUnavailableAmount };
+  return { 
+    availableItems, 
+    unavailableItems, 
+    totalAvailableAmount, 
+    totalUnavailableAmount,
+    reservedCardsByVariant 
+  };
 }
 
 /**
- * Allocates gift cards for available items
+ * Updates reservations from temporary order ID to real order ID
  */
-async function allocateGiftCards(availableItems: any[], orderId: string, userId: string) {
-  const allocatedCardIds: string[] = [];
-
-  for (const item of availableItems) {
-    const giftCardIds = item.availableGiftCards.map((gc: any) => gc.giftCardId);
-    await giftCardRepository.markAsUsedByOrder(giftCardIds, orderId, userId);
-    allocatedCardIds.push(...giftCardIds);
+async function updateReservationsToOrder(tempOrderId: string, realOrderId: string) {
+  const reservedCards = await giftCardRepository.findReservedByOrder(tempOrderId);
+  
+  for (const card of reservedCards) {
+    card.reservedByOrder = realOrderId;
+    await giftCardRepository.save(card);
   }
-
-  return { allocatedCardIds };
 }
 
 /**
@@ -358,17 +379,17 @@ function buildOrderResponse(
 async function handleOrderCreationFailure(
   userId: string,
   paymentTransaction: WalletTransaction | null,
-  allocatedGiftCards: string[],
+  tempOrderId: string | null,
   orderCreated: boolean,
   originalError: any
 ) {
   console.error('Order creation failed, initiating recovery:', originalError);
 
   try {
-    // Release allocated gift cards
-    if (allocatedGiftCards.length > 0) {
-      await giftCardRepository.releaseGiftCards(''); // Release by card IDs
-      console.log(`Released ${allocatedGiftCards.length} allocated gift cards`);
+    // Release reserved gift cards
+    if (tempOrderId) {
+      const releasedCards = await giftCardRepository.releaseReservations(tempOrderId);
+      console.log(`Released ${releasedCards.length} reserved gift cards`);
     }
 
     // Process refund if payment was taken

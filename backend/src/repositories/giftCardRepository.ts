@@ -77,7 +77,7 @@ export class GiftCardRepository {
       TableName: GIFT_CARD_TABLE,
       IndexName: VARIANT_EXPIRY_GSI,
       KeyConditionExpression: 'variantId = :variantId AND expiryTime > :now',
-      FilterExpression: 'attribute_not_exists(usedByOrder)', // Only unused cards
+      FilterExpression: 'attribute_not_exists(usedByOrder) AND (attribute_not_exists(reservedByOrder) OR reservationExpiresAt < :now)', // Only unused and unreserved cards
       ExpressionAttributeValues: {
         ':variantId': variantId,
         ':now': now
@@ -88,6 +88,254 @@ export class GiftCardRepository {
     
     const result = await docClient.send(command);
     return (result.Items || []).map(item => new GiftCard(item as any));
+  }
+
+  /**
+   * Atomically reserve gift cards for an order (prevents concurrent allocation)
+   * This is the key method for preventing duplicate voucher allocation
+   * Returns whatever cards could be reserved (may be less than requested quantity)
+   */
+  async reserveGiftCards(variantId: string, quantity: number, orderId: string, userId: string, reservationMinutes: number = 10): Promise<GiftCard[]> {
+    const reservedCards: GiftCard[] = [];
+    const now = new Date().toISOString();
+    
+    // Find available cards with a buffer to handle concurrent requests
+    const availableCards = await this.findAvailableByVariant(variantId, Math.max(quantity * 2, 50)); // Get more than needed
+    
+    if (availableCards.length === 0) {
+      // No cards available at all
+      return [];
+    }
+
+    // Try to reserve cards one by one atomically
+    // Reserve as many as possible, up to the requested quantity
+    for (const card of availableCards) {
+      if (reservedCards.length >= quantity) {
+        break; // We have enough cards
+      }
+
+      try {
+        // Attempt atomic reservation
+        card.reserve(orderId, userId, reservationMinutes);
+        
+        const command = new UpdateCommand({
+          TableName: GIFT_CARD_TABLE,
+          Key: { giftCardId: card.giftCardId },
+          UpdateExpression: 'SET reservedByOrder = :orderId, reservedByUser = :userId, reservedAt = :reservedAt, reservationExpiresAt = :expiresAt, updatedAt = :updatedAt',
+          ExpressionAttributeValues: {
+            ':orderId': card.reservedByOrder,
+            ':userId': card.reservedByUser,
+            ':reservedAt': card.reservedAt,
+            ':expiresAt': card.reservationExpiresAt,
+            ':updatedAt': card.updatedAt,
+            ':now': now
+          },
+          // Critical: Only reserve if card is truly available
+          ConditionExpression: 'attribute_not_exists(usedByOrder) AND (attribute_not_exists(reservedByOrder) OR reservationExpiresAt < :now) AND expiryTime > :now'
+        });
+        
+        await docClient.send(command);
+        reservedCards.push(card);
+        
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          // Card was taken by another request, continue to next card
+          console.log(`Gift card ${card.giftCardId} was already reserved/used by another request`);
+          continue;
+        }
+        // For other errors, log but continue trying other cards
+        console.warn(`Failed to reserve gift card ${card.giftCardId}:`, error.message);
+        continue;
+      }
+    }
+
+    // Return whatever we managed to reserve (could be 0 to quantity)
+    console.log(`Reserved ${reservedCards.length} out of ${quantity} requested gift cards for variant ${variantId}`);
+    return reservedCards;
+  }
+
+  /**
+   * Confirm reservations and mark cards as used
+   */
+  async confirmReservations(orderId: string): Promise<GiftCard[]> {
+    // Find all cards reserved by this order
+    const reservedCards = await this.findReservedByOrder(orderId);
+    const confirmedCards: GiftCard[] = [];
+
+    for (const card of reservedCards) {
+      try {
+        card.confirmReservation();
+        
+        const command = new UpdateCommand({
+          TableName: GIFT_CARD_TABLE,
+          Key: { giftCardId: card.giftCardId },
+          UpdateExpression: 'SET usedByOrder = :orderId, usedByUser = :userId, usedAt = :usedAt, updatedAt = :updatedAt REMOVE reservedByOrder, reservedByUser, reservedAt, reservationExpiresAt',
+          ExpressionAttributeValues: {
+            ':orderId': card.usedByOrder,
+            ':userId': card.usedByUser,
+            ':usedAt': card.usedAt,
+            ':updatedAt': card.updatedAt
+          },
+          ConditionExpression: 'reservedByOrder = :orderId AND attribute_not_exists(usedByOrder)' // Ensure still reserved by this order
+        });
+        
+        await docClient.send(command);
+        confirmedCards.push(card);
+        
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          console.warn(`Could not confirm reservation for gift card ${card.giftCardId} - may have been released or expired`);
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    return confirmedCards;
+  }
+
+  /**
+   * Release reservations for an order (cleanup on failure)
+   */
+  async releaseReservations(orderId: string): Promise<GiftCard[]> {
+    const reservedCards = await this.findReservedByOrder(orderId);
+    const releasedCards: GiftCard[] = [];
+
+    for (const card of reservedCards) {
+      try {
+        card.releaseReservation();
+        
+        const command = new UpdateCommand({
+          TableName: GIFT_CARD_TABLE,
+          Key: { giftCardId: card.giftCardId },
+          UpdateExpression: 'REMOVE reservedByOrder, reservedByUser, reservedAt, reservationExpiresAt SET updatedAt = :updatedAt',
+          ExpressionAttributeValues: {
+            ':updatedAt': card.updatedAt
+          },
+          ConditionExpression: 'reservedByOrder = :orderId', // Ensure still reserved by this order
+          ExpressionAttributeNames: {}
+        });
+        
+        command.input.ExpressionAttributeValues![':orderId'] = orderId;
+        
+        await docClient.send(command);
+        releasedCards.push(card);
+        
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          console.warn(`Could not release reservation for gift card ${card.giftCardId} - may already be released`);
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    return releasedCards;
+  }
+
+  /**
+   * Find gift cards reserved by an order
+   */
+  async findReservedByOrder(orderId: string): Promise<GiftCard[]> {
+    const command = new ScanCommand({
+      TableName: GIFT_CARD_TABLE,
+      FilterExpression: 'reservedByOrder = :orderId',
+      ExpressionAttributeValues: {
+        ':orderId': orderId
+      }
+    });
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new GiftCard(item as any));
+  }
+
+  /**
+   * Clean up expired reservations (should be run periodically)
+   */
+  async cleanupExpiredReservations(): Promise<number> {
+    const now = new Date().toISOString();
+    const command = new ScanCommand({
+      TableName: GIFT_CARD_TABLE,
+      FilterExpression: 'attribute_exists(reservedByOrder) AND reservationExpiresAt < :now',
+      ExpressionAttributeValues: {
+        ':now': now
+      }
+    });
+    
+    const result = await docClient.send(command);
+    const expiredReservations = (result.Items || []).map(item => new GiftCard(item as any));
+    
+    if (expiredReservations.length === 0) {
+      return 0; // No cleanup needed
+    }
+    
+    console.log(`Found ${expiredReservations.length} expired reservations to cleanup`);
+    
+    let cleanedCount = 0;
+    for (const card of expiredReservations) {
+      try {
+        card.releaseReservation();
+        
+        const updateCommand = new UpdateCommand({
+          TableName: GIFT_CARD_TABLE,
+          Key: { giftCardId: card.giftCardId },
+          UpdateExpression: 'REMOVE reservedByOrder, reservedByUser, reservedAt, reservationExpiresAt SET updatedAt = :updatedAt',
+          ExpressionAttributeValues: {
+            ':updatedAt': card.updatedAt,
+            ':now': now
+          },
+          ConditionExpression: 'attribute_exists(reservedByOrder) AND reservationExpiresAt < :now'
+        });
+        
+        await docClient.send(updateCommand);
+        cleanedCount++;
+        
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          // Already cleaned up, continue
+          continue;
+        }
+        console.error(`Failed to cleanup expired reservation for card ${card.giftCardId}:`, error);
+      }
+    }
+    
+    console.log(`Successfully cleaned up ${cleanedCount} expired reservations`);
+    return cleanedCount;
+  }
+
+  /**
+   * Get reservation statistics for monitoring
+   */
+  async getReservationStats(): Promise<{
+    totalReserved: number;
+    expiredReservations: number;
+    activeReservations: number;
+  }> {
+    const now = new Date().toISOString();
+    const command = new ScanCommand({
+      TableName: GIFT_CARD_TABLE,
+      FilterExpression: 'attribute_exists(reservedByOrder)',
+      ProjectionExpression: 'giftCardId, reservationExpiresAt'
+    });
+    
+    const result = await docClient.send(command);
+    const reservations = result.Items || [];
+    
+    const stats = {
+      totalReserved: reservations.length,
+      expiredReservations: 0,
+      activeReservations: 0
+    };
+    
+    reservations.forEach(item => {
+      if (item.reservationExpiresAt && item.reservationExpiresAt < now) {
+        stats.expiredReservations++;
+      } else {
+        stats.activeReservations++;
+      }
+    });
+    
+    return stats;
   }
 
   /**
