@@ -19,8 +19,9 @@ provider:
     CART_TABLE: ${self:service}-${self:provider.stage}-cart
     ORDERS_TABLE: ${self:service}-${self:provider.stage}-orders
     GIFT_CARDS_TABLE: ${self:service}-${self:provider.stage}-gift-cards
-    JWT_SECRET: ${env:JWT_SECRET, 'your-jwt-secret-key'}
+    JWT_ACCESS_SECRET: ${env:JWT_ACCESS_SECRET, 'your-jwt-access-secret-key'}
     JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-jwt-refresh-secret-key'}
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, 'your-encryption-key-32-chars-long'}
   iam:
     role:
       statements:
@@ -141,10 +142,6 @@ resources:
         AttributeDefinitions:
           - AttributeName: productId
             AttributeType: S
-          - AttributeName: category
-            AttributeType: S
-          - AttributeName: createdAt
-            AttributeType: S
           - AttributeName: isActive
             AttributeType: S
           - AttributeName: name
@@ -153,14 +150,6 @@ resources:
           - AttributeName: productId
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: CategoryIndex
-            KeySchema:
-              - AttributeName: category
-                KeyType: HASH
-              - AttributeName: createdAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
           - IndexName: ActiveProductsIndex
             KeySchema:
               - AttributeName: isActive
@@ -181,10 +170,6 @@ resources:
             AttributeType: S
           - AttributeName: variantId
             AttributeType: S
-          - AttributeName: isActive
-            AttributeType: S
-          - AttributeName: denomination
-            AttributeType: N
         KeySchema:
           - AttributeName: productId
             KeyType: HASH
@@ -195,14 +180,6 @@ resources:
             KeySchema:
               - AttributeName: variantId
                 KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-          - IndexName: ActiveVariantsIndex
-            KeySchema:
-              - AttributeName: productId
-                KeyType: HASH
-              - AttributeName: denomination
-                KeyType: RANGE
             Projection:
               ProjectionType: ALL
 
@@ -264,37 +241,35 @@ resources:
         AttributeDefinitions:
           - AttributeName: giftCardId
             AttributeType: S
-          - AttributeName: userId
+          - AttributeName: variantId
             AttributeType: S
-          - AttributeName: issuedAt
+          - AttributeName: expiryTime
             AttributeType: S
-          - AttributeName: orderId
+          - AttributeName: usedByOrder
             AttributeType: S
-          - AttributeName: giftCardNumber
+          - AttributeName: usedByUser
             AttributeType: S
         KeySchema:
           - AttributeName: giftCardId
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: UserGiftCardsIndex
+          - IndexName: VariantExpiryIndex
             KeySchema:
-              - AttributeName: userId
+              - AttributeName: variantId
                 KeyType: HASH
-              - AttributeName: issuedAt
+              - AttributeName: expiryTime
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-          - IndexName: OrderGiftCardsIndex
+          - IndexName: OrderCardsIndex
             KeySchema:
-              - AttributeName: orderId
+              - AttributeName: usedByOrder
                 KeyType: HASH
-              - AttributeName: giftCardId
-                KeyType: RANGE
             Projection:
               ProjectionType: ALL
-          - IndexName: GiftCardNumberIndex
+          - IndexName: UserCardsIndex
             KeySchema:
-              - AttributeName: giftCardNumber
+              - AttributeName: usedByUser
                 KeyType: HASH
             Projection:
               ProjectionType: ALL 
