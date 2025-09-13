@@ -1,5 +1,10 @@
-// Cart types
-export interface CartItem {
+export interface CartSummary {
+  totalItems: number;
+  totalAmount: number;
+  totalAmountFormatted: string;
+} 
+
+export interface CartItemWithStock {
   variantId: string;
   productId: string;
   productName: string;
@@ -7,19 +12,6 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  stockAvailable: number;
+  isInStock: boolean;
 }
-
-export interface Cart {
-  userId: string;
-  items: CartItem[];
-  totalAmount: number;
-  totalItems: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CartSummary {
-  totalItems: number;
-  totalAmount: number;
-  totalAmountFormatted: string;
-} 
