@@ -12,14 +12,6 @@ import { GiftCardModel } from '../../models/GiftCardModel';
 import { APP_CONSTANTS } from '../../config/constants';
 import { ulid } from 'ulid';
 
-interface FulfillmentResult {
-  fulfilledItems: any[];
-  unfulfilledItems: any[];
-  totalFulfilled: number;
-  totalUnfulfilled: number;
-  giftCards: any[];
-}
-
 /**
  * Validates stock availability for cart items
  */
