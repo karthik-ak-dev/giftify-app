@@ -1,44 +1,4 @@
 import { OrderStatus } from '../models/OrderModel';
-import { TransactionStatus } from '../models/WalletTransactionModel';
-
-// Order types
-export interface OrderItem {
-  variantId: string;
-  productId: string;
-  productName: string;
-  variantName: string;
-  unitPrice: number;
-  requestedQuantity: number;
-  fulfilledQuantity: number;
-  totalPrice: number;
-  fulfilledPrice: number;
-  refundedPrice: number;
-}
-
-export interface Order {
-  orderId: string;
-  userId: string;
-  status: 'PENDING' | 'PROCESSING' | 'PARTIALLY_FULFILLED' | 'FULFILLED' | 'CANCELLED' | 'FAILED';
-  totalAmount: number;
-  paidAmount: number;
-  refundAmount: number;
-  items: OrderItem[];
-  fulfillmentDetails?: {
-    attemptedAt?: string;
-    fulfilledAt?: string;
-    partialFulfillment: boolean;
-    refundProcessed: boolean;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateOrderRequest {
-  items: {
-    variantId: string;
-    quantity: number;
-  }[];
-}
 
 // Enhanced response interfaces for services
 export interface OrderItemResponse {
@@ -110,6 +70,52 @@ export interface CancelOrderResponse {
   formattedNewWalletBalance: string;
   message: string;
   cancelledAt: string;
+}
+
+export interface CreateOrderResponse {
+  orderId: string;
+  status: OrderStatus;
+  statusDisplayName: string;
+  totalAmount: number;
+  paidAmount: number;
+  refundAmount: number;
+  formattedTotalAmount: string;
+  formattedPaidAmount: string;
+  formattedRefundAmount: string;
+  fulfillmentDetails: {
+    attemptedAt: string;
+    partialFulfillment: boolean;
+    refundProcessed: boolean;
+    totalItemsRequested: number;
+    totalItemsFulfilled: number;
+    totalGiftCardsAllocated: number;
+    fulfillmentSummary: {
+      fulfilledAmount: number;
+      fulfilledAmountFormatted: string;
+      refundedAmount: number;
+      refundedAmountFormatted: string;
+    };
+    giftCards: Array<{
+      giftCardId: string;
+      productName: string;
+      variantName: string;
+      denomination: number;
+      giftCardNumber: string;
+      giftCardPin: string;
+      expiryTime: string;
+      denominationFormatted: string;
+    }>;
+    unavailableItems: Array<{
+      productName: string;
+      variantName: string;
+      requestedQuantity: number;
+      reason: string;
+      refundAmount: number;
+      refundAmountFormatted: string;
+    }>;
+  };
+  createdAt: string;
+  message: string;
 }
 
  
