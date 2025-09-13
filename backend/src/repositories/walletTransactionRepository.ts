@@ -1,5 +1,5 @@
 import { PutCommand, GetCommand, DeleteCommand, ScanCommand, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { WalletTransaction, WALLET_TRANSACTION_TABLE, TRANSACTION_ID_GSI, USER_TRANSACTION_HISTORY_GSI } from '../models/WalletTransactionModel';
+import { WalletTransaction, TransactionStatus, WALLET_TRANSACTION_TABLE, TRANSACTION_ID_GSI, USER_TRANSACTION_HISTORY_GSI } from '../models/WalletTransactionModel';
 import { PaginationParams, PaginatedResponse } from '../types/api';
 import { docClient } from '../utils/database';
 
@@ -95,15 +95,15 @@ export class WalletTransactionRepository {
     return transaction;
   }
 
-  async updateStatus(transaction: WalletTransaction, status: 'COMPLETED' | 'FAILED' | 'PENDING'): Promise<WalletTransaction> {
+  async updateStatus(transaction: WalletTransaction, status: TransactionStatus): Promise<WalletTransaction> {
     switch (status) {
-      case 'COMPLETED':
+      case TransactionStatus.COMPLETED:
         transaction.markAsCompleted();
         break;
-      case 'FAILED':
+      case TransactionStatus.FAILED:
         transaction.markAsFailed();
         break;
-      case 'PENDING':
+      case TransactionStatus.PENDING:
         transaction.markAsPending();
         break;
     }
@@ -160,7 +160,7 @@ export class WalletTransactionRepository {
       },
       ExpressionAttributeValues: {
         ':userId': userId,
-        ':status': 'COMPLETED'
+        ':status': TransactionStatus.COMPLETED
       },
       ScanIndexForward: false // Most recent first
     });
@@ -275,7 +275,7 @@ export class WalletTransactionRepository {
         '#status': 'status'
       },
       ExpressionAttributeValues: {
-        ':status': 'PENDING'
+        ':status': TransactionStatus.PENDING
       }
     });
     
@@ -291,7 +291,7 @@ export class WalletTransactionRepository {
         '#status': 'status'
       },
       ExpressionAttributeValues: {
-        ':status': 'FAILED'
+        ':status': TransactionStatus.FAILED
       }
     });
     
@@ -300,7 +300,7 @@ export class WalletTransactionRepository {
   }
 
   // Batch operations for better performance
-  async batchUpdateStatus(transactionIds: string[], status: 'COMPLETED' | 'FAILED'): Promise<WalletTransaction[]> {
+  async batchUpdateStatus(transactionIds: string[], status: TransactionStatus.COMPLETED | TransactionStatus.FAILED): Promise<WalletTransaction[]> {
     const updatedTransactions: WalletTransaction[] = [];
     
     // Process in batches (DynamoDB has limits on batch operations)
@@ -334,8 +334,8 @@ export class WalletTransactionRepository {
         '#status': 'status'
       },
       ExpressionAttributeValues: {
-        ':pending': 'PENDING',
-        ':failed': 'FAILED'
+        ':pending': TransactionStatus.PENDING,
+        ':failed': TransactionStatus.FAILED
       }
     });
     
