@@ -1,69 +1,121 @@
+import { PutCommand, GetCommand, DeleteCommand, ScanCommand, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { Product, ProductCategory, PRODUCT_TABLE, ACTIVE_PRODUCTS_GSI } from '../models/ProductModel';
-import { db } from '../utils/database';
+import { docClient } from '../utils/database';
 
 export class ProductRepository {
   async create(product: Product): Promise<Product> {
-    await db.put(PRODUCT_TABLE, product);
-    return product;
+    // Store isActive as string for GSI compatibility
+    const itemToStore = {
+      ...product,
+      isActive: product.isActive ? 'true' : 'false'
+    };
+    
+    const command = new PutCommand({
+      TableName: PRODUCT_TABLE,
+      Item: itemToStore,
+      ConditionExpression: 'attribute_not_exists(productId)' // Prevent overwriting existing product
+    });
+    
+    try {
+      await docClient.send(command);
+      return product;
+    } catch (error: any) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new Error('Product already exists');
+      }
+      throw error;
+    }
   }
 
   async findById(productId: string): Promise<Product | null> {
-    const item = await db.get(PRODUCT_TABLE, { productId });
-    return item ? new Product(item as any) : null;
+    const command = new GetCommand({
+      TableName: PRODUCT_TABLE,
+      Key: { productId }
+    });
+    
+    const result = await docClient.send(command);
+    if (!result.Item) return null;
+    
+    return new Product({
+      ...result.Item,
+      isActive: result.Item.isActive === 'true' || result.Item.isActive === true
+    } as any);
   }
 
   async findAllActive(): Promise<Product[]> {
     // Query GSI for active products (isActive stored as string 'true' for GSI)
-    const items = await db.queryGSI(PRODUCT_TABLE, ACTIVE_PRODUCTS_GSI, 'isActive', 'true');
-    return items.map(item => new Product({
+    const command = new QueryCommand({
+      TableName: PRODUCT_TABLE,
+      IndexName: ACTIVE_PRODUCTS_GSI,
+      KeyConditionExpression: 'isActive = :active',
+      ExpressionAttributeValues: {
+        ':active': 'true'
+      }
+    });
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
       ...item,
-      isActive: item.isActive === 'true' || item.isActive === true
+      isActive: true // We know these are active since we queried for them
     } as any));
   }
 
   async findAll(): Promise<Product[]> {
-    const items = await db.scan(PRODUCT_TABLE, {});
-    return items.map(item => new Product({
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE
+    });
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
       ...item,
       isActive: item.isActive === 'true' || item.isActive === true
     } as any));
   }
 
   async findByCategory(category: ProductCategory): Promise<Product[]> {
-    const items = await db.scan(PRODUCT_TABLE, {
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE,
       FilterExpression: 'category = :category',
       ExpressionAttributeValues: {
         ':category': category
       }
     });
-    return items.map(item => new Product({
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
       ...item,
       isActive: item.isActive === 'true' || item.isActive === true
     } as any));
   }
 
   async findActiveByCategory(category: ProductCategory): Promise<Product[]> {
-    const items = await db.scan(PRODUCT_TABLE, {
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE,
       FilterExpression: 'category = :category AND isActive = :active',
       ExpressionAttributeValues: {
         ':category': category,
         ':active': 'true'
       }
     });
-    return items.map(item => new Product({
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
       ...item,
       isActive: true
     } as any));
   }
 
   async findByBrand(brand: string): Promise<Product[]> {
-    const items = await db.scan(PRODUCT_TABLE, {
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE,
       FilterExpression: 'brand = :brand',
       ExpressionAttributeValues: {
         ':brand': brand
       }
     });
-    return items.map(item => new Product({
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
       ...item,
       isActive: item.isActive === 'true' || item.isActive === true
     } as any));
@@ -75,49 +127,119 @@ export class ProductRepository {
       ...product,
       isActive: product.isActive ? 'true' : 'false'
     };
-    await db.put(PRODUCT_TABLE, itemToStore);
+    
+    const command = new PutCommand({
+      TableName: PRODUCT_TABLE,
+      Item: itemToStore
+    });
+    
+    await docClient.send(command);
     return product;
   }
 
   async activate(product: Product): Promise<Product> {
     product.activate();
-    await db.update(PRODUCT_TABLE, { productId: product.productId }, {
-      isActive: 'true', // Store as string for GSI
-      updatedAt: product.updatedAt
+    
+    const command = new UpdateCommand({
+      TableName: PRODUCT_TABLE,
+      Key: { productId: product.productId },
+      UpdateExpression: 'SET isActive = :active, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':active': 'true', // Store as string for GSI
+        ':updatedAt': product.updatedAt
+      },
+      ConditionExpression: 'attribute_exists(productId)' // Ensure product exists
     });
-    return product;
+    
+    try {
+      await docClient.send(command);
+      return product;
+    } catch (error: any) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new Error('Product not found');
+      }
+      throw error;
+    }
   }
 
   async deactivate(product: Product): Promise<Product> {
     product.deactivate();
-    await db.update(PRODUCT_TABLE, { productId: product.productId }, {
-      isActive: 'false', // Store as string for GSI
-      updatedAt: product.updatedAt
+    
+    const command = new UpdateCommand({
+      TableName: PRODUCT_TABLE,
+      Key: { productId: product.productId },
+      UpdateExpression: 'SET isActive = :inactive, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':inactive': 'false', // Store as string for GSI
+        ':updatedAt': product.updatedAt
+      },
+      ConditionExpression: 'attribute_exists(productId)' // Ensure product exists
     });
-    return product;
+    
+    try {
+      await docClient.send(command);
+      return product;
+    } catch (error: any) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new Error('Product not found');
+      }
+      throw error;
+    }
   }
 
   async updateImages(product: Product, imageUrl: string, thumbnailUrl: string): Promise<Product> {
     product.updateImages(imageUrl, thumbnailUrl);
-    await db.update(PRODUCT_TABLE, { productId: product.productId }, {
-      imageUrl: product.imageUrl,
-      thumbnailUrl: product.thumbnailUrl,
-      updatedAt: product.updatedAt
+    
+    const command = new UpdateCommand({
+      TableName: PRODUCT_TABLE,
+      Key: { productId: product.productId },
+      UpdateExpression: 'SET imageUrl = :imageUrl, thumbnailUrl = :thumbnailUrl, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':imageUrl': product.imageUrl,
+        ':thumbnailUrl': product.thumbnailUrl,
+        ':updatedAt': product.updatedAt
+      },
+      ConditionExpression: 'attribute_exists(productId)' // Ensure product exists
     });
-    return product;
+    
+    try {
+      await docClient.send(command);
+      return product;
+    } catch (error: any) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new Error('Product not found');
+      }
+      throw error;
+    }
   }
 
   async updateContent(product: Product, termsAndConditions: string, howToRedeem: string): Promise<Product> {
     product.updateContent(termsAndConditions, howToRedeem);
-    await db.update(PRODUCT_TABLE, { productId: product.productId }, {
-      termsAndConditions: product.termsAndConditions,
-      howToRedeem: product.howToRedeem,
-      updatedAt: product.updatedAt
+    
+    const command = new UpdateCommand({
+      TableName: PRODUCT_TABLE,
+      Key: { productId: product.productId },
+      UpdateExpression: 'SET termsAndConditions = :terms, howToRedeem = :howToRedeem, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':terms': product.termsAndConditions,
+        ':howToRedeem': product.howToRedeem,
+        ':updatedAt': product.updatedAt
+      },
+      ConditionExpression: 'attribute_exists(productId)' // Ensure product exists
     });
-    return product;
+    
+    try {
+      await docClient.send(command);
+      return product;
+    } catch (error: any) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new Error('Product not found');
+      }
+      throw error;
+    }
   }
 
-  // Business query methods
+  // Business query methods with optimized scans
   async findIncompleteProducts(): Promise<Product[]> {
     const allProducts = await this.findAll();
     return allProducts.filter(product => !product.hasCompleteInfo);
@@ -177,7 +299,8 @@ export class ProductRepository {
 
   async searchProducts(searchTerm: string): Promise<Product[]> {
     const lowerSearchTerm = searchTerm.toLowerCase();
-    const items = await db.scan(PRODUCT_TABLE, {
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE,
       FilterExpression: 'contains(#name, :searchTerm) OR contains(#brand, :searchTerm) OR contains(#description, :searchTerm)',
       ExpressionAttributeNames: {
         '#name': 'name',
@@ -189,14 +312,71 @@ export class ProductRepository {
       }
     });
     
-    return items.map(item => new Product({
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
       ...item,
       isActive: item.isActive === 'true' || item.isActive === true
     } as any));
   }
 
+  // Advanced query methods
+  async findProductsByBrandAndCategory(brand: string, category: ProductCategory): Promise<Product[]> {
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE,
+      FilterExpression: 'brand = :brand AND category = :category',
+      ExpressionAttributeValues: {
+        ':brand': brand,
+        ':category': category
+      }
+    });
+    
+    const result = await docClient.send(command);
+    return (result.Items || []).map(item => new Product({
+      ...item,
+      isActive: item.isActive === 'true' || item.isActive === true
+    } as any));
+  }
+
+  async findRecentlyUpdatedProducts(daysBack: number = 7): Promise<Product[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysBack);
+    const cutoffISOString = cutoffDate.toISOString();
+    
+    const command = new ScanCommand({
+      TableName: PRODUCT_TABLE,
+      FilterExpression: 'updatedAt >= :cutoffDate',
+      ExpressionAttributeValues: {
+        ':cutoffDate': cutoffISOString
+      }
+    });
+    
+    const result = await docClient.send(command);
+    const products = (result.Items || []).map(item => new Product({
+      ...item,
+      isActive: item.isActive === 'true' || item.isActive === true
+    } as any));
+    
+    return products.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }
+
   async delete(product: Product): Promise<void> {
-    await db.delete(PRODUCT_TABLE, { productId: product.productId });
+    const command = new DeleteCommand({
+      TableName: PRODUCT_TABLE,
+      Key: { productId: product.productId },
+      ConditionExpression: 'isActive = :inactive', // Only allow deleting inactive products
+      ExpressionAttributeValues: {
+        ':inactive': 'false'
+      }
+    });
+    
+    try {
+      await docClient.send(command);
+    } catch (error: any) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new Error('Cannot delete active products. Deactivate first.');
+      }
+      throw error;
+    }
   }
 }
 
