@@ -123,7 +123,7 @@ npm run remove:prod
 ### **Stage Environment** (`.env.stage`)
 ```env
 NODE_ENV=development
-AWS_REGION=us-east-1
+AWS_REGION=ap-southeast-1
 JWT_ACCESS_SECRET=stage-jwt-access-secret-key-change-in-production-12345
 JWT_REFRESH_SECRET=stage-jwt-refresh-secret-key-change-in-production-67890
 ENCRYPTION_KEY=stage-encryption-key-32-chars-long
