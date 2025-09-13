@@ -1,4 +1,5 @@
 import { userRepository } from '../../repositories/userRepository';
+import { User, UserStatus } from '../../models/UserModel';
 import { comparePassword } from '../../utils/crypto';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
 import { AppError } from '../../middleware/errorHandler';
@@ -11,7 +12,7 @@ export const loginService = async (email: string, password: string) => {
   }
 
   // Check if user is active
-  if (user.status !== 'ACTIVE') {
+  if (user.status !== UserStatus.ACTIVE) {
     throw new AppError('Account is suspended or deleted', 401, 'ACCOUNT_SUSPENDED');
   }
 
@@ -21,19 +22,18 @@ export const loginService = async (email: string, password: string) => {
     throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
   }
 
-  // Update last login
-  await userRepository.updateLastLogin(user.userId);
+  // Update last login using the User instance
+  const updatedUser = await userRepository.updateLastLogin(user);
 
   // Generate tokens
-  const accessToken = generateAccessToken(user.userId, user.email);
-  const refreshToken = generateRefreshToken(user.userId, user.email);
+  const accessToken = generateAccessToken(updatedUser.userId, updatedUser.email);
+  const refreshToken = generateRefreshToken(updatedUser.userId, updatedUser.email);
+
+  // Return user data without sensitive fields
+  const publicUserData = updatedUser.toPublic();
 
   return {
-    userId: user.userId,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    walletBalance: user.walletBalance,
+    ...publicUserData,
     accessToken,
     refreshToken
   };
