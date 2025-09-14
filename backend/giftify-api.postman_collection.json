@@ -1,8 +1,8 @@
 {
     "info": {
         "name": "Giftify API",
-        "description": "Complete API collection for Giftify backend with all endpoints, authentication, and examples",
-        "version": "1.0.0",
+        "description": "Complete API collection for Giftify backend with working automatic token management",
+        "version": "1.0.1",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "auth": {
@@ -18,7 +18,7 @@
     "variable": [
         {
             "key": "baseUrl",
-            "value": "http://localhost:3000",
+            "value": "https://hfgwvrqkhk.execute-api.ap-southeast-1.amazonaws.com/stage",
             "type": "string"
         },
         {
@@ -39,7 +39,7 @@
     ],
     "item": [
         {
-            "name": "Authentication",
+            "name": "🔐 Authentication",
             "item": [
                 {
                     "name": "Register User",
@@ -56,50 +56,47 @@
                             "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/auth/register",
+                            "raw": "{{baseUrl}}/auth/register",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "auth",
                                 "register"
                             ]
                         }
                     },
-                    "response": [
-                        {
-                            "name": "Success Response",
-                            "originalRequest": {
-                                "method": "POST",
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
-                                }
-                            },
-                            "status": "Created",
-                            "code": 201,
-                            "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"userId\": \"01HKQM5X8G9YZ2ABCDEF123456\",\n      \"email\": \"john.doe@example.com\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"isEmailVerified\": false,\n      \"status\": \"ACTIVE\",\n      \"walletBalance\": 0,\n      \"createdAt\": \"2024-01-15T10:30:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n    }\n  },\n  \"message\": \"User registered successfully\",\n  \"timestamp\": \"2024-01-15T10:30:00.000Z\"\n}"
-                        }
-                    ]
-                },
-                {
-                    "name": "Login User",
                     "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
-                                    "if (pm.response.code === 200) {",
-                                    "    const response = pm.response.json();",
-                                    "    pm.environment.set('accessToken', response.data.tokens.accessToken);",
-                                    "    pm.environment.set('refreshToken', response.data.tokens.refreshToken);",
-                                    "    pm.environment.set('userId', response.data.user.userId);",
+                                    "// Auto-save tokens after registration",
+                                    "if (pm.response.code === 201) {",
+                                    "    try {",
+                                    "        const response = pm.response.json();",
+                                    "        console.log('📝 Registration Response:', JSON.stringify(response, null, 2));",
+                                    "        ",
+                                    "        if (response.success && response.data && response.data.tokens) {",
+                                    "            pm.collectionVariables.set('accessToken', response.data.tokens.accessToken);",
+                                    "            pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+                                    "            pm.collectionVariables.set('userId', response.data.user.userId);",
+                                    "            ",
+                                    "            console.log('✅ Registration successful! Tokens saved automatically.');",
+                                    "            console.log('🔑 Access Token:', response.data.tokens.accessToken.substring(0, 20) + '...');",
+                                    "            console.log('👤 User ID:', response.data.user.userId);",
+                                    "        }",
+                                    "    } catch (error) {",
+                                    "        console.error('❌ Error processing registration response:', error);",
+                                    "    }",
                                     "}"
                                 ]
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "name": "Login User",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -113,17 +110,49 @@
                             "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/auth/login",
+                            "raw": "{{baseUrl}}/auth/login",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "auth",
                                 "login"
                             ]
                         }
-                    }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Auto-save tokens after login",
+                                    "if (pm.response.code === 200) {",
+                                    "    try {",
+                                    "        const response = pm.response.json();",
+                                    "        console.log('🔐 Login Response:', JSON.stringify(response, null, 2));",
+                                    "        ",
+                                    "        if (response.success && response.data && response.data.tokens) {",
+                                    "            pm.collectionVariables.set('accessToken', response.data.tokens.accessToken);",
+                                    "            pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+                                    "            pm.collectionVariables.set('userId', response.data.user.userId);",
+                                    "            ",
+                                    "            console.log('✅ Login successful! Tokens saved automatically.');",
+                                    "            console.log('🔑 Access Token:', response.data.tokens.accessToken.substring(0, 20) + '...');",
+                                    "            console.log('👤 User ID:', response.data.user.userId);",
+                                    "        } else {",
+                                    "            console.log('❌ Unexpected response structure');",
+                                    "        }",
+                                    "    } catch (error) {",
+                                    "        console.error('❌ Error processing login response:', error);",
+                                    "        console.log('Raw response:', pm.response.text());",
+                                    "    }",
+                                    "} else {",
+                                    "    console.log('❌ Login failed with status:', pm.response.code);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
                     "name": "Refresh Token",
@@ -140,35 +169,61 @@
                             "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/auth/refresh",
+                            "raw": "{{baseUrl}}/auth/refresh",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "auth",
                                 "refresh"
                             ]
                         }
-                    }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Auto-save new tokens after refresh",
+                                    "if (pm.response.code === 200) {",
+                                    "    try {",
+                                    "        const response = pm.response.json();",
+                                    "        if (response.success && response.data && response.data.tokens) {",
+                                    "            pm.collectionVariables.set('accessToken', response.data.tokens.accessToken);",
+                                    "            pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+                                    "            console.log('✅ Tokens refreshed successfully!');",
+                                    "        }",
+                                    "    } catch (error) {",
+                                    "        console.error('❌ Error processing refresh response:', error);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "User Profile",
+            "name": "👤 User Profile",
             "item": [
                 {
                     "name": "Get Profile",
                     "request": {
                         "method": "GET",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/users/profile",
+                            "raw": "{{baseUrl}}/users/profile",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "users",
                                 "profile"
                             ]
@@ -183,6 +238,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -190,12 +250,11 @@
                             "raw": "{\n  \"firstName\": \"John Updated\",\n  \"lastName\": \"Doe Updated\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/users/profile",
+                            "raw": "{{baseUrl}}/users/profile",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "users",
                                 "profile"
                             ]
@@ -205,20 +264,25 @@
             ]
         },
         {
-            "name": "Wallet",
+            "name": "💰 Wallet",
             "item": [
                 {
                     "name": "Get Balance",
                     "request": {
                         "method": "GET",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/wallet/balance",
+                            "raw": "{{baseUrl}}/wallet/balance",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "wallet",
                                 "balance"
                             ]
@@ -233,6 +297,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -240,12 +309,11 @@
                             "raw": "{\n  \"amount\": 1000,\n  \"paymentMethod\": \"UPI\",\n  \"paymentReference\": \"UPI123456789\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/wallet/topup",
+                            "raw": "{{baseUrl}}/wallet/topup",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "wallet",
                                 "topup"
                             ]
@@ -256,14 +324,19 @@
                     "name": "Get Transactions",
                     "request": {
                         "method": "GET",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/wallet/transactions?page=1&limit=20&type=CREDIT",
+                            "raw": "{{baseUrl}}/wallet/transactions?page=1&limit=20&type=CREDIT",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "wallet",
                                 "transactions"
                             ],
@@ -287,7 +360,7 @@
             ]
         },
         {
-            "name": "Products",
+            "name": "🛍️ Products",
             "item": [
                 {
                     "name": "Get All Products",
@@ -295,12 +368,11 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/api/products",
+                            "raw": "{{baseUrl}}/products",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "products"
                             ]
                         }
@@ -312,12 +384,11 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/api/products?category=ENTERTAINMENT&activeOnly=true",
+                            "raw": "{{baseUrl}}/products?category=ENTERTAINMENT&activeOnly=true",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "products"
                             ],
                             "query": [
@@ -336,20 +407,25 @@
             ]
         },
         {
-            "name": "Cart",
+            "name": "🛒 Cart",
             "item": [
                 {
                     "name": "Get Cart",
                     "request": {
                         "method": "GET",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/cart",
+                            "raw": "{{baseUrl}}/cart",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "cart"
                             ]
                         }
@@ -363,6 +439,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -370,12 +451,11 @@
                             "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VARIANT123\",\n  \"quantity\": 2\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/cart/items",
+                            "raw": "{{baseUrl}}/cart/items",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "cart",
                                 "items"
                             ]
@@ -390,6 +470,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -397,12 +482,11 @@
                             "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VARIANT123\",\n  \"quantity\": 3\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/cart/items",
+                            "raw": "{{baseUrl}}/cart/items",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "cart",
                                 "items"
                             ]
@@ -417,6 +501,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -424,12 +513,11 @@
                             "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VARIANT123\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/cart/items",
+                            "raw": "{{baseUrl}}/cart/items",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "cart",
                                 "items"
                             ]
@@ -440,14 +528,19 @@
                     "name": "Clear Cart",
                     "request": {
                         "method": "DELETE",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/cart",
+                            "raw": "{{baseUrl}}/cart",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "cart"
                             ]
                         }
@@ -456,7 +549,7 @@
             ]
         },
         {
-            "name": "Orders",
+            "name": "📦 Orders",
             "item": [
                 {
                     "name": "Create Order",
@@ -466,6 +559,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -473,12 +571,11 @@
                             "raw": "{}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/orders",
+                            "raw": "{{baseUrl}}/orders",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "orders"
                             ]
                         }
@@ -488,14 +585,19 @@
                     "name": "Get Orders",
                     "request": {
                         "method": "GET",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/orders?page=1&limit=10",
+                            "raw": "{{baseUrl}}/orders?page=1&limit=10",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "orders"
                             ],
                             "query": [
@@ -515,14 +617,19 @@
                     "name": "Get Order by ID",
                     "request": {
                         "method": "GET",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/orders/01HKQM5X8G9YZ2ORDER123",
+                            "raw": "{{baseUrl}}/orders/01HKQM5X8G9YZ2ORDER123",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "orders",
                                 "01HKQM5X8G9YZ2ORDER123"
                             ]
@@ -537,6 +644,11 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
                             }
                         ],
                         "body": {
@@ -544,12 +656,11 @@
                             "raw": "{\n  \"reason\": \"Changed my mind\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/orders/01HKQM5X8G9YZ2ORDER123/cancel",
+                            "raw": "{{baseUrl}}/orders/01HKQM5X8G9YZ2ORDER123/cancel",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "orders",
                                 "01HKQM5X8G9YZ2ORDER123",
                                 "cancel"
