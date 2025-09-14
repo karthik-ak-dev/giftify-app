@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Custom Properties for Design System */
+:root {
+    /* Primary Colors */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --primary-purple: #667eea;
+    --primary-dark: #764ba2;
+
+    /* Accent Colors */
+    --accent-pink: #ff6b9d;
+    --accent-orange: #ff8a56;
+    --accent-yellow: #ffd93d;
+
+    /* Background Colors */
+    --bg-primary: #0f0f23;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #16213e;
+
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-accent: #e0e0e0;
+
+    /* Glass Effect */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-purple), var(--primary-dark));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--accent-pink), var(--primary-purple));
+}
+
+/* Component Classes */
+@layer components {
+    .glass-card {
+        @apply bg-glass-bg backdrop-blur-glass border border-glass-border rounded-2xl shadow-glass;
+    }
+
+    .glass-button {
+        @apply bg-glass-bg backdrop-blur-glass border border-glass-border rounded-xl px-6 py-3 font-medium transition-all duration-300 hover:border-accent-pink hover:shadow-neon-pink;
+    }
+
+    .gradient-button {
+        @apply bg-primary-gradient text-white font-semibold px-8 py-4 rounded-2xl shadow-neon transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95;
+    }
+
+    .neon-text {
+        @apply bg-gradient-to-r from-primary-purple to-accent-pink bg-clip-text text-transparent font-bold;
+    }
+
+    .hero-gradient {
+        @apply bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-card;
+    }
+}
+
+/* Utility Classes */
+@layer utilities {
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .glow-on-hover {
+        transition: var(--transition-smooth);
+    }
+
+    .glow-on-hover:hover {
+        box-shadow: 0 0 30px rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+    }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+}
+
+.animate-stagger {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-stagger:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.animate-stagger:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.animate-stagger:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.animate-stagger:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading States */
+.skeleton {
+    @apply animate-pulse bg-gradient-to-r from-bg-secondary via-bg-card to-bg-secondary bg-[length:200%_100%];
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Focus States */
+.focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-purple focus:ring-offset-2 focus:ring-offset-bg-primary;
+}
