@@ -66,9 +66,11 @@
     "notes": [
         "walletBalance is stored in paise (cents) - 150000 paise = ₹1,500",
         "passwordHash is bcrypt hashed with 12 salt rounds",
-        "status can be: ACTIVE, SUSPENDED, DELETED",
+        "status uses UserStatus enum: ACTIVE, SUSPENDED, DELETED",
         "All timestamps are in ISO 8601 format",
         "userId uses ULID format for sortable unique IDs",
-        "lastLoginAt is optional and only set after login"
+        "lastLoginAt is optional and only set after login",
+        "email is immutable and used for GSI lookup",
+        "isEmailVerified tracks email verification status"
     ]
 }

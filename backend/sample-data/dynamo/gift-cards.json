@@ -152,7 +152,9 @@
     "notes": [
         "Each gift card is a unique inventory item with encrypted number and PIN",
         "usedByOrder and usedByUser are set when card is allocated to an order",
+        "usedAt timestamp marks when the card was actually used",
         "reservedByOrder/reservedByUser implement temporary reservation system",
+        "reservedAt timestamp marks when reservation was made",
         "reservationExpiresAt ensures expired reservations are automatically released",
         "Available cards have no usedByOrder and no active reservation",
         "VariantExpiryIndex enables FIFO allocation (expiring cards first)",
@@ -160,6 +162,7 @@
         "UserCardsIndex allows querying all cards owned by a user",
         "giftCardNumber and giftCardPin are encrypted in actual implementation",
         "purchasePrice is what we paid for the card (in paise)",
-        "expiryTime is when the gift card itself expires (not reservation)"
+        "expiryTime is when the gift card itself expires (not reservation)",
+        "All immutable fields match the GiftCardModel structure exactly"
     ]
 }
