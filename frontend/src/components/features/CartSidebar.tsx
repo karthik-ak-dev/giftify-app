@@ -40,7 +40,7 @@ const CartSidebar: React.FC = () => {
         isOpen,
         closeCart,
         updateQuantity,
-        removeItem,
+        removeFromCart,
         clearCart,
         fetchCart,
         clearError
@@ -91,7 +91,7 @@ const CartSidebar: React.FC = () => {
      */
     const handleRemoveItem = async (variantId: string) => {
         try {
-            await removeItem(variantId);
+            await removeFromCart(variantId);
         } catch (error) {
             console.error('Failed to remove item:', error);
         }
@@ -242,7 +242,7 @@ const CartSidebar: React.FC = () => {
                                                     {item.productName}
                                                 </h4>
                                                 <p className="text-sm text-text-secondary">
-                                                    {formatCurrency(item.sellingPrice)} each
+                                                    {formatCurrency(item.unitPrice)} each
                                                 </p>
                                             </div>
                                             <button
@@ -308,7 +308,7 @@ const CartSidebar: React.FC = () => {
                                 onClick={handleCheckout}
                                 className="w-full"
                                 disabled={isLoading || items.length === 0}
-                                loading={isLoading}
+                                isLoading={isLoading}
                             >
                                 Proceed to Checkout
                             </Button>
