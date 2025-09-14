@@ -192,22 +192,6 @@ export const cartSchemas = {
 
 // Order Schemas
 export const orderSchemas = {
-  createOrder: Joi.object({
-    items: Joi.array()
-      .items(
-        Joi.object({
-          variantId: commonPatterns.ulid,
-          quantity: commonPatterns.positiveInteger
-        })
-      )
-      .min(1)
-      .required()
-      .messages({
-        'array.min': 'At least one item is required',
-        'any.required': 'Order items are required'
-      })
-  }),
-  
   getOrders: Joi.object({
     page: commonPatterns.pagination.page,
     limit: Joi.number()

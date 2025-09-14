@@ -9,7 +9,7 @@ import { createValidationMiddleware, orderSchemas } from '../utils/validation';
 const router = Router();
 
 // POST /orders/create
-router.post('/create', authenticateToken, createValidationMiddleware(orderSchemas.createOrder, 'body'), createOrderHandler);
+router.post('/create', authenticateToken, createOrderHandler);
 
 // GET /orders
 router.get('/', authenticateToken, createValidationMiddleware(orderSchemas.getOrders, 'query'), getOrdersHandler);

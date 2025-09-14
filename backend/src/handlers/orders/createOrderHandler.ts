@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { createOrderService } from '../../services/orders/createOrderService';
 import { ApiResponse } from '../../types/api';
 import { AuthenticatedRequest } from '../../types/auth';
+import { OrderStatus } from '../../models/OrderModel';
 
 export const createOrderHandler = async (
   req: AuthenticatedRequest,
@@ -21,13 +22,13 @@ export const createOrderHandler = async (
     let message = 'Order created successfully';
     let statusCode = 201;
 
-    if (orderResult.status === 'FAILED') {
+    if (orderResult.status === OrderStatus.FAILED) {
       message = 'Order could not be fulfilled due to stock unavailability. Full refund processed.';
       statusCode = 200;
-    } else if (orderResult.status === 'PARTIALLY_FULFILLED') {
+    } else if (orderResult.status === OrderStatus.PARTIALLY_FULFILLED) {
       message = `Order partially fulfilled. ${orderResult.fulfillmentDetails.totalGiftCardsAllocated} gift cards allocated. Refund processed for unavailable items.`;
       statusCode = 200;
-    } else if (orderResult.status === 'FULFILLED') {
+    } else if (orderResult.status === OrderStatus.FULFILLED) {
       message = `Order fulfilled successfully. ${orderResult.fulfillmentDetails.totalGiftCardsAllocated} gift cards allocated.`;
       statusCode = 201;
     }
