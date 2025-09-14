@@ -18,8 +18,8 @@
     ],
     "sampleItems": [
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
-            "transactionId": "01HKQM5X8G9YZ2TRANS001234",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
+            "transactionId": "01HKQM5X8G9YZ2TRANS0012345",
             "type": "CREDIT",
             "amount": 100000,
             "balanceAfter": 100000,
@@ -30,20 +30,20 @@
             "updatedAt": "2024-01-15T10:35:30.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
-            "transactionId": "01HKQM5X8G9YZ2TRANS001235",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
+            "transactionId": "01HKQM5X8G9YZ2TRANS0012346",
             "type": "DEBIT",
             "amount": 50000,
             "balanceAfter": 50000,
             "description": "Order payment for Amazon Gift Cards",
-            "orderId": "01HKQM5X8G9YZ2ORDER123456",
+            "orderId": "01HKQM5X8G9YZ2ORDER0012345",
             "status": "COMPLETED",
             "createdAt": "2024-01-15T11:20:00.000Z",
             "updatedAt": "2024-01-15T11:20:15.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
-            "transactionId": "01HKQM5X8G9YZ2TRANS001236",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH5678",
+            "transactionId": "01HKQM5X8G9YZ2TRANS0012347",
             "type": "CREDIT",
             "amount": 200000,
             "balanceAfter": 200000,
@@ -53,20 +53,20 @@
             "updatedAt": "2024-01-14T16:15:45.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
-            "transactionId": "01HKQM5X8G9YZ2TRANS001237",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH5678",
+            "transactionId": "01HKQM5X8G9YZ2TRANS0012348",
             "type": "REFUND",
             "amount": 25000,
             "balanceAfter": 225000,
             "description": "Refund for cancelled order",
-            "orderId": "01HKQM5X8G9YZ2ORDER789012",
+            "orderId": "01HKQM5X8G9YZ2ORDER0012346",
             "status": "COMPLETED",
             "createdAt": "2024-01-14T18:30:00.000Z",
             "updatedAt": "2024-01-14T18:30:20.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
-            "transactionId": "01HKQM5X8G9YZ2TRANS001238",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH3456",
+            "transactionId": "01HKQM5X8G9YZ2TRANS0012349",
             "type": "CREDIT",
             "amount": 75000,
             "balanceAfter": 75000,
@@ -83,6 +83,7 @@
         "status uses TransactionStatus enum: PENDING, COMPLETED, FAILED",
         "orderId is set for DEBIT/REFUND transactions related to orders",
         "description provides human-readable transaction details",
+        "userId and transactionId use valid 26-character ULID format matching validation pattern",
         "Composite key allows multiple transactions per user with chronological ordering",
         "TransactionIdIndex enables direct transaction lookup",
         "UserTransactionHistoryIndex allows chronological transaction queries"

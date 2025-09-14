@@ -12,7 +12,7 @@
     ],
     "sampleItems": [
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
             "email": "john.doe@example.com",
             "firstName": "John",
             "lastName": "Doe",
@@ -25,7 +25,7 @@
             "lastLoginAt": "2024-01-15T12:45:00.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH5678",
             "email": "jane.smith@example.com",
             "firstName": "Jane",
             "lastName": "Smith",
@@ -38,7 +38,7 @@
             "lastLoginAt": "2024-01-14T16:20:00.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF345678",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH9012",
             "email": "mike.wilson@example.com",
             "firstName": "Mike",
             "lastName": "Wilson",
@@ -51,7 +51,7 @@
             "lastLoginAt": "2024-01-11T18:45:00.000Z"
         },
         {
-            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH3456",
             "email": "sarah.johnson@example.com",
             "firstName": "Sarah",
             "lastName": "Johnson",
@@ -68,7 +68,7 @@
         "passwordHash is bcrypt hashed with 12 salt rounds",
         "status uses UserStatus enum: ACTIVE, SUSPENDED, DELETED",
         "All timestamps are in ISO 8601 format",
-        "userId uses ULID format for sortable unique IDs",
+        "userId uses valid 26-character ULID format matching validation pattern",
         "lastLoginAt is optional and only set after login",
         "email is immutable and used for GSI lookup",
         "isEmailVerified tracks email verification status"

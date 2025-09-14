@@ -13,8 +13,8 @@
     ],
     "sampleItems": [
         {
-            "productId": "01HKQM5X8G9YZ2PROD001234",
-            "variantId": "01HKQM5X8G9YZ2VAR001234",
+            "productId": "01HKQM5X8G9YZ2PROD001234567",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345A1",
             "name": "₹500 Amazon Gift Card",
             "denomination": 500,
             "mrp": 50000,
@@ -29,8 +29,8 @@
             "updatedAt": "2024-01-15T10:30:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001234",
-            "variantId": "01HKQM5X8G9YZ2VAR001235",
+            "productId": "01HKQM5X8G9YZ2PROD001234567",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345A2",
             "name": "₹1000 Amazon Gift Card",
             "denomination": 1000,
             "mrp": 100000,
@@ -45,8 +45,8 @@
             "updatedAt": "2024-01-15T09:45:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001234",
-            "variantId": "01HKQM5X8G9YZ2VAR001236",
+            "productId": "01HKQM5X8G9YZ2PROD001234567",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345A3",
             "name": "₹2000 Amazon Gift Card",
             "denomination": 2000,
             "mrp": 200000,
@@ -61,8 +61,8 @@
             "updatedAt": "2024-01-14T16:20:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001235",
-            "variantId": "01HKQM5X8G9YZ2VAR001237",
+            "productId": "01HKQM5X8G9YZ2PROD001234568",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345B1",
             "name": "₹500 Flipkart Gift Card",
             "denomination": 500,
             "mrp": 50000,
@@ -77,8 +77,8 @@
             "updatedAt": "2024-01-13T11:15:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001235",
-            "variantId": "01HKQM5X8G9YZ2VAR001238",
+            "productId": "01HKQM5X8G9YZ2PROD001234568",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345B2",
             "name": "₹1000 Flipkart Gift Card",
             "denomination": 1000,
             "mrp": 100000,
@@ -93,8 +93,8 @@
             "updatedAt": "2024-01-15T08:30:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001236",
-            "variantId": "01HKQM5X8G9YZ2VAR001239",
+            "productId": "01HKQM5X8G9YZ2PROD001234569",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345C1",
             "name": "₹799 Netflix Gift Card (1 Month)",
             "denomination": 799,
             "mrp": 79900,
@@ -109,8 +109,8 @@
             "updatedAt": "2024-01-12T14:45:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001236",
-            "variantId": "01HKQM5X8G9YZ2VAR001240",
+            "productId": "01HKQM5X8G9YZ2PROD001234569",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345C2",
             "name": "₹1499 Netflix Gift Card (3 Months)",
             "denomination": 1499,
             "mrp": 149900,
@@ -125,8 +125,8 @@
             "updatedAt": "2024-01-11T09:20:00.000Z"
         },
         {
-            "productId": "01HKQM5X8G9YZ2PROD001238",
-            "variantId": "01HKQM5X8G9YZ2VAR001241",
+            "productId": "01HKQM5X8G9YZ2PROD00123456B",
+            "variantId": "01HKQM5X8G9YZ2VAR0012345D1",
             "name": "₹500 Starbucks Gift Card",
             "denomination": 500,
             "mrp": 50000,
@@ -151,6 +151,7 @@
         "minOrderQuantity is minimum quantity per order",
         "maxOrderQuantity is maximum quantity per order",
         "isActive is stored as string ('true'/'false') for consistency with DynamoDB storage",
+        "productId and variantId use valid 26-character ULID format matching validation pattern",
         "Composite key allows multiple variants per product",
         "VariantIdIndex enables direct variant lookup across all products"
     ]

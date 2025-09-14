@@ -18,13 +18,13 @@
     ],
     "sampleItems": [
         {
-            "orderId": "01HKQM5X8G9YZ2ORDER123456",
-            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "orderId": "01HKQM5X8G9YZ2ORDER0012345",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
             "status": "FULFILLED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR001234",
-                    "productId": "01HKQM5X8G9YZ2PROD001234",
+                    "variantId": "01HKQM5X8G9YZ2VAR0012345A1",
+                    "productId": "01HKQM5X8G9YZ2PROD001234567",
                     "productName": "Amazon Gift Card",
                     "variantName": "₹500 Amazon Gift Card",
                     "unitPrice": 50000,
@@ -46,14 +46,14 @@
                 "totalGiftCardsAllocated": 2,
                 "giftCards": [
                     {
-                        "giftCardId": "01HKQM5X8G9YZ2GIFT001234",
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001234567",
                         "giftCardNumber": "1234-5678-9012-3456",
                         "giftCardPin": "1234",
                         "denomination": 500,
                         "expiryTime": "2025-01-15T11:25:00.000Z"
                     },
                     {
-                        "giftCardId": "01HKQM5X8G9YZ2GIFT001235",
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001234568",
                         "giftCardNumber": "2345-6789-0123-4567",
                         "giftCardPin": "5678",
                         "denomination": 500,
@@ -65,13 +65,13 @@
             "updatedAt": "2024-01-15T11:25:15.000Z"
         },
         {
-            "orderId": "01HKQM5X8G9YZ2ORDER789012",
-            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "orderId": "01HKQM5X8G9YZ2ORDER0012346",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH5678",
             "status": "PARTIALLY_FULFILLED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR001235",
-                    "productId": "01HKQM5X8G9YZ2PROD001234",
+                    "variantId": "01HKQM5X8G9YZ2VAR0012345A2",
+                    "productId": "01HKQM5X8G9YZ2PROD001234567",
                     "productName": "Amazon Gift Card",
                     "variantName": "₹1000 Amazon Gift Card",
                     "unitPrice": 100000,
@@ -93,14 +93,14 @@
                 "totalGiftCardsAllocated": 2,
                 "giftCards": [
                     {
-                        "giftCardId": "01HKQM5X8G9YZ2GIFT001236",
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001234569",
                         "giftCardNumber": "3456-7890-1234-5678",
                         "giftCardPin": "9012",
                         "denomination": 1000,
                         "expiryTime": "2025-01-14T18:25:00.000Z"
                     },
                     {
-                        "giftCardId": "01HKQM5X8G9YZ2GIFT001237",
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT00123456A",
                         "giftCardNumber": "4567-8901-2345-6789",
                         "giftCardPin": "3456",
                         "denomination": 1000,
@@ -112,13 +112,13 @@
             "updatedAt": "2024-01-14T18:30:20.000Z"
         },
         {
-            "orderId": "01HKQM5X8G9YZ2ORDER345678",
-            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "orderId": "01HKQM5X8G9YZ2ORDER0012347",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
             "status": "CANCELLED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR001239",
-                    "productId": "01HKQM5X8G9YZ2PROD001236",
+                    "variantId": "01HKQM5X8G9YZ2VAR0012345C1",
+                    "productId": "01HKQM5X8G9YZ2PROD001234569",
                     "productName": "Netflix Gift Card",
                     "variantName": "₹799 Netflix Gift Card (1 Month)",
                     "unitPrice": 79900,
@@ -137,13 +137,13 @@
             "updatedAt": "2024-01-13T15:45:00.000Z"
         },
         {
-            "orderId": "01HKQM5X8G9YZ2ORDER901234",
-            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
+            "orderId": "01HKQM5X8G9YZ2ORDER0012348",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH3456",
             "status": "FAILED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR001238",
-                    "productId": "01HKQM5X8G9YZ2PROD001235",
+                    "variantId": "01HKQM5X8G9YZ2VAR0012345B2",
+                    "productId": "01HKQM5X8G9YZ2PROD001234568",
                     "productName": "Flipkart Gift Card",
                     "variantName": "₹1000 Flipkart Gift Card",
                     "unitPrice": 100000,
@@ -176,6 +176,7 @@
         "fulfillmentDetails follows FulfillmentDetails interface structure",
         "fulfillmentDetails is null for cancelled orders before processing",
         "giftCards array contains actual gift card details for fulfilled items",
+        "orderId, userId, productId, variantId, and giftCardId use valid 26-character ULID format matching validation pattern",
         "UserOrdersIndex allows efficient user order history queries",
         "OrderStatusIndex enables status-based order filtering",
         "fulfilledQuantity + (requestedQuantity - fulfilledQuantity) should equal requestedQuantity"

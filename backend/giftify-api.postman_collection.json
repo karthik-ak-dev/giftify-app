@@ -432,38 +432,7 @@
                     }
                 },
                 {
-                    "name": "Add to Cart",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{accessToken}}",
-                                "type": "text"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VARIANT123\",\n  \"quantity\": 2\n}"
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/cart/items",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "cart",
-                                "items"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Cart Item",
+                    "name": "Manage Cart (Add/Update Item)",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -479,24 +448,24 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VARIANT123\",\n  \"quantity\": 3\n}"
+                            "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VAR0012345A1\",\n  \"quantity\": 2\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/cart/items",
+                            "raw": "{{baseUrl}}/cart/manage",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "cart",
-                                "items"
+                                "manage"
                             ]
                         }
                     }
                 },
                 {
-                    "name": "Remove from Cart",
+                    "name": "Remove Item from Cart (Set quantity to 0)",
                     "request": {
-                        "method": "DELETE",
+                        "method": "PUT",
                         "header": [
                             {
                                 "key": "Content-Type",
@@ -510,16 +479,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VARIANT123\"\n}"
+                            "raw": "{\n  \"variantId\": \"01HKQM5X8G9YZ2VAR0012345A1\",\n  \"quantity\": 0\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/cart/items",
+                            "raw": "{{baseUrl}}/cart/manage",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "cart",
-                                "items"
+                                "manage"
                             ]
                         }
                     }
@@ -536,12 +505,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/cart",
+                            "raw": "{{baseUrl}}/cart/clear",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "cart"
+                                "cart",
+                                "clear"
                             ]
                         }
                     }
@@ -568,15 +538,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{}"
+                            "raw": "{\n  \"items\": [\n    {\n      \"variantId\": \"01HKQM5X8G9YZ2VAR0012345A1\",\n      \"quantity\": 2\n    },\n    {\n      \"variantId\": \"01HKQM5X8G9YZ2VAR0012345A2\",\n      \"quantity\": 1\n    }\n  ]\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/orders",
+                            "raw": "{{baseUrl}}/orders/create",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "orders"
+                                "orders",
+                                "create"
                             ]
                         }
                     }
@@ -625,13 +596,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/orders/01HKQM5X8G9YZ2ORDER123",
+                            "raw": "{{baseUrl}}/orders/01HKQM5X8G9YZ2ORDER0012345",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "orders",
-                                "01HKQM5X8G9YZ2ORDER123"
+                                "01HKQM5X8G9YZ2ORDER0012345"
                             ]
                         }
                     }
@@ -656,13 +627,13 @@
                             "raw": "{\n  \"reason\": \"Changed my mind\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/orders/01HKQM5X8G9YZ2ORDER123/cancel",
+                            "raw": "{{baseUrl}}/orders/01HKQM5X8G9YZ2ORDER0012345/cancel",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "orders",
-                                "01HKQM5X8G9YZ2ORDER123",
+                                "01HKQM5X8G9YZ2ORDER0012345",
                                 "cancel"
                             ]
                         }
