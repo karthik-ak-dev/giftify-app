@@ -11,18 +11,25 @@ import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 // Store hooks
 import { useProductStore } from '../store/productStore';
 import { useCartStore } from '../store/cartStore';
+import { useAuthStore } from '../store/authStore';
+
+
+
+interface HomeProps {
+    onAuthRequired?: (mode?: 'login' | 'register') => void;
+}
 
 /**
  * Home Page Component
  * 
  * Features:
- * - Product catalog with grid layout
+ * - Public product catalog (no auth required)
  * - Search functionality
  * - Category filtering
- * - Add to cart functionality
+ * - Add to cart functionality (triggers auth if needed)
  * - Responsive design with cool animations
  */
-const Home: React.FC = () => {
+const Home: React.FC<HomeProps> = ({ onAuthRequired }) => {
     const {
         products,
         isLoading,
@@ -35,8 +42,9 @@ const Home: React.FC = () => {
     } = useProductStore();
 
     const { addToCart, isLoading: cartLoading } = useCartStore();
+    const { isAuthenticated } = useAuthStore();
 
-    // Fetch products on component mount
+    // Fetch products on component mount (public access)
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
@@ -46,8 +54,14 @@ const Home: React.FC = () => {
         setSearchQuery(e.target.value);
     };
 
-    // Handle add to cart
+    // Handle add to cart - trigger auth if needed
     const handleAddToCart = async (variantId: string) => {
+        if (!isAuthenticated) {
+            // Trigger auth sidebar instead of adding to cart
+            onAuthRequired?.('login');
+            return;
+        }
+
         try {
             await addToCart(variantId, 1);
         } catch (error) {

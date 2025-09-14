@@ -22,18 +22,22 @@ import { useWalletStore } from '../../store/walletStore';
 // Utils
 import { formatCurrency } from '../../utils/formatters';
 
+interface HeaderProps {
+    onAuthClick?: (mode?: 'login' | 'register') => void;
+}
+
 /**
  * Header Component
  * 
  * Main navigation header with:
  * - Logo and brand
  * - Navigation links
- * - Wallet balance display
- * - Shopping cart with item count
- * - User profile menu with dropdown
- * - Mobile responsive navigation
+ * - User authentication (login/register for guests, profile for authenticated)
+ * - Cart and wallet for authenticated users
+ * - Mobile responsive design
+ * - Dropdown menus with animations
  */
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
     // ===== HOOKS & STATE =====
     const navigate = useNavigate();
     const { user, logout, isAuthenticated } = useAuthStore();
@@ -374,11 +378,6 @@ const Header: React.FC = () => {
 
     // ===== MAIN RENDER =====
 
-    // Don't render header if user is not authenticated
-    if (!isAuthenticated) {
-        return null;
-    }
-
     return (
         <>
             <header className="sticky top-0 z-40 glass-card border-b border-glass-border backdrop-blur-md">
@@ -386,14 +385,16 @@ const Header: React.FC = () => {
                     <div className="flex items-center justify-between h-16">
                         {/* Left Section - Logo & Mobile Menu */}
                         <div className="flex items-center gap-4">
-                            {/* Mobile Menu Button */}
-                            <button
-                                onClick={toggleMobileMenu}
-                                className="md:hidden p-2 hover:bg-glass-bg rounded-lg transition-colors"
-                                aria-label="Open menu"
-                            >
-                                <Menu size={24} />
-                            </button>
+                            {/* Mobile Menu Button - only for authenticated users */}
+                            {isAuthenticated && (
+                                <button
+                                    onClick={toggleMobileMenu}
+                                    className="md:hidden p-2 hover:bg-glass-bg rounded-lg transition-colors"
+                                    aria-label="Open menu"
+                                >
+                                    <Menu size={24} />
+                                </button>
+                            )}
 
                             {/* Logo */}
                             <Link to="/" className="flex items-center space-x-2">
@@ -406,28 +407,52 @@ const Header: React.FC = () => {
                             </Link>
                         </div>
 
-                        {/* Center Section - Navigation (Desktop) */}
-                        <nav className="hidden md:flex items-center space-x-8">
-                            {renderNavLinks()}
-                        </nav>
+                        {/* Center Section - Navigation (Desktop) - only for authenticated users */}
+                        {isAuthenticated && (
+                            <nav className="hidden md:flex items-center space-x-8">
+                                {renderNavLinks()}
+                            </nav>
+                        )}
 
                         {/* Right Section - Actions */}
                         <div className="flex items-center space-x-3">
-                            {/* Wallet Balance */}
-                            {renderWalletBalance()}
+                            {isAuthenticated ? (
+                                <>
+                                    {/* Wallet Balance */}
+                                    {renderWalletBalance()}
 
-                            {/* Cart Button */}
-                            {renderCartButton()}
+                                    {/* Cart Button */}
+                                    {renderCartButton()}
 
-                            {/* User Menu */}
-                            {renderUserMenu()}
+                                    {/* User Menu */}
+                                    {renderUserMenu()}
+                                </>
+                            ) : (
+                                /* Auth Buttons for non-authenticated users */
+                                <div className="flex items-center space-x-3">
+                                    <Button
+                                        onClick={() => onAuthClick?.('login')}
+                                        variant="ghost"
+                                        size="sm"
+                                    >
+                                        Sign In
+                                    </Button>
+                                    <Button
+                                        onClick={() => onAuthClick?.('register')}
+                                        variant="primary"
+                                        size="sm"
+                                    >
+                                        Sign Up
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* Mobile Menu */}
-            {renderMobileMenu()}
+            {/* Mobile Menu - only for authenticated users */}
+            {isAuthenticated && renderMobileMenu()}
         </>
     );
 };
