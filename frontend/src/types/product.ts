@@ -28,7 +28,7 @@ export interface ProductVariant {
   stockQuantity: number;
   minOrderQuantity: number;
   maxOrderQuantity: number;
-  isActive: boolean;
+  isActive: string; // API returns string "true"/"false"
   isInStock: boolean;
   isOutOfStock: boolean;
   hasLowStock: boolean;

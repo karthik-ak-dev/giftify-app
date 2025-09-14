@@ -14,13 +14,15 @@ export const productService = {
   getProducts: async (filters?: ProductFilters): Promise<Product[]> => {
     const response = await apiClient.get<{ 
       success: boolean; 
-      data: { products: Product[] }; 
+      data: Product[]; // Products are directly in data array
+      message: string;
+      timestamp: string;
     }>(API_ENDPOINTS.PRODUCTS, { params: filters });
     
     if (!response.data?.success || !response.data.data) {
       throw new Error('Failed to fetch products');
     }
     
-    return response.data.data.products;
+    return response.data.data;
   }
 }; 
