@@ -72,7 +72,10 @@ export const createOrderService = async (userId: string): Promise<CreateOrderRes
       items: buildOrderItems(cart.items, availableItems, unavailableItems)
     });
 
-    // Update order status based on fulfillment
+    // First transition to PROCESSING state
+    order.markAsProcessing();
+
+    // Then update order status based on fulfillment
     if (unavailableItems.length === 0) {
       order.markAsFulfilled({
         totalGiftCardsAllocated: 0, // Will be updated after allocation
