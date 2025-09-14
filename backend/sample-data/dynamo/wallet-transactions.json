@@ -1,0 +1,95 @@
+{
+    "tableName": "giftify-backend-stage-wallet-transactions",
+    "description": "Sample data for Wallet Transactions table - stores all wallet credit/debit transactions",
+    "primaryKey": {
+        "partitionKey": "userId (String)",
+        "sortKey": "transactionId (String)"
+    },
+    "globalSecondaryIndexes": [
+        {
+            "indexName": "TransactionIdIndex",
+            "partitionKey": "transactionId (String)"
+        },
+        {
+            "indexName": "UserTransactionHistoryIndex",
+            "partitionKey": "userId (String)",
+            "sortKey": "createdAt (String)"
+        }
+    ],
+    "sampleItems": [
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "transactionId": "01HKQM5X8G9YZ2TRANS001234",
+            "type": "CREDIT",
+            "amount": 100000,
+            "status": "COMPLETED",
+            "description": "Wallet top-up via UPI",
+            "paymentMethod": "UPI",
+            "paymentReference": "UPI123456789",
+            "orderId": null,
+            "createdAt": "2024-01-15T10:35:00.000Z",
+            "updatedAt": "2024-01-15T10:35:30.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "transactionId": "01HKQM5X8G9YZ2TRANS001235",
+            "type": "DEBIT",
+            "amount": 50000,
+            "status": "COMPLETED",
+            "description": "Order payment for Amazon Gift Cards",
+            "paymentMethod": "WALLET",
+            "paymentReference": null,
+            "orderId": "01HKQM5X8G9YZ2ORDER123456",
+            "createdAt": "2024-01-15T11:20:00.000Z",
+            "updatedAt": "2024-01-15T11:20:15.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "transactionId": "01HKQM5X8G9YZ2TRANS001236",
+            "type": "CREDIT",
+            "amount": 200000,
+            "status": "COMPLETED",
+            "description": "Wallet top-up via Credit Card",
+            "paymentMethod": "CREDIT_CARD",
+            "paymentReference": "CC987654321",
+            "orderId": null,
+            "createdAt": "2024-01-14T16:15:00.000Z",
+            "updatedAt": "2024-01-14T16:15:45.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "transactionId": "01HKQM5X8G9YZ2TRANS001237",
+            "type": "REFUND",
+            "amount": 25000,
+            "status": "COMPLETED",
+            "description": "Refund for cancelled order",
+            "paymentMethod": "WALLET",
+            "paymentReference": null,
+            "orderId": "01HKQM5X8G9YZ2ORDER789012",
+            "createdAt": "2024-01-14T18:30:00.000Z",
+            "updatedAt": "2024-01-14T18:30:20.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
+            "transactionId": "01HKQM5X8G9YZ2TRANS001238",
+            "type": "CREDIT",
+            "amount": 75000,
+            "status": "PENDING",
+            "description": "Wallet top-up via Bank Transfer",
+            "paymentMethod": "BANK_TRANSFER",
+            "paymentReference": "BT456789123",
+            "orderId": null,
+            "createdAt": "2024-01-15T09:10:00.000Z",
+            "updatedAt": "2024-01-15T09:10:00.000Z"
+        }
+    ],
+    "notes": [
+        "amount is stored in paise (cents) - 100000 paise = ₹1,000",
+        "type can be: CREDIT, DEBIT, REFUND",
+        "status can be: PENDING, COMPLETED, FAILED",
+        "paymentMethod can be: UPI, CREDIT_CARD, DEBIT_CARD, NET_BANKING, BANK_TRANSFER, WALLET",
+        "orderId is set for DEBIT/REFUND transactions related to orders",
+        "paymentReference is external payment gateway reference",
+        "Composite key allows multiple transactions per user with chronological ordering"
+    ]
+}

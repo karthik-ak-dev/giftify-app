@@ -1,0 +1,91 @@
+{
+    "tableName": "giftify-backend-stage-cart",
+    "description": "Sample data for Cart table - stores user shopping cart items",
+    "primaryKey": {
+        "partitionKey": "userId (String)"
+    },
+    "globalSecondaryIndexes": [],
+    "sampleItems": [
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "items": [
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001234",
+                    "productId": "01HKQM5X8G9YZ2PROD001234",
+                    "productName": "Amazon Gift Card",
+                    "variantName": "₹500 Amazon Gift Card",
+                    "denomination": 500,
+                    "sellingPrice": 50000,
+                    "quantity": 2,
+                    "totalPrice": 100000,
+                    "addedAt": "2024-01-15T10:45:00.000Z"
+                },
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001239",
+                    "productId": "01HKQM5X8G9YZ2PROD001236",
+                    "productName": "Netflix Gift Card",
+                    "variantName": "₹799 Netflix Gift Card (1 Month)",
+                    "denomination": 799,
+                    "sellingPrice": 79900,
+                    "quantity": 1,
+                    "totalPrice": 79900,
+                    "addedAt": "2024-01-15T11:20:00.000Z"
+                }
+            ],
+            "totalAmount": 179900,
+            "totalItems": 3,
+            "createdAt": "2024-01-15T10:45:00.000Z",
+            "updatedAt": "2024-01-15T11:20:00.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "items": [
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001235",
+                    "productId": "01HKQM5X8G9YZ2PROD001234",
+                    "productName": "Amazon Gift Card",
+                    "variantName": "₹1000 Amazon Gift Card",
+                    "denomination": 1000,
+                    "sellingPrice": 100000,
+                    "quantity": 1,
+                    "totalPrice": 100000,
+                    "addedAt": "2024-01-14T16:30:00.000Z"
+                },
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001241",
+                    "productId": "01HKQM5X8G9YZ2PROD001238",
+                    "productName": "Starbucks Gift Card",
+                    "variantName": "₹500 Starbucks Gift Card",
+                    "denomination": 500,
+                    "sellingPrice": 50000,
+                    "quantity": 2,
+                    "totalPrice": 100000,
+                    "addedAt": "2024-01-14T17:15:00.000Z"
+                }
+            ],
+            "totalAmount": 200000,
+            "totalItems": 3,
+            "createdAt": "2024-01-14T16:30:00.000Z",
+            "updatedAt": "2024-01-14T17:15:00.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
+            "items": [],
+            "totalAmount": 0,
+            "totalItems": 0,
+            "createdAt": "2024-01-12T11:18:00.000Z",
+            "updatedAt": "2024-01-15T09:12:00.000Z"
+        }
+    ],
+    "notes": [
+        "Each user has one cart identified by userId",
+        "items array contains all cart items with product details",
+        "All prices are stored in paise (cents)",
+        "totalAmount is sum of all item totalPrice values",
+        "totalItems is sum of all item quantities",
+        "addedAt tracks when each item was added to cart",
+        "Empty carts have empty items array but still exist as records",
+        "Cart is automatically created when user adds first item",
+        "updatedAt changes whenever cart is modified"
+    ]
+}

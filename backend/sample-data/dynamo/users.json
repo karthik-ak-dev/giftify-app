@@ -1,0 +1,74 @@
+{
+    "tableName": "giftify-backend-stage-users",
+    "description": "Sample data for Users table - stores user account information",
+    "primaryKey": {
+        "partitionKey": "userId (String)"
+    },
+    "globalSecondaryIndexes": [
+        {
+            "indexName": "EmailIndex",
+            "partitionKey": "email (String)"
+        }
+    ],
+    "sampleItems": [
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "email": "john.doe@example.com",
+            "firstName": "John",
+            "lastName": "Doe",
+            "passwordHash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9qK",
+            "isEmailVerified": false,
+            "status": "ACTIVE",
+            "walletBalance": 150000,
+            "createdAt": "2024-01-15T10:30:00.000Z",
+            "updatedAt": "2024-01-15T12:45:00.000Z",
+            "lastLoginAt": "2024-01-15T12:45:00.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "email": "jane.smith@example.com",
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "passwordHash": "$2b$12$8Bc7q2K9mN3pL5rS1tU4vW6xY7zA0bC1dE2fG3hI4jK5lM6nO7pQ",
+            "isEmailVerified": true,
+            "status": "ACTIVE",
+            "walletBalance": 250000,
+            "createdAt": "2024-01-10T08:15:00.000Z",
+            "updatedAt": "2024-01-14T16:20:00.000Z",
+            "lastLoginAt": "2024-01-14T16:20:00.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF345678",
+            "email": "mike.wilson@example.com",
+            "firstName": "Mike",
+            "lastName": "Wilson",
+            "passwordHash": "$2b$12$9Cd8r3L0oP4qM6sT2uV5wX7yZ8aB1cD2eF3gH4iJ5kL6mN7oP8qR",
+            "isEmailVerified": true,
+            "status": "SUSPENDED",
+            "walletBalance": 0,
+            "createdAt": "2024-01-05T14:22:00.000Z",
+            "updatedAt": "2024-01-12T09:30:00.000Z",
+            "lastLoginAt": "2024-01-11T18:45:00.000Z"
+        },
+        {
+            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
+            "email": "sarah.johnson@example.com",
+            "firstName": "Sarah",
+            "lastName": "Johnson",
+            "passwordHash": "$2b$12$0De9s4M1pQ5rN7tU3vW6xY8zA9bC0dE1fG2hI3jK4lM5nO6pQ7rS",
+            "isEmailVerified": false,
+            "status": "ACTIVE",
+            "walletBalance": 75000,
+            "createdAt": "2024-01-12T11:18:00.000Z",
+            "updatedAt": "2024-01-15T09:12:00.000Z"
+        }
+    ],
+    "notes": [
+        "walletBalance is stored in paise (cents) - 150000 paise = ₹1,500",
+        "passwordHash is bcrypt hashed with 12 salt rounds",
+        "status can be: ACTIVE, SUSPENDED, DELETED",
+        "All timestamps are in ISO 8601 format",
+        "userId uses ULID format for sortable unique IDs",
+        "lastLoginAt is optional and only set after login"
+    ]
+}

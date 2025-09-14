@@ -1,0 +1,165 @@
+{
+    "tableName": "giftify-backend-stage-gift-cards",
+    "description": "Sample data for Gift Cards table - stores individual gift card inventory with reservation system",
+    "primaryKey": {
+        "partitionKey": "giftCardId (String)"
+    },
+    "globalSecondaryIndexes": [
+        {
+            "indexName": "VariantExpiryIndex",
+            "partitionKey": "variantId (String)",
+            "sortKey": "expiryTime (String)"
+        },
+        {
+            "indexName": "OrderCardsIndex",
+            "partitionKey": "usedByOrder (String)"
+        },
+        {
+            "indexName": "UserCardsIndex",
+            "partitionKey": "usedByUser (String)"
+        }
+    ],
+    "sampleItems": [
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001234",
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "variantId": "01HKQM5X8G9YZ2VAR001234",
+            "productName": "Amazon Gift Card",
+            "variantName": "₹500 Amazon Gift Card",
+            "denomination": 500,
+            "giftCardNumber": "AMZN-1234-5678-9012-3456",
+            "giftCardPin": "1234",
+            "expiryTime": "2025-01-15T11:25:00.000Z",
+            "purchasePrice": 47500,
+            "usedByOrder": "01HKQM5X8G9YZ2ORDER123456",
+            "usedByUser": "01HKQM5X8G9YZ2ABCDEF123456",
+            "usedAt": "2024-01-15T11:25:00.000Z",
+            "createdAt": "2024-01-10T09:00:00.000Z",
+            "updatedAt": "2024-01-15T11:25:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001235",
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "variantId": "01HKQM5X8G9YZ2VAR001234",
+            "productName": "Amazon Gift Card",
+            "variantName": "₹500 Amazon Gift Card",
+            "denomination": 500,
+            "giftCardNumber": "AMZN-2345-6789-0123-4567",
+            "giftCardPin": "5678",
+            "expiryTime": "2025-01-15T11:25:00.000Z",
+            "purchasePrice": 47500,
+            "usedByOrder": "01HKQM5X8G9YZ2ORDER123456",
+            "usedByUser": "01HKQM5X8G9YZ2ABCDEF123456",
+            "usedAt": "2024-01-15T11:25:00.000Z",
+            "createdAt": "2024-01-10T09:00:00.000Z",
+            "updatedAt": "2024-01-15T11:25:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001236",
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "variantId": "01HKQM5X8G9YZ2VAR001235",
+            "productName": "Amazon Gift Card",
+            "variantName": "₹1000 Amazon Gift Card",
+            "denomination": 1000,
+            "giftCardNumber": "AMZN-3456-7890-1234-5678",
+            "giftCardPin": "9012",
+            "expiryTime": "2025-01-14T18:25:00.000Z",
+            "purchasePrice": 95000,
+            "usedByOrder": "01HKQM5X8G9YZ2ORDER789012",
+            "usedByUser": "01HKQM5X8G9YZ2ABCDEF789012",
+            "usedAt": "2024-01-14T18:25:00.000Z",
+            "createdAt": "2024-01-08T14:30:00.000Z",
+            "updatedAt": "2024-01-14T18:25:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001237",
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "variantId": "01HKQM5X8G9YZ2VAR001235",
+            "productName": "Amazon Gift Card",
+            "variantName": "₹1000 Amazon Gift Card",
+            "denomination": 1000,
+            "giftCardNumber": "AMZN-4567-8901-2345-6789",
+            "giftCardPin": "3456",
+            "expiryTime": "2025-01-14T18:25:00.000Z",
+            "purchasePrice": 95000,
+            "usedByOrder": "01HKQM5X8G9YZ2ORDER789012",
+            "usedByUser": "01HKQM5X8G9YZ2ABCDEF789012",
+            "usedAt": "2024-01-14T18:25:00.000Z",
+            "createdAt": "2024-01-08T14:30:00.000Z",
+            "updatedAt": "2024-01-14T18:25:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001238",
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "variantId": "01HKQM5X8G9YZ2VAR001234",
+            "productName": "Amazon Gift Card",
+            "variantName": "₹500 Amazon Gift Card",
+            "denomination": 500,
+            "giftCardNumber": "AMZN-5678-9012-3456-7890",
+            "giftCardPin": "7890",
+            "expiryTime": "2025-02-01T10:00:00.000Z",
+            "purchasePrice": 47500,
+            "reservedByOrder": "01HKQM5X8G9YZ2ORDER567890",
+            "reservedByUser": "01HKQM5X8G9YZ2ABCDEF901234",
+            "reservedAt": "2024-01-15T14:30:00.000Z",
+            "reservationExpiresAt": "2024-01-15T14:35:00.000Z",
+            "createdAt": "2024-01-12T16:00:00.000Z",
+            "updatedAt": "2024-01-15T14:30:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001239",
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "variantId": "01HKQM5X8G9YZ2VAR001234",
+            "productName": "Amazon Gift Card",
+            "variantName": "₹500 Amazon Gift Card",
+            "denomination": 500,
+            "giftCardNumber": "AMZN-6789-0123-4567-8901",
+            "giftCardPin": "2345",
+            "expiryTime": "2025-02-01T10:00:00.000Z",
+            "purchasePrice": 47500,
+            "createdAt": "2024-01-12T16:00:00.000Z",
+            "updatedAt": "2024-01-12T16:00:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001240",
+            "productId": "01HKQM5X8G9YZ2PROD001236",
+            "variantId": "01HKQM5X8G9YZ2VAR001239",
+            "productName": "Netflix Gift Card",
+            "variantName": "₹799 Netflix Gift Card (1 Month)",
+            "denomination": 799,
+            "giftCardNumber": "NFLX-7890-1234-5678-9012",
+            "giftCardPin": "6789",
+            "expiryTime": "2026-01-15T00:00:00.000Z",
+            "purchasePrice": 75905,
+            "createdAt": "2024-01-05T12:00:00.000Z",
+            "updatedAt": "2024-01-05T12:00:00.000Z"
+        },
+        {
+            "giftCardId": "01HKQM5X8G9YZ2GIFT001241",
+            "productId": "01HKQM5X8G9YZ2PROD001238",
+            "variantId": "01HKQM5X8G9YZ2VAR001241",
+            "productName": "Starbucks Gift Card",
+            "variantName": "₹500 Starbucks Gift Card",
+            "denomination": 500,
+            "giftCardNumber": "SBUX-8901-2345-6789-0123",
+            "giftCardPin": "0123",
+            "expiryTime": "2025-01-05T10:00:00.000Z",
+            "purchasePrice": 47500,
+            "createdAt": "2024-01-05T10:30:00.000Z",
+            "updatedAt": "2024-01-05T10:30:00.000Z"
+        }
+    ],
+    "notes": [
+        "Each gift card is a unique inventory item with encrypted number and PIN",
+        "usedByOrder and usedByUser are set when card is allocated to an order",
+        "reservedByOrder/reservedByUser implement temporary reservation system",
+        "reservationExpiresAt ensures expired reservations are automatically released",
+        "Available cards have no usedByOrder and no active reservation",
+        "VariantExpiryIndex enables FIFO allocation (expiring cards first)",
+        "OrderCardsIndex allows querying all cards for a specific order",
+        "UserCardsIndex allows querying all cards owned by a user",
+        "giftCardNumber and giftCardPin are encrypted in actual implementation",
+        "purchasePrice is what we paid for the card (in paise)",
+        "expiryTime is when the gift card itself expires (not reservation)"
+    ]
+}

@@ -1,0 +1,98 @@
+{
+    "tableName": "giftify-backend-stage-products",
+    "description": "Sample data for Products table - stores gift card product information",
+    "primaryKey": {
+        "partitionKey": "productId (String)"
+    },
+    "globalSecondaryIndexes": [
+        {
+            "indexName": "ActiveProductsIndex",
+            "partitionKey": "isActive (String)",
+            "sortKey": "name (String)"
+        }
+    ],
+    "sampleItems": [
+        {
+            "productId": "01HKQM5X8G9YZ2PROD001234",
+            "name": "Amazon Gift Card",
+            "description": "Amazon India Gift Card - Shop for millions of products across categories",
+            "category": "ECOMMERCE",
+            "brand": "Amazon",
+            "images": [
+                "https://example.com/images/amazon-gift-card-1.jpg",
+                "https://example.com/images/amazon-gift-card-2.jpg"
+            ],
+            "termsAndConditions": "Valid for 1 year from date of issue. Can be used for purchases on Amazon.in. Not redeemable for cash.",
+            "isActive": "true",
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-10T12:00:00.000Z"
+        },
+        {
+            "productId": "01HKQM5X8G9YZ2PROD001235",
+            "name": "Flipkart Gift Card",
+            "description": "Flipkart Gift Card - India's leading e-commerce platform",
+            "category": "ECOMMERCE",
+            "brand": "Flipkart",
+            "images": [
+                "https://example.com/images/flipkart-gift-card-1.jpg"
+            ],
+            "termsAndConditions": "Valid for 1 year from date of issue. Can be used for purchases on Flipkart.com. Not redeemable for cash.",
+            "isActive": "true",
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-08T15:30:00.000Z"
+        },
+        {
+            "productId": "01HKQM5X8G9YZ2PROD001236",
+            "name": "Netflix Gift Card",
+            "description": "Netflix Gift Card - Stream unlimited movies and TV shows",
+            "category": "ENTERTAINMENT",
+            "brand": "Netflix",
+            "images": [
+                "https://example.com/images/netflix-gift-card-1.jpg",
+                "https://example.com/images/netflix-gift-card-2.jpg",
+                "https://example.com/images/netflix-gift-card-3.jpg"
+            ],
+            "termsAndConditions": "Valid for Netflix subscription. Can be redeemed on Netflix.com. No expiry date.",
+            "isActive": "true",
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-12T09:45:00.000Z"
+        },
+        {
+            "productId": "01HKQM5X8G9YZ2PROD001237",
+            "name": "Spotify Premium Gift Card",
+            "description": "Spotify Premium Gift Card - Enjoy ad-free music streaming",
+            "category": "ENTERTAINMENT",
+            "brand": "Spotify",
+            "images": [
+                "https://example.com/images/spotify-gift-card-1.jpg"
+            ],
+            "termsAndConditions": "Valid for Spotify Premium subscription. Can be redeemed on Spotify.com. Valid for 1 year.",
+            "isActive": "false",
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-14T11:20:00.000Z"
+        },
+        {
+            "productId": "01HKQM5X8G9YZ2PROD001238",
+            "name": "Starbucks Gift Card",
+            "description": "Starbucks Gift Card - Perfect for coffee lovers",
+            "category": "FOOD_AND_BEVERAGE",
+            "brand": "Starbucks",
+            "images": [
+                "https://example.com/images/starbucks-gift-card-1.jpg",
+                "https://example.com/images/starbucks-gift-card-2.jpg"
+            ],
+            "termsAndConditions": "Valid at participating Starbucks stores in India. Valid for 1 year from date of issue.",
+            "isActive": "true",
+            "createdAt": "2024-01-05T10:00:00.000Z",
+            "updatedAt": "2024-01-05T10:00:00.000Z"
+        }
+    ],
+    "notes": [
+        "isActive is stored as string ('true'/'false') for GSI compatibility",
+        "category can be: ECOMMERCE, ENTERTAINMENT, FOOD_AND_BEVERAGE, GAMING, FASHION, TRAVEL, etc.",
+        "images array contains URLs to product images",
+        "termsAndConditions contains legal text for the gift card",
+        "brand represents the company/merchant issuing the gift card",
+        "ActiveProductsIndex allows efficient querying of active products sorted by name"
+    ]
+}

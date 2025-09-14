@@ -1,0 +1,223 @@
+{
+    "tableName": "giftify-backend-stage-orders",
+    "description": "Sample data for Orders table - stores order information and fulfillment details",
+    "primaryKey": {
+        "partitionKey": "orderId (String)"
+    },
+    "globalSecondaryIndexes": [
+        {
+            "indexName": "UserOrdersIndex",
+            "partitionKey": "userId (String)",
+            "sortKey": "createdAt (String)"
+        },
+        {
+            "indexName": "OrderStatusIndex",
+            "partitionKey": "status (String)",
+            "sortKey": "createdAt (String)"
+        }
+    ],
+    "sampleItems": [
+        {
+            "orderId": "01HKQM5X8G9YZ2ORDER123456",
+            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "status": "FULFILLED",
+            "items": [
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001234",
+                    "productId": "01HKQM5X8G9YZ2PROD001234",
+                    "productName": "Amazon Gift Card",
+                    "variantName": "₹500 Amazon Gift Card",
+                    "denomination": 500,
+                    "quantity": 2,
+                    "unitPrice": 50000,
+                    "totalPrice": 100000,
+                    "fulfilledQuantity": 2,
+                    "refundedQuantity": 0,
+                    "fulfilledPrice": 100000,
+                    "refundedPrice": 0
+                }
+            ],
+            "totalAmount": 100000,
+            "paidAmount": 100000,
+            "refundAmount": 0,
+            "fulfillmentDetails": {
+                "attemptedAt": "2024-01-15T11:25:00.000Z",
+                "partialFulfillment": false,
+                "refundProcessed": false,
+                "totalItemsRequested": 2,
+                "totalItemsFulfilled": 2,
+                "totalGiftCardsAllocated": 2,
+                "fulfillmentSummary": {
+                    "fulfilledAmount": 100000,
+                    "refundedAmount": 0
+                },
+                "giftCards": [
+                    {
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001234",
+                        "giftCardNumber": "1234-5678-9012-3456",
+                        "giftCardPin": "1234",
+                        "expiryTime": "2025-01-15T11:25:00.000Z"
+                    },
+                    {
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001235",
+                        "giftCardNumber": "2345-6789-0123-4567",
+                        "giftCardPin": "5678",
+                        "expiryTime": "2025-01-15T11:25:00.000Z"
+                    }
+                ],
+                "unavailableItems": []
+            },
+            "createdAt": "2024-01-15T11:20:00.000Z",
+            "updatedAt": "2024-01-15T11:25:15.000Z"
+        },
+        {
+            "orderId": "01HKQM5X8G9YZ2ORDER789012",
+            "userId": "01HKQM5X8G9YZ2ABCDEF789012",
+            "status": "PARTIALLY_FULFILLED",
+            "items": [
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001235",
+                    "productId": "01HKQM5X8G9YZ2PROD001234",
+                    "productName": "Amazon Gift Card",
+                    "variantName": "₹1000 Amazon Gift Card",
+                    "denomination": 1000,
+                    "quantity": 3,
+                    "unitPrice": 100000,
+                    "totalPrice": 300000,
+                    "fulfilledQuantity": 2,
+                    "refundedQuantity": 1,
+                    "fulfilledPrice": 200000,
+                    "refundedPrice": 100000
+                }
+            ],
+            "totalAmount": 300000,
+            "paidAmount": 300000,
+            "refundAmount": 100000,
+            "fulfillmentDetails": {
+                "attemptedAt": "2024-01-14T18:25:00.000Z",
+                "partialFulfillment": true,
+                "refundProcessed": true,
+                "totalItemsRequested": 3,
+                "totalItemsFulfilled": 2,
+                "totalGiftCardsAllocated": 2,
+                "fulfillmentSummary": {
+                    "fulfilledAmount": 200000,
+                    "refundedAmount": 100000
+                },
+                "giftCards": [
+                    {
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001236",
+                        "giftCardNumber": "3456-7890-1234-5678",
+                        "giftCardPin": "9012",
+                        "expiryTime": "2025-01-14T18:25:00.000Z"
+                    },
+                    {
+                        "giftCardId": "01HKQM5X8G9YZ2GIFT001237",
+                        "giftCardNumber": "4567-8901-2345-6789",
+                        "giftCardPin": "3456",
+                        "expiryTime": "2025-01-14T18:25:00.000Z"
+                    }
+                ],
+                "unavailableItems": [
+                    {
+                        "variantId": "01HKQM5X8G9YZ2VAR001235",
+                        "productName": "Amazon Gift Card",
+                        "variantName": "₹1000 Amazon Gift Card",
+                        "requestedQuantity": 1,
+                        "reason": "Insufficient stock",
+                        "refundAmount": 100000
+                    }
+                ]
+            },
+            "createdAt": "2024-01-14T18:20:00.000Z",
+            "updatedAt": "2024-01-14T18:30:20.000Z"
+        },
+        {
+            "orderId": "01HKQM5X8G9YZ2ORDER345678",
+            "userId": "01HKQM5X8G9YZ2ABCDEF123456",
+            "status": "CANCELLED",
+            "items": [
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001239",
+                    "productId": "01HKQM5X8G9YZ2PROD001236",
+                    "productName": "Netflix Gift Card",
+                    "variantName": "₹799 Netflix Gift Card (1 Month)",
+                    "denomination": 799,
+                    "quantity": 1,
+                    "unitPrice": 79900,
+                    "totalPrice": 79900,
+                    "fulfilledQuantity": 0,
+                    "refundedQuantity": 1,
+                    "fulfilledPrice": 0,
+                    "refundedPrice": 79900
+                }
+            ],
+            "totalAmount": 79900,
+            "paidAmount": 79900,
+            "refundAmount": 79900,
+            "fulfillmentDetails": null,
+            "createdAt": "2024-01-13T14:30:00.000Z",
+            "updatedAt": "2024-01-13T15:45:00.000Z"
+        },
+        {
+            "orderId": "01HKQM5X8G9YZ2ORDER901234",
+            "userId": "01HKQM5X8G9YZ2ABCDEF901234",
+            "status": "FAILED",
+            "items": [
+                {
+                    "variantId": "01HKQM5X8G9YZ2VAR001238",
+                    "productId": "01HKQM5X8G9YZ2PROD001235",
+                    "productName": "Flipkart Gift Card",
+                    "variantName": "₹1000 Flipkart Gift Card",
+                    "denomination": 1000,
+                    "quantity": 2,
+                    "unitPrice": 100000,
+                    "totalPrice": 200000,
+                    "fulfilledQuantity": 0,
+                    "refundedQuantity": 2,
+                    "fulfilledPrice": 0,
+                    "refundedPrice": 200000
+                }
+            ],
+            "totalAmount": 200000,
+            "paidAmount": 200000,
+            "refundAmount": 200000,
+            "fulfillmentDetails": {
+                "attemptedAt": "2024-01-12T16:10:00.000Z",
+                "partialFulfillment": false,
+                "refundProcessed": true,
+                "totalItemsRequested": 2,
+                "totalItemsFulfilled": 0,
+                "totalGiftCardsAllocated": 0,
+                "fulfillmentSummary": {
+                    "fulfilledAmount": 0,
+                    "refundedAmount": 200000
+                },
+                "giftCards": [],
+                "unavailableItems": [
+                    {
+                        "variantId": "01HKQM5X8G9YZ2VAR001238",
+                        "productName": "Flipkart Gift Card",
+                        "variantName": "₹1000 Flipkart Gift Card",
+                        "requestedQuantity": 2,
+                        "reason": "Product out of stock",
+                        "refundAmount": 200000
+                    }
+                ]
+            },
+            "createdAt": "2024-01-12T16:05:00.000Z",
+            "updatedAt": "2024-01-12T16:15:30.000Z"
+        }
+    ],
+    "notes": [
+        "status can be: PENDING, PROCESSING, FULFILLED, PARTIALLY_FULFILLED, CANCELLED, FAILED",
+        "All amounts are in paise (cents)",
+        "items array contains ordered products with fulfillment details",
+        "fulfillmentDetails is null for cancelled orders before processing",
+        "giftCards array contains actual gift card details for fulfilled items",
+        "unavailableItems tracks what couldn't be fulfilled and refund amounts",
+        "UserOrdersIndex allows efficient user order history queries",
+        "OrderStatusIndex enables status-based order filtering",
+        "fulfilledQuantity + refundedQuantity should equal original quantity"
+    ]
+}
