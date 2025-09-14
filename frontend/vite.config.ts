@@ -17,8 +17,6 @@ export default defineConfig({
   // Plugins
   plugins: [
     react({
-      // Enable Fast Refresh for development
-      fastRefresh: true,
       // Include JSX runtime for better performance
       jsxRuntime: 'automatic'
     })
@@ -96,9 +94,6 @@ export default defineConfig({
         
         // Asset file naming
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name?.split('.') || [];
-          const extType = info[info.length - 1];
-          
           if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name || '')) {
             return `assets/images/[name]-[hash][extname]`;
           }
