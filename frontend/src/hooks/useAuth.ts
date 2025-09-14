@@ -11,7 +11,7 @@ import type { LoginCredentials, RegisterData, ProfileData, User } from '../types
 /**
  * Auth hook return type
  */
-interface UseAuthReturn {
+export interface UseAuthReturn {
   // State
   user: User | null;
   isAuthenticated: boolean;

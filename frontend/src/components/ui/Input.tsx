@@ -1,10 +1,8 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
-    helperText?: string;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
 }
@@ -12,62 +10,50 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 export const Input: React.FC<InputProps> = ({
     label,
     error,
-    helperText,
     leftIcon,
     rightIcon,
-    className,
-    id,
+    className = '',
     ...props
 }) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    const baseClasses = 'w-full px-4 py-3 bg-glass-bg border border-glass-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-pink focus:border-transparent transition-all duration-200';
+    const errorClasses = error ? 'border-red-500 focus:ring-red-500' : '';
+    const paddingClasses = leftIcon ? 'pl-12' : rightIcon ? 'pr-12' : '';
+
+    const inputClasses = `${baseClasses} ${errorClasses} ${paddingClasses} ${className}`;
 
     return (
-        <div className="w-full">
+        <div className="space-y-2">
             {label && (
-                <label
-                    htmlFor={inputId}
-                    className="block text-sm font-medium text-text-primary mb-2"
-                >
+                <label className="block text-sm font-medium text-text-primary">
                     {label}
                 </label>
             )}
 
             <div className="relative">
                 {leftIcon && (
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary">
                         {leftIcon}
                     </div>
                 )}
 
                 <input
-                    id={inputId}
-                    className={cn(
-                        'w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-xl text-text-primary placeholder-text-secondary transition-all duration-300 focus-ring',
-                        'hover:border-accent-pink focus:border-primary-purple',
-                        leftIcon && 'pl-10',
-                        rightIcon && 'pr-10',
-                        error && 'border-red-500 focus:border-red-500',
-                        className
-                    )}
+                    className={inputClasses}
                     {...props}
                 />
 
                 {rightIcon && (
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary">
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                         {rightIcon}
                     </div>
                 )}
             </div>
 
             {error && (
-                <p className="mt-1 text-sm text-red-400">
+                <p className="text-sm text-red-400 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                     {error}
-                </p>
-            )}
-
-            {helperText && !error && (
-                <p className="mt-1 text-sm text-text-secondary">
-                    {helperText}
                 </p>
             )}
         </div>

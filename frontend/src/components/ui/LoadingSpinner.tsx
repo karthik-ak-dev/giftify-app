@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 /**
  * LoadingSpinner Component Props
  */
-interface LoadingSpinnerProps {
+export interface LoadingSpinnerProps {
     /** Size of the spinner */
     size?: 'sm' | 'md' | 'lg' | 'xl';
     /** Custom color for the spinner */

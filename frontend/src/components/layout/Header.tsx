@@ -136,7 +136,7 @@ const Header: React.FC = () => {
         >
             <Wallet size={18} className="text-accent-pink" />
             <span className="font-medium">
-                {balance !== null ? formatCurrency(balance) : '...'}
+                {balance !== null ? formatCurrency(balance.balance) : '...'}
             </span>
         </motion.div>
     );
