@@ -1,26 +1,54 @@
+/**
+ * Authentication Store
+ * 
+ * Zustand store for managing authentication state
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { apiClient } from '../services/api';
-import { API_ENDPOINTS, STORAGE_KEYS, SUCCESS_MESSAGES } from '../utils/constants';
-import type { 
-  User, 
-  LoginCredentials, 
-  RegisterData, 
-  AuthResponse, 
-  ProfileData,
-  AuthState,
-  AuthActions 
-} from '../types/auth';
+import { authService } from '../services/authService';
+import type { User, LoginCredentials, RegisterData, ProfileData } from '../types/auth';
 
-type AuthStore = AuthState & AuthActions;
+/**
+ * Storage keys for localStorage
+ */
+const STORAGE_KEYS = {
+  ACCESS_TOKEN: 'giftify_access_token',
+  REFRESH_TOKEN: 'giftify_refresh_token',
+  USER: 'giftify_user'
+} as const;
 
+/**
+ * Authentication Store State
+ */
+export interface AuthStore {
+  // State
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  
+  // Actions
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
+  logout: () => void;
+  updateProfile: (data: ProfileData) => Promise<void>;
+  clearError: () => void;
+  checkAuth: () => void;
+  refreshToken: () => Promise<boolean>;
+  
+  // Computed
+  userFullName: string;
+}
+
+/**
+ * Create authentication store
+ */
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
-      // State
+      // Initial state
       user: null,
-      accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -30,12 +58,17 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const response = await apiClient.post<AuthResponse>(
-            API_ENDPOINTS.LOGIN,
-            credentials
-          );
+          const response = await authService.login(credentials);
+          
+          if (!response.data) {
+            throw new Error('Invalid response from server');
+          }
 
-          const { user, tokens } = response.data!;
+          const { user, tokens } = response.data;
+          
+          if (!user || !tokens) {
+            throw new Error('Invalid authentication data');
+          }
           
           // Store tokens in localStorage
           localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
@@ -43,23 +76,17 @@ export const useAuthStore = create<AuthStore>()(
           
           set({
             user,
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
             isAuthenticated: true,
             isLoading: false,
-            error: null,
+            error: null
           });
-
-          // Show success message (you can integrate with a toast library here)
-          console.log(SUCCESS_MESSAGES.LOGIN_SUCCESS);
-        } catch (error: unknown) {
-          const errorMessage = error && typeof error === 'object' && 'error' in error 
-            ? (error as { error?: { message?: string } }).error?.message || 'Login failed'
-            : 'Login failed';
-          
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Login failed';
           set({
             isLoading: false,
             error: errorMessage,
+            isAuthenticated: false,
+            user: null
           });
           throw error;
         }
@@ -69,12 +96,17 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         
         try {
-          const response = await apiClient.post<AuthResponse>(
-            API_ENDPOINTS.REGISTER,
-            userData
-          );
+          const response = await authService.register(userData);
+          
+          if (!response.data) {
+            throw new Error('Invalid response from server');
+          }
 
-          const { user, tokens } = response.data!;
+          const { user, tokens } = response.data;
+          
+          if (!user || !tokens) {
+            throw new Error('Invalid registration data');
+          }
           
           // Store tokens in localStorage
           localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
@@ -82,104 +114,60 @@ export const useAuthStore = create<AuthStore>()(
           
           set({
             user,
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
             isAuthenticated: true,
             isLoading: false,
-            error: null,
+            error: null
           });
-
-          // Show success message
-          console.log(SUCCESS_MESSAGES.REGISTER_SUCCESS);
-        } catch (error: unknown) {
-          const errorMessage = error && typeof error === 'object' && 'error' in error 
-            ? (error as { error?: { message?: string } }).error?.message || 'Registration failed'
-            : 'Registration failed';
-          
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Registration failed';
           set({
             isLoading: false,
             error: errorMessage,
+            isAuthenticated: false,
+            user: null
           });
           throw error;
         }
       },
 
       logout: () => {
-        // Clear localStorage
+        // Clear tokens from localStorage
         localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.USER_DATA);
-        localStorage.removeItem(STORAGE_KEYS.CART_DATA);
+        localStorage.removeItem(STORAGE_KEYS.USER);
         
+        // Reset state
         set({
           user: null,
-          accessToken: null,
-          refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
-          error: null,
+          error: null
         });
-
-        // Show success message
-        console.log(SUCCESS_MESSAGES.LOGOUT_SUCCESS);
-      },
-
-      refreshAccessToken: async () => {
-        const { refreshToken } = get();
         
-        if (!refreshToken) {
-          get().logout();
-          throw new Error('No refresh token available');
-        }
-
-        try {
-          const response = await apiClient.post<{ data: { tokens: { accessToken: string; refreshToken: string } } }>(
-            API_ENDPOINTS.REFRESH,
-            { refreshToken }
-          );
-
-          const { accessToken, refreshToken: newRefreshToken } = response.data!.data.tokens;
-          
-          localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-          localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
-          
-          set({
-            accessToken,
-            refreshToken: newRefreshToken,
-          });
-        } catch (error) {
-          get().logout();
-          throw error;
-        }
+        // Call logout API (fire and forget)
+        authService.logout().catch(console.error);
       },
 
       updateProfile: async (data: ProfileData) => {
         set({ isLoading: true, error: null });
         
         try {
-          const response = await apiClient.put<User>(
-            API_ENDPOINTS.PROFILE,
-            data
-          );
-
-          const updatedUser = response.data!;
+          const updatedUser = await authService.updateProfile(data);
+          
+          if (!updatedUser) {
+            throw new Error('Invalid response from server');
+          }
           
           set({
             user: updatedUser,
             isLoading: false,
-            error: null,
+            error: null
           });
-
-          // Show success message
-          console.log(SUCCESS_MESSAGES.PROFILE_UPDATED);
-        } catch (error: unknown) {
-          const errorMessage = error && typeof error === 'object' && 'error' in error 
-            ? (error as { error?: { message?: string } }).error?.message || 'Profile update failed'
-            : 'Profile update failed';
-          
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Profile update failed';
           set({
             isLoading: false,
-            error: errorMessage,
+            error: errorMessage
           });
           throw error;
         }
@@ -188,15 +176,66 @@ export const useAuthStore = create<AuthStore>()(
       clearError: () => {
         set({ error: null });
       },
+
+      checkAuth: () => {
+        const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
+        
+        if (accessToken && storedUser) {
+          try {
+            const user = JSON.parse(storedUser);
+            set({
+              user,
+              isAuthenticated: true
+            });
+          } catch (error) {
+            console.error('Failed to parse stored user:', error);
+            get().logout();
+          }
+        }
+      },
+
+      refreshToken: async (): Promise<boolean> => {
+        const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+        
+        if (!refreshToken) {
+          get().logout();
+          return false;
+        }
+        
+        try {
+          const response = await authService.refresh(refreshToken);
+          
+          if (!response.data?.tokens) {
+            throw new Error('Invalid refresh response');
+          }
+
+          const { tokens } = response.data;
+          
+          // Update tokens in localStorage
+          localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
+          localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
+          
+          return true;
+        } catch (error) {
+          console.error('Token refresh failed:', error);
+          get().logout();
+          return false;
+        }
+      },
+
+      // Computed properties
+      get userFullName() {
+        const { user } = get();
+        return user ? `${user.firstName} ${user.lastName}` : '';
+      }
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({
+      name: 'auth-store',
+      partialize: (state) => ({ 
         user: state.user,
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
-        isAuthenticated: state.isAuthenticated,
-      }),
+        isAuthenticated: state.isAuthenticated 
+      })
     }
   )
 ); 

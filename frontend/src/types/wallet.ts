@@ -1,61 +1,72 @@
+/**
+ * Wallet Types
+ * Based on backend WalletTransactionModel and wallet types
+ */
+
+// Transaction Type from backend
+export enum TransactionType {
+  TOPUP = 'TOPUP',
+  ORDER_PAYMENT = 'ORDER_PAYMENT',
+  REFUND = 'REFUND'
+}
+
+// Transaction Status from backend
+export enum TransactionStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED'
+}
+
+// Wallet Transaction Response from backend
 export interface WalletTransaction {
-  transactionId: string;
   userId: string;
+  transactionId: string;
   type: TransactionType;
   amount: number;
   balanceAfter: number;
   description: string;
   orderId?: string;
   status: TransactionStatus;
+  isCompleted: boolean;
+  isPending: boolean;
+  isFailed: boolean;
+  isCredit: boolean;
+  isDebit: boolean;
+  isRefund: boolean;
+  formattedAmount: string;
+  formattedBalanceAfter: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export type TransactionType = 'CREDIT' | 'DEBIT' | 'REFUND';
-export type TransactionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
-
-export interface WalletBalance {
+// Wallet Balance Response from backend
+export interface WalletBalanceResponse {
   balance: number;
   balanceFormatted: string;
+  balanceInRupees: number;
 }
 
+// Topup Request
 export interface TopupRequest {
   amount: number;
-  description?: string;
 }
 
+// Topup Response from backend
 export interface TopupResponse {
   transactionId: string;
   amount: number;
+  amountFormatted: string;
   newBalance: number;
+  newBalanceFormatted: string;
   status: TransactionStatus;
+  description: string;
+  createdAt: string;
 }
 
+// Transaction Filters
 export interface TransactionFilters {
-  type?: TransactionType;
-  status?: TransactionStatus;
-  startDate?: string;
-  endDate?: string;
   page?: number;
   limit?: number;
-}
-
-export interface WalletState {
-  balance: number;
-  transactions: WalletTransaction[];
-  isLoading: boolean;
-  error: string | null;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    hasNext: boolean;
-  };
-}
-
-export interface WalletActions {
-  fetchBalance: () => Promise<void>;
-  fetchTransactions: (filters?: TransactionFilters) => Promise<void>;
-  topupWallet: (request: TopupRequest) => Promise<void>;
-  clearError: () => void;
+  type?: TransactionType;
+  status?: TransactionStatus;
 } 

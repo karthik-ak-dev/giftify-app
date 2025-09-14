@@ -8,7 +8,6 @@ export const useCart = () => {
     isOpen,
     items,
     toggleCart,
-    openCart,
     closeCart,
   } = useCartStore();
 
@@ -25,7 +24,6 @@ export const useCart = () => {
     
     // Actions
     toggleCart,
-    openCart,
     closeCart,
   };
 }; 

@@ -1,41 +1,64 @@
+/**
+ * Wallet Service
+ * Handles wallet-related API calls
+ */
+
 import { apiClient } from './api';
 import { API_ENDPOINTS } from '../utils/constants';
 import type { 
-  WalletBalance, 
+  WalletBalanceResponse, 
   WalletTransaction, 
   TopupRequest, 
   TopupResponse,
-  TransactionFilters
+  TransactionFilters 
 } from '../types/wallet';
 
 export const walletService = {
   /**
    * Get wallet balance
    */
-  getBalance: async (): Promise<WalletBalance> => {
-    const response = await apiClient.get<WalletBalance>(API_ENDPOINTS.WALLET_BALANCE);
-    return response.data!;
+  getBalance: async (): Promise<WalletBalanceResponse> => {
+    const response = await apiClient.get<{
+      success: boolean;
+      data: WalletBalanceResponse;
+    }>(API_ENDPOINTS.WALLET_BALANCE);
+    
+    if (!response.data?.success || !response.data.data) {
+      throw new Error('Failed to fetch wallet balance');
+    }
+    
+    return response.data.data;
+  },
+
+  /**
+   * Get wallet transactions
+   */
+  getTransactions: async (filters?: TransactionFilters): Promise<WalletTransaction[]> => {
+    const response = await apiClient.get<{
+      success: boolean;
+      data: { transactions: WalletTransaction[] };
+    }>(API_ENDPOINTS.WALLET_TRANSACTIONS, { params: filters });
+    
+    if (!response.data?.success || !response.data.data) {
+      throw new Error('Failed to fetch transactions');
+    }
+    
+    return response.data.data.transactions;
   },
 
   /**
    * Top up wallet
    */
-  topupWallet: async (request: TopupRequest): Promise<TopupResponse> => {
-    const response = await apiClient.post<TopupResponse>(
-      API_ENDPOINTS.WALLET_TOPUP,
-      request
-    );
-    return response.data!;
-  },
-
-  /**
-   * Get transaction history
-   */
-  getTransactions: async (filters?: TransactionFilters): Promise<{ transactions: WalletTransaction[] }> => {
-    const response = await apiClient.get<{ transactions: WalletTransaction[] }>(
-      API_ENDPOINTS.WALLET_TRANSACTIONS,
-      filters as Record<string, unknown>
-    );
-    return response.data!;
-  },
+  topup: async (request: TopupRequest): Promise<TopupResponse> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: TopupResponse;
+    }>(API_ENDPOINTS.WALLET_TOPUP, request);
+    
+    if (!response.data?.success || !response.data.data) {
+      throw new Error('Failed to top up wallet');
+    }
+    
+    return response.data.data;
+  }
 }; 

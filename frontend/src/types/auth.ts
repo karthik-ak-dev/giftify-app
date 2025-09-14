@@ -1,60 +1,64 @@
+/**
+ * Authentication Types
+ * Based on backend UserModel and auth types
+ */
+
+// User Status from backend UserModel
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  DELETED = 'DELETED'
+}
+
+// User interface matching backend User model
 export interface User {
   userId: string;
   email: string;
   firstName: string;
   lastName: string;
-  phoneNumber?: string;
-  walletBalance: number;
   isEmailVerified: boolean;
-  isPhoneVerified: boolean;
+  status: UserStatus;
+  walletBalance: number;
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
 }
 
+// Login request
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
+// Register request matching backend CreateUserRequest
 export interface RegisterData {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
-  phoneNumber?: string;
 }
 
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  tokens: AuthTokens;
-}
-
+// Update profile matching backend UpdateUserRequest
 export interface ProfileData {
   firstName?: string;
   lastName?: string;
-  phoneNumber?: string;
 }
 
-export interface AuthState {
-  user: User | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
+// Auth tokens
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
 }
 
-export interface AuthActions {
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (userData: RegisterData) => Promise<void>;
-  logout: () => void;
-  refreshAccessToken: () => Promise<void>;
-  updateProfile: (data: ProfileData) => Promise<void>;
-  clearError: () => void;
+// Auth response
+export interface AuthResponse {
+  success: boolean;
+  data: {
+    user: User;
+    tokens: AuthTokens;
+  };
+  message: string;
+  timestamp: string;
 } 

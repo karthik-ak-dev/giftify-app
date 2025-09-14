@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Giftify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0A0A0F 0%, #1A1A2E 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, #FF0080, #0066FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .retry-btn {
+            background: linear-gradient(45deg, #FF0080, #FF6B35);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-size: 16px;
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+
+        .features {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .feature-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .icon {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon">📱</div>
+        <h1>You're Offline</h1>
+        <p>
+            Don't worry! You can still browse your cached gift cards and
+            manage your cart. Your changes will sync when you're back online.
+        </p>
+
+        <button class="retry-btn" onclick="window.location.reload()">
+            Try Again
+        </button>
+
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">✓</span>
+                Browse cached products
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✓</span>
+                View your profile
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✓</span>
+                Manage cart items
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✓</span>
+                Auto-sync when online
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for connection and auto-reload
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+
+        // Show connection status
+        if (navigator.onLine) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

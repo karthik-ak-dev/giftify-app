@@ -1,101 +1,97 @@
+/**
+ * Wallet Store
+ * Zustand store for managing wallet state
+ */
+
 import { create } from 'zustand';
 import { walletService } from '../services/walletService';
-import { SUCCESS_MESSAGES } from '../utils/constants';
 import type { 
-  WalletState, 
-  WalletActions, 
-  TopupRequest, 
-  TransactionFilters 
+  WalletBalanceResponse, 
+  WalletTransaction, 
+  TopupRequest 
 } from '../types/wallet';
 
-type WalletStore = WalletState & WalletActions;
+export interface WalletStore {
+  // State
+  balance: WalletBalanceResponse | null;
+  transactions: WalletTransaction[];
+  isLoading: boolean;
+  error: string | null;
+  
+  // Actions
+  fetchBalance: () => Promise<void>;
+  fetchTransactions: () => Promise<void>;
+  topUp: (request: TopupRequest) => Promise<void>;
+  clearError: () => void;
+}
 
 export const useWalletStore = create<WalletStore>((set, get) => ({
-  // State
-  balance: 0,
+  // Initial state
+  balance: null,
   transactions: [],
   isLoading: false,
   error: null,
-  pagination: {
-    page: 1,
-    limit: 20,
-    total: 0,
-    hasNext: false,
-  },
 
   // Actions
   fetchBalance: async () => {
     set({ isLoading: true, error: null });
     
     try {
-      const walletBalance = await walletService.getBalance();
-      
+      const balance = await walletService.getBalance();
       set({
-        balance: walletBalance.balance,
+        balance,
         isLoading: false,
-        error: null,
+        error: null
       });
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to fetch balance'
-        : 'Failed to fetch balance';
-      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch balance';
       set({
         isLoading: false,
-        error: errorMessage,
+        error: errorMessage
       });
     }
   },
 
-  fetchTransactions: async (filters?: TransactionFilters) => {
+  fetchTransactions: async () => {
     set({ isLoading: true, error: null });
     
     try {
-      const response = await walletService.getTransactions(filters);
-      
+      const transactions = await walletService.getTransactions();
       set({
-        transactions: response.transactions,
+        transactions,
         isLoading: false,
-        error: null,
+        error: null
       });
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to fetch transactions'
-        : 'Failed to fetch transactions';
-      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch transactions';
       set({
         isLoading: false,
-        error: errorMessage,
+        error: errorMessage
       });
     }
   },
 
-  topupWallet: async (request: TopupRequest) => {
+  topUp: async (request: TopupRequest) => {
     set({ isLoading: true, error: null });
     
     try {
-      const response = await walletService.topupWallet(request);
+      await walletService.topup(request);
       
-      // Update balance
+      // Refresh balance and transactions after successful top-up
+      await Promise.all([
+        get().fetchBalance(),
+        get().fetchTransactions()
+      ]);
+      
       set({
-        balance: response.newBalance,
         isLoading: false,
-        error: null,
+        error: null
       });
-
-      // Refresh transactions to show the new topup
-      get().fetchTransactions();
-
-      // Show success message
-      console.log(SUCCESS_MESSAGES.WALLET_TOPPED_UP);
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to top up wallet'
-        : 'Failed to top up wallet';
-      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to top up wallet';
       set({
         isLoading: false,
-        error: errorMessage,
+        error: errorMessage
       });
       throw error;
     }
@@ -103,5 +99,5 @@ export const useWalletStore = create<WalletStore>((set, get) => ({
 
   clearError: () => {
     set({ error: null });
-  },
+  }
 })); 

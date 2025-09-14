@@ -1,139 +1,189 @@
+/**
+ * Cart Store
+ * Zustand store for managing cart state
+ */
+
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { cartService } from '../services/cartService';
-import { SUCCESS_MESSAGES } from '../utils/constants';
-import type { CartState, CartActions, AddToCartRequest } from '../types/cart';
+import type { CartItem } from '../types/cart';
 
-type CartStore = CartState & CartActions;
-
-export const useCartStore = create<CartStore>((set, get) => ({
+export interface CartStore {
   // State
-  items: [],
-  totalAmount: 0,
-  totalItems: 0,
-  isLoading: false,
-  error: null,
-  isOpen: false,
-
+  items: CartItem[];
+  isLoading: boolean;
+  error: string | null;
+  isOpen: boolean;
+  
   // Actions
-  addItem: async (variantId: string, quantity: number) => {
-    set({ isLoading: true, error: null });
-    
-    try {
-      const request: AddToCartRequest = { variantId, quantity };
-      await cartService.manageCart(request);
-      
-      // Refresh cart after adding item
-      await get().fetchCart();
-      
-      console.log(SUCCESS_MESSAGES.ITEM_ADDED_TO_CART);
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to add item to cart'
-        : 'Failed to add item to cart';
-      
-      set({
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
+  fetchCart: () => Promise<void>;
+  addToCart: (variantId: string, quantity: number) => Promise<void>;
+  updateQuantity: (variantId: string, quantity: number) => Promise<void>;
+  removeFromCart: (variantId: string) => Promise<void>;
+  clearCart: () => Promise<void>;
+  toggleCart: () => void;
+  closeCart: () => void;
+  clearError: () => void;
+  
+  // Computed
+  totalItems: number;
+  totalAmount: number;
+  isEmpty: boolean;
+}
+
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      items: [],
+      isLoading: false,
+      error: null,
+      isOpen: false,
+
+      // Actions
+      fetchCart: async () => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          const items = await cartService.getCart();
+          set({
+            items,
+            isLoading: false,
+            error: null
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to fetch cart';
+          set({
+            isLoading: false,
+            error: errorMessage
+          });
+        }
+      },
+
+      addToCart: async (variantId: string, quantity: number) => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          const items = await cartService.manageCart({
+            variantId,
+            action: 'ADD',
+            quantity
+          });
+          
+          set({
+            items,
+            isLoading: false,
+            error: null
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to add to cart';
+          set({
+            isLoading: false,
+            error: errorMessage
+          });
+          throw error;
+        }
+      },
+
+      updateQuantity: async (variantId: string, quantity: number) => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          const items = await cartService.manageCart({
+            variantId,
+            action: 'UPDATE',
+            quantity
+          });
+          
+          set({
+            items,
+            isLoading: false,
+            error: null
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to update cart';
+          set({
+            isLoading: false,
+            error: errorMessage
+          });
+          throw error;
+        }
+      },
+
+      removeFromCart: async (variantId: string) => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          const items = await cartService.manageCart({
+            variantId,
+            action: 'REMOVE'
+          });
+          
+          set({
+            items,
+            isLoading: false,
+            error: null
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to remove from cart';
+          set({
+            isLoading: false,
+            error: errorMessage
+          });
+          throw error;
+        }
+      },
+
+      clearCart: async () => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          await cartService.clearCart();
+          set({
+            items: [],
+            isLoading: false,
+            error: null
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to clear cart';
+          set({
+            isLoading: false,
+            error: errorMessage
+          });
+          throw error;
+        }
+      },
+
+      toggleCart: () => {
+        set(state => ({ isOpen: !state.isOpen }));
+      },
+
+      closeCart: () => {
+        set({ isOpen: false });
+      },
+
+      clearError: () => {
+        set({ error: null });
+      },
+
+      // Computed properties
+      get totalItems() {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+
+      get totalAmount() {
+        return get().items.reduce((total, item) => total + item.totalPrice, 0);
+      },
+
+      get isEmpty() {
+        return get().items.length === 0;
+      }
+    }),
+    {
+      name: 'cart-store',
+      partialize: (state) => ({ 
+        items: state.items 
+      })
     }
-  },
-
-  updateQuantity: async (variantId: string, quantity: number) => {
-    set({ isLoading: true, error: null });
-    
-    try {
-      const request: AddToCartRequest = { variantId, quantity };
-      await cartService.manageCart(request);
-      
-      // Refresh cart after updating
-      await get().fetchCart();
-      
-      console.log(SUCCESS_MESSAGES.CART_UPDATED);
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to update cart'
-        : 'Failed to update cart';
-      
-      set({
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  },
-
-  removeItem: async (variantId: string) => {
-    // Remove item by setting quantity to 0
-    await get().updateQuantity(variantId, 0);
-  },
-
-  clearCart: async () => {
-    set({ isLoading: true, error: null });
-    
-    try {
-      await cartService.clearCart();
-      
-      set({
-        items: [],
-        totalAmount: 0,
-        totalItems: 0,
-        isLoading: false,
-        error: null,
-      });
-      
-      console.log(SUCCESS_MESSAGES.CART_CLEARED);
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to clear cart'
-        : 'Failed to clear cart';
-      
-      set({
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  },
-
-  fetchCart: async () => {
-    set({ isLoading: true, error: null });
-    
-    try {
-      const cart = await cartService.getCart();
-      
-      set({
-        items: cart.items,
-        totalAmount: cart.totalAmount,
-        totalItems: cart.totalItems,
-        isLoading: false,
-        error: null,
-      });
-    } catch (error: unknown) {
-      const errorMessage = error && typeof error === 'object' && 'error' in error 
-        ? (error as { error?: { message?: string } }).error?.message || 'Failed to fetch cart'
-        : 'Failed to fetch cart';
-      
-      set({
-        isLoading: false,
-        error: errorMessage,
-      });
-    }
-  },
-
-  toggleCart: () => {
-    set((state) => ({ isOpen: !state.isOpen }));
-  },
-
-  openCart: () => {
-    set({ isOpen: true });
-  },
-
-  closeCart: () => {
-    set({ isOpen: false });
-  },
-
-  clearError: () => {
-    set({ error: null });
-  },
-})); 
+  )
+); 

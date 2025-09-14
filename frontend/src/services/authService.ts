@@ -1,13 +1,12 @@
+/**
+ * Authentication Service
+ * 
+ * Handles all authentication-related API calls
+ */
+
 import { apiClient } from './api';
 import { API_ENDPOINTS } from '../utils/constants';
-import type { 
-  LoginCredentials, 
-  RegisterData, 
-  AuthResponse, 
-  ProfileData,
-  User,
-  AuthTokens
-} from '../types/auth';
+import type { LoginCredentials, RegisterData, AuthResponse, ProfileData, User } from '../types/auth';
 
 export const authService = {
   /**
@@ -18,7 +17,12 @@ export const authService = {
       API_ENDPOINTS.LOGIN,
       credentials
     );
-    return response.data!;
+    
+    if (!response.data) {
+      throw new Error('Invalid response from server');
+    }
+    
+    return response.data;
   },
 
   /**
@@ -29,33 +33,54 @@ export const authService = {
       API_ENDPOINTS.REGISTER,
       userData
     );
-    return response.data!;
+    
+    if (!response.data) {
+      throw new Error('Invalid response from server');
+    }
+    
+    return response.data;
   },
 
   /**
    * Refresh access token
    */
-  refreshToken: async (refreshToken: string): Promise<AuthTokens> => {
-    const response = await apiClient.post<{ tokens: AuthTokens }>(
+  refresh: async (refreshToken: string): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>(
       API_ENDPOINTS.REFRESH,
       { refreshToken }
     );
-    return response.data!.tokens;
+    
+    if (!response.data) {
+      throw new Error('Invalid response from server');
+    }
+    
+    return response.data;
   },
 
   /**
-   * Get user profile
+   * Logout user
    */
-  getProfile: async (): Promise<User> => {
-    const response = await apiClient.get<User>(API_ENDPOINTS.PROFILE);
-    return response.data!;
+  logout: async (): Promise<void> => {
+    const response = await apiClient.post(API_ENDPOINTS.LOGOUT);
+    
+    if (!response.data) {
+      throw new Error('Invalid response from server');
+    }
   },
 
   /**
    * Update user profile
    */
-  updateProfile: async (data: ProfileData): Promise<User> => {
-    const response = await apiClient.put<User>(API_ENDPOINTS.PROFILE, data);
-    return response.data!;
-  },
+  updateProfile: async (profileData: ProfileData): Promise<User> => {
+    const response = await apiClient.put<{ user: User }>(
+      API_ENDPOINTS.UPDATE_PROFILE,
+      profileData
+    );
+    
+    if (!response.data?.user) {
+      throw new Error('Invalid response from server');
+    }
+    
+    return response.data.user;
+  }
 }; 
