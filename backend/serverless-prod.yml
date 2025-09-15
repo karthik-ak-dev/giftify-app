@@ -25,6 +25,8 @@ provider:
     JWT_ACCESS_SECRET: ${env:JWT_ACCESS_SECRET}
     JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET}
     ENCRYPTION_KEY: ${env:ENCRYPTION_KEY}
+    # CORS Configuration
+    CORS_ORIGIN: ${env:CORS_ORIGIN, 'https://your-frontend-domain.com'}
     # Production Features
     ENABLE_REQUEST_LOGGING: false
     ENABLE_DETAILED_ERRORS: false

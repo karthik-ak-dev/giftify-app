@@ -25,6 +25,8 @@ provider:
     JWT_ACCESS_SECRET: ${env:JWT_ACCESS_SECRET, 'stage-jwt-access-secret-key-change-in-production'}
     JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'stage-jwt-refresh-secret-key-change-in-production'}
     ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, 'stage-encryption-key-32-chars-long'}
+    # CORS Configuration
+    CORS_ORIGIN: ${env:CORS_ORIGIN, '*'}
     # Development Features
     ENABLE_REQUEST_LOGGING: true
     ENABLE_DETAILED_ERRORS: true
