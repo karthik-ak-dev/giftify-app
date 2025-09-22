@@ -21,10 +21,8 @@ export interface ProductStore {
   setSelectedCategory: (category: ProductCategory | null) => void;
   setSearchQuery: (query: string) => void;
   clearError: () => void;
-  
-  // Computed
-  filteredProducts: Product[];
-  categories: ProductCategory[];
+  getFilteredProducts: () => Product[];
+  getCategories: () => ProductCategory[];
 }
 
 export const useProductStore = create<ProductStore>((set, get) => ({
@@ -45,12 +43,15 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         activeOnly: true
       });
       
+      console.log('Fetched products:', products); // Debug log
+      
       set({
         products,
         isLoading: false,
         error: null
       });
     } catch (error) {
+      console.error('Product fetch error:', error); // Debug log
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
       set({
         isLoading: false,
@@ -71,20 +72,25 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ error: null });
   },
 
-  // Computed properties
-  get filteredProducts() {
-    const { products, selectedCategory, searchQuery } = get();
+  // Helper functions
+  getFilteredProducts: () => {
+    const state = get();
+    let filtered = state.products;
     
-    let filtered = products;
+    console.log('Computing filtered products:', {
+      totalProducts: state.products.length,
+      selectedCategory: state.selectedCategory,
+      searchQuery: state.searchQuery
+    }); // Debug log
     
     // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+    if (state.selectedCategory) {
+      filtered = filtered.filter(product => product.category === state.selectedCategory);
     }
     
     // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
+    if (state.searchQuery.trim()) {
+      const query = state.searchQuery.toLowerCase().trim();
       filtered = filtered.filter(product => 
         product.name.toLowerCase().includes(query) ||
         product.brand.toLowerCase().includes(query) ||
@@ -92,10 +98,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       );
     }
     
+    console.log('Filtered products result:', filtered.length); // Debug log
     return filtered;
   },
 
-  get categories() {
+  getCategories: () => {
     return Object.values(ProductCategory);
   }
 })); 

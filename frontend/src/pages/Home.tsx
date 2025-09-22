@@ -35,19 +35,33 @@ const Home: React.FC<HomeProps> = ({ onAuthRequired }) => {
         isLoading,
         error,
         searchQuery,
-        filteredProducts,
         fetchProducts,
         setSearchQuery,
-        clearError
+        clearError,
+        getFilteredProducts
     } = useProductStore();
 
     const { addToCart, isLoading: cartLoading } = useCartStore();
     const { isAuthenticated } = useAuthStore();
 
+    // Get filtered products
+    const filteredProducts = getFilteredProducts();
+
     // Fetch products on component mount (public access)
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
+
+    // Debug log
+    useEffect(() => {
+        console.log('Home component state:', {
+            productsLength: products.length,
+            filteredProductsLength: filteredProducts.length,
+            isLoading,
+            error,
+            searchQuery
+        });
+    }, [products, filteredProducts, isLoading, error, searchQuery]);
 
     // Handle search input change
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
