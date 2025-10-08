@@ -7,24 +7,35 @@
         @apply border-dark-200;
     }
 
+    html {
+        @apply overflow-x-hidden bg-dark-950;
+        /* Prevent overscroll bounce that shows white background */
+        overscroll-behavior: none;
+    }
+
     body {
+        @apply overflow-x-hidden;
         @apply bg-gradient-to-br from-dark-950 via-dark-900 to-primary-900 text-dark-50 min-h-screen font-sans antialiased;
+        /* Prevent overscroll bounce effect */
+        overscroll-behavior: none;
     }
 
-    ::-webkit-scrollbar {
-        @apply w-2;
+    /* Prevent pull-to-refresh on mobile */
+    #root {
+        overscroll-behavior-y: contain;
     }
 
-    ::-webkit-scrollbar-track {
-        @apply bg-dark-800;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    *::-webkit-scrollbar {
+        display: none;
     }
 
-    ::-webkit-scrollbar-thumb {
-        @apply bg-primary-600 rounded-full;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        @apply bg-primary-500;
+    /* Hide scrollbar for IE, Edge and Firefox */
+    * {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
     }
 }
 

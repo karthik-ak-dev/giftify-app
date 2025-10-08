@@ -20,16 +20,16 @@ const Home = () => {
     });
 
     return (
-        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
             <div className="max-w-7xl mx-auto">
                 {/* Hero Section */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="relative mb-16 overflow-hidden"
+                    className="relative mb-16 overflow-hidden rounded-3xl"
                 >
                     {/* Background Decorative Elements */}
-                    <div className="absolute inset-0 -z-10">
+                    <div className="absolute inset-0 -z-10 overflow-hidden">
                         <motion.div
                             animate={{
                                 scale: [1, 1.2, 1],
@@ -40,7 +40,7 @@ const Home = () => {
                                 repeat: Infinity,
                                 ease: "linear"
                             }}
-                            className="absolute top-0 right-1/4 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl"
+                            className="absolute top-0 right-1/3 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl"
                         />
                         <motion.div
                             animate={{
@@ -52,14 +52,14 @@ const Home = () => {
                                 repeat: Infinity,
                                 ease: "linear"
                             }}
-                            className="absolute bottom-0 left-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl"
+                            className="absolute bottom-0 left-1/3 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl"
                         />
                     </div>
 
                     {/* Main Hero Content */}
                     <div className="text-center py-12 sm:py-16">
                         {/* Floating Icons */}
-                        <div className="relative mb-6">
+                        <div className="relative mb-6 h-12">
                             <motion.div
                                 animate={{
                                     y: [0, -10, 0],
@@ -70,7 +70,7 @@ const Home = () => {
                                     repeat: Infinity,
                                     ease: "easeInOut"
                                 }}
-                                className="absolute left-1/4 -top-4 text-4xl opacity-50"
+                                className="absolute left-1/3 sm:left-1/4 top-0 text-3xl sm:text-4xl opacity-50"
                             >
                                 🎁
                             </motion.div>
@@ -85,7 +85,7 @@ const Home = () => {
                                     ease: "easeInOut",
                                     delay: 0.5
                                 }}
-                                className="absolute right-1/4 -top-2 text-4xl opacity-50"
+                                className="absolute right-1/3 sm:right-1/4 top-2 text-3xl sm:text-4xl opacity-50"
                             >
                                 ✨
                             </motion.div>
