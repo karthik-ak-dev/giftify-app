@@ -1,98 +1,35 @@
 {
-  "name": "giftify-frontend",
-  "version": "1.0.0",
-  "description": "Modern Gift Card Marketplace - Frontend Application built with React, TypeScript, and Vite",
-  "type": "module",
-  "homepage": "https://giftify.app",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-org/giftify-app.git",
-    "directory": "frontend"
-  },
-  "bugs": {
-    "url": "https://github.com/your-org/giftify-app/issues"
-  },
-  "scripts": {
-    "dev": "vite --host",
-    "build": "tsc -b && vite build",
-    "build:staging": "tsc -b && vite build --mode staging",
-    "build:production": "tsc -b && vite build --mode production",
-    "build:analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --ext ts,tsx --fix",
-    "type-check": "tsc --noEmit",
-    "preview": "vite preview --host",
-    "clean": "rm -rf dist node_modules/.vite .eslintcache",
-    "start": "npm run dev",
-    "deploy:staging": "npm run build:staging && echo 'Ready for staging deployment'",
-    "deploy:production": "npm run build:production && echo 'Ready for production deployment'",
-    "health-check": "curl -f http://localhost:3000 || exit 1",
-    "size-check": "npm run build && du -sh dist/",
-    "deps:check": "npm outdated",
-    "deps:update": "npm update",
-    "security:audit": "npm audit",
-    "security:fix": "npm audit fix"
-  },
-  "dependencies": {
-    "@headlessui/react": "^2.1.8",
-    "axios": "^1.7.7",
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.5.4",
-    "lucide-react": "^0.441.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.1",
-    "tailwind-merge": "^2.5.2",
-    "zustand": "^4.5.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.9.0",
-    "@types/aria-query": "^5.0.4",
-    "@types/node": "^22.5.4",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@types/react-router-dom": "^5.3.3",
-    "@typescript-eslint/eslint-plugin": "^8.43.0",
-    "@typescript-eslint/parser": "^8.43.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.9.0",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.9",
-    "globals": "^15.9.0",
-    "postcss": "^8.4.45",
-    "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.43.0",
-    "vite": "^5.4.1"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ],
-  "keywords": [
-    "react",
-    "typescript",
-    "vite",
-    "tailwindcss",
-    "gift-cards",
-    "marketplace",
-    "modern-ui",
-    "pwa",
-    "responsive",
-    "ecommerce"
-  ],
-  "author": {
-    "name": "Giftify Team",
-    "email": "team@giftify.app",
-    "url": "https://giftify.app"
-  },
-  "license": "MIT",
-  "private": true
+    "name": "giftify-frontend",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.22.0",
+        "framer-motion": "^11.0.5",
+        "lucide-react": "^0.344.0",
+        "zustand": "^4.5.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.56",
+        "@types/react-dom": "^18.2.19",
+        "@typescript-eslint/eslint-plugin": "^7.0.2",
+        "@typescript-eslint/parser": "^7.0.2",
+        "@vitejs/plugin-react": "^4.2.1",
+        "autoprefixer": "^10.4.17",
+        "eslint": "^8.56.0",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-react-refresh": "^0.4.5",
+        "postcss": "^8.4.35",
+        "tailwindcss": "^3.4.1",
+        "typescript": "^5.2.2",
+        "vite": "^5.1.4"
+    }
 }

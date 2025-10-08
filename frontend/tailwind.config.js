@@ -8,61 +8,75 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    purple: '#667eea',
-                    dark: '#764ba2',
+                    50: '#f0f4ff',
+                    100: '#e0e8ff',
+                    200: '#c7d4fe',
+                    300: '#a5b8fc',
+                    400: '#8b94f8',
+                    500: '#7c6cf5',
+                    600: '#6c4be8',
+                    700: '#5b3cd4',
+                    800: '#4c33ad',
+                    900: '#402d89',
                 },
                 accent: {
-                    pink: '#ff6b9d',
-                    orange: '#ff8a56',
-                    yellow: '#ffd93d',
+                    50: '#f0fdfa',
+                    100: '#ccfbf1',
+                    200: '#99f6e4',
+                    300: '#5eead4',
+                    400: '#2dd4bf',
+                    500: '#14b8a6',
+                    600: '#0d9488',
+                    700: '#0f766e',
+                    800: '#115e59',
+                    900: '#134e4a',
                 },
-                bg: {
-                    primary: '#0f0f23',
-                    secondary: '#1a1a2e',
-                    card: '#16213e',
-                },
-                text: {
-                    primary: '#ffffff',
-                    secondary: '#a0a0a0',
-                    accent: '#e0e0e0',
-                },
-                glass: {
-                    bg: 'rgba(255, 255, 255, 0.1)',
-                    border: 'rgba(255, 255, 255, 0.2)',
+                dark: {
+                    50: '#f8fafc',
+                    100: '#f1f5f9',
+                    200: '#e2e8f0',
+                    300: '#cbd5e1',
+                    400: '#94a3b8',
+                    500: '#64748b',
+                    600: '#475569',
+                    700: '#334155',
+                    800: '#1e293b',
+                    900: '#0f172a',
+                    950: '#020617',
                 }
             },
-            backgroundImage: {
-                'primary-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                'hero-gradient': 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
-            },
-            boxShadow: {
-                'glass': '0 8px 32px rgba(0, 0, 0, 0.3)',
-                'neon': '0 0 20px rgba(102, 126, 234, 0.3)',
-                'neon-pink': '0 0 20px rgba(255, 107, 157, 0.3)',
-            },
-            backdropBlur: {
-                'glass': '20px',
+            fontFamily: {
+                sans: ['Inter', 'system-ui', 'sans-serif'],
             },
             animation: {
-                'fade-in': 'fadeIn 0.5s ease-in-out',
-                'slide-in-right': 'slideInRight 0.3s ease-out',
-                'pulse-glow': 'pulseGlow 2s infinite',
+                'slide-in': 'slideIn 0.3s ease-out',
+                'slide-out': 'slideOut 0.3s ease-in',
+                'bounce-subtle': 'bounceSubtle 0.5s ease-out',
+                'fade-in': 'fadeIn 0.3s ease-out',
             },
             keyframes: {
-                fadeIn: {
-                    '0%': { opacity: '0', transform: 'translateY(20px)' },
-                    '100%': { opacity: '1', transform: 'translateY(0)' },
-                },
-                slideInRight: {
+                slideIn: {
                     '0%': { transform: 'translateX(100%)' },
                     '100%': { transform: 'translateX(0)' },
                 },
-                pulseGlow: {
-                    '0%, 100%': { boxShadow: '0 0 20px rgba(102, 126, 234, 0.3)' },
-                    '50%': { boxShadow: '0 0 30px rgba(102, 126, 234, 0.6)' },
+                slideOut: {
+                    '0%': { transform: 'translateX(0)' },
+                    '100%': { transform: 'translateX(100%)' },
                 },
+                bounceSubtle: {
+                    '0%, 100%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.1)' },
+                },
+                fadeIn: {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
+                },
+            },
+            backdropBlur: {
+                xs: '2px',
             },
         },
     },
     plugins: [],
-} 
+}
+
