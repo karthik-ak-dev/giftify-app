@@ -1,27 +1,49 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import CartSidebar from './components/CartSidebar';
-import VariantModal from './components/VariantModal';
-import Toast from './components/Toast';
-import Home from './pages/Home';
-import OrderHistory from './pages/OrderHistory';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import AllBrands from './pages/AllBrands'
+import BrandDetail from './pages/BrandDetail'
+import Checkout from './pages/Checkout'
+import Account from './pages/Account'
+import FAQ from './pages/FAQ'
+import Contact from './pages/Contact'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
+import Refund from './pages/Refund'
+import Cookies from './pages/Cookies'
+import About from './pages/About'
+import Partners from './pages/Partners'
+import { CartProvider } from './context/CartContext'
+import { AuthProvider } from './context/AuthContext'
+import CartSidebar from './components/CartSidebar'
+import AuthSidebar from './components/AuthSidebar'
 
 function App() {
     return (
-        <Router>
-            <div className="min-h-screen">
-                <Navbar />
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/orders" element={<OrderHistory />} />
-                </Routes>
-                <CartSidebar />
-                <VariantModal />
-                <Toast />
-            </div>
-        </Router>
-    );
+        <AuthProvider>
+            <CartProvider>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/brands" element={<AllBrands />} />
+                        <Route path="/brand/:brandSlug" element={<BrandDetail />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/account" element={<Account />} />
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/terms" element={<Terms />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/refund" element={<Refund />} />
+                        <Route path="/cookies" element={<Cookies />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/partners" element={<Partners />} />
+                    </Routes>
+                    <CartSidebar />
+                    <AuthSidebar />
+                </Router>
+            </CartProvider>
+        </AuthProvider>
+    )
 }
 
-export default App;
+export default App
 
