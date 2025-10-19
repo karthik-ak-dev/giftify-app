@@ -1,159 +1,87 @@
-# Giftify Frontend - React Voucher Store
+# Giftify Frontend
 
-A modern, Gen-Z inspired React web application for browsing and purchasing digital vouchers.
+A modern React-based frontend for the Giftify digital gift cards platform, inspired by contemporary e-commerce design patterns.
 
 ## Features
 
-- 🎨 **Modern Design**: Dark theme with glassmorphism effects inspired by kgen.io
-- 🛍️ **Voucher Browsing**: View various vouchers with different denominations
-- 🛒 **Shopping Cart**: Add items to cart with quantity management
-- 📦 **Order History**: Track all your past orders
-- 🔍 **Search & Filter**: Find vouchers by name or category
-- 💾 **Persistent Storage**: Cart and orders saved in localStorage
-- ✨ **Smooth Animations**: Using Framer Motion for fluid transitions
-- 📱 **Responsive Design**: Works perfectly on all devices
+- 🎨 Modern, dark-themed UI with gradient accents
+- 🎯 Hero section with call-to-action
+- 📦 Category browsing
+- 🏢 Popular brands showcase
+- 📱 Fully responsive design
+- ⚡ Built with Vite for fast development
+- 🎭 Smooth animations and transitions
 
 ## Tech Stack
 
-- **React 18** - UI framework
+- **React 18** - UI library
 - **TypeScript** - Type safety
-- **Vite** - Fast build tool
-- **Tailwind CSS** - Utility-first styling
-- **Zustand** - State management
-- **Framer Motion** - Animations
-- **React Router** - Navigation
-- **Lucide React** - Beautiful icons
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **Lucide React** - Icon library
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 16+ and npm
+- Node.js 18+ 
+- npm or yarn
 
 ### Installation
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
+```bash
+# Install dependencies
+npm install
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+# Start development server
+npm run dev
 
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+# Build for production
+npm run build
 
-4. Open your browser and visit `http://localhost:3000`
+# Preview production build
+npm run preview
+```
 
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+The application will be available at `http://localhost:3000`
 
 ## Project Structure
 
 ```
 src/
-├── components/          # React components
-│   ├── Navbar.tsx      # Navigation bar with cart
-│   ├── VoucherCard.tsx # Voucher display card
-│   ├── VariantModal.tsx # Denomination selection modal
-│   ├── CartSidebar.tsx # Sliding cart panel
-│   └── Toast.tsx       # Notification toasts
-├── pages/              # Page components
-│   ├── Home.tsx        # Voucher listing page
-│   └── OrderHistory.tsx # Past orders page
-├── store/              # State management
-│   └── useStore.ts     # Zustand store
-├── data/               # Mock data
-│   └── vouchers.ts     # Voucher catalog
-├── types/              # TypeScript types
-│   └── index.ts        # Type definitions
-├── utils/              # Utility functions
-│   ├── storage.ts      # localStorage helpers
-│   └── formatters.ts   # Format currency/dates
-├── App.tsx             # Main app component
-├── main.tsx            # Entry point
-└── index.css           # Global styles
+├── components/       # Reusable UI components
+│   ├── Navbar.tsx
+│   ├── HeroSection.tsx
+│   ├── CategorySection.tsx
+│   ├── PopularBrands.tsx
+│   └── Footer.tsx
+├── pages/           # Page components
+│   └── Home.tsx
+├── App.tsx          # Main app component
+├── main.tsx         # Entry point
+└── index.css        # Global styles
 ```
 
-## Design Philosophy
+## Design Features
 
-The app uses a dark theme with:
-- **Primary Color**: Purple gradient (#7c6cf5 - #6c4be8)
-- **Accent Color**: Teal/Cyan (#14b8a6 - #0d9488)
-- **Glassmorphism**: Translucent panels with backdrop blur
-- **Smooth Transitions**: All interactions are animated
-- **Modern Typography**: Inter font family
+- Dark theme with gradient accents (indigo, purple, pink)
+- Card-based layouts with hover effects
+- Glassmorphism elements
+- Responsive grid layouts
+- Smooth transitions and animations
+- Modern spacing and typography
 
-## Features Walkthrough
+## Future Enhancements
 
-### Browse Vouchers
-- View all available vouchers on the home page
-- Search by name or filter by category
-- Click on any voucher to view available denominations
-
-### Add to Cart
-- Select a denomination in the modal
-- Click the + button to add to cart
-- Cart badge updates automatically
-
-### Manage Cart
-- Click cart icon to open sidebar
-- Adjust quantities with +/- buttons
-- Remove items with trash icon
-- View total in real-time
-
-### Place Order
-- Click "Place Order" in cart
-- Order is saved to history
-- Cart is cleared automatically
-- Success notification appears
-
-### View Orders
-- Navigate to "Orders" page
-- See all past orders with details
-- Click any order to expand and view items
-
-## Customization
-
-### Add New Vouchers
-Edit `src/data/vouchers.ts`:
-```typescript
-{
-  id: 'unique-id',
-  name: 'Brand Name',
-  brand: 'Brand Name',
-  description: 'Description',
-  icon: '🎁',
-  category: 'Category',
-  color: 'from-color to-color',
-  variants: [
-    { id: 'var-1', denomination: 500, price: 500 }
-  ]
-}
-```
-
-### Modify Colors
-Edit `tailwind.config.js` to change the color scheme.
-
-### Update Styles
-Modify `src/index.css` for global styles or component files for specific changes.
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+- Product detail pages
+- Shopping cart functionality
+- User authentication
+- Order management
+- Wallet integration
+- Search functionality
+- Filter and sort options
 
 ## License
 
-This project is part of the Giftify application.
+© 2024 Giftify. All rights reserved
 

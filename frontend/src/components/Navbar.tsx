@@ -1,80 +1,98 @@
-import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, History, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useStore } from '../store/useStore';
+import { Search, Globe, ShoppingCart, User } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 const Navbar = () => {
-    const location = useLocation();
-    const { cart, toggleCart } = useStore();
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const [searchQuery, setSearchQuery] = useState('')
+    const { totalItems, openCart } = useCart()
+    const { isAuthenticated, openAuthSidebar } = useAuth()
+    const navigate = useNavigate()
 
     return (
-        <nav className="sticky top-0 z-50 glass-dark border-b border-white/10 shadow-xl">
+        <nav className="sticky top-0 z-50 bg-dark-50/90 backdrop-blur-xl border-b border-white/10 shadow-xl shadow-black/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <motion.div
-                            whileHover={{ rotate: 180, scale: 1.1 }}
-                            transition={{ duration: 0.3 }}
-                            className="bg-gradient-to-r from-primary-500 to-accent-500 p-2 rounded-xl"
-                        >
-                            <Sparkles className="w-6 h-6 text-white" />
-                        </motion.div>
-                        <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
-                            Giftify
-                        </span>
+                    <Link to="/" className="flex items-center space-x-2 bg-gradient-to-r from-accent-500 to-accent-600 px-4 py-2 rounded-xl shadow-lg shadow-accent-500/40 hover:from-accent-600 hover:to-accent-700 transition-all duration-300 cursor-pointer">
+                        <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                            <span className="text-white font-black text-base">G</span>
+                        </div>
+                        <span className="text-white font-display font-bold text-xl tracking-tight">iftify</span>
                     </Link>
 
-                    {/* Navigation Links */}
-                    <div className="flex items-center gap-4">
-                        <Link
-                            to="/"
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${location.pathname === '/'
-                                    ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-500/50'
-                                    : 'text-dark-300 hover:text-white hover:bg-white/5'
-                                }`}
-                        >
-                            <Sparkles className="w-4 h-4" />
-                            Vouchers
-                        </Link>
+                    {/* Search Bar - Desktop */}
+                    <div className="hidden md:flex flex-1 max-w-xl mx-8">
+                        <div className="relative w-full">
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by Brand or Category"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-12 pr-4 py-2.5 bg-dark-100/40 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 transition-all"
+                            />
+                        </div>
+                    </div>
 
-                        <Link
-                            to="/orders"
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${location.pathname === '/orders'
-                                    ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-500/50'
-                                    : 'text-dark-300 hover:text-white hover:bg-white/5'
-                                }`}
+                    {/* Right Side Actions */}
+                    <div className="flex items-center space-x-3">
+                        <button
+                            onClick={openCart}
+                            className="flex relative p-2.5 hover:bg-white/5 rounded-xl transition-colors"
                         >
-                            <History className="w-4 h-4" />
-                            Orders
-                        </Link>
-
-                        {/* Cart Button */}
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={toggleCart}
-                            className="relative flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-white bg-gradient-to-r from-accent-600 to-accent-500 shadow-lg shadow-accent-500/50 transition-all hover:shadow-accent-500/70"
-                        >
-                            <ShoppingCart className="w-5 h-5" />
-                            <span className="hidden sm:inline">Cart</span>
-                            {cartCount > 0 && (
-                                <motion.span
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg"
-                                >
-                                    {cartCount}
-                                </motion.span>
+                            <ShoppingCart className="w-5 h-5 text-white" />
+                            {totalItems > 0 && (
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg shadow-accent-500/50">
+                                    {totalItems}
+                                </div>
                             )}
-                        </motion.button>
+                        </button>
+
+                        {isAuthenticated ? (
+                            <button
+                                onClick={() => navigate('/account')}
+                                className="flex items-center space-x-2 p-2.5 hover:bg-white/5 rounded-xl transition-colors"
+                            >
+                                <div className="w-8 h-8 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full flex items-center justify-center">
+                                    <User className="w-5 h-5 text-white" />
+                                </div>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={openAuthSidebar}
+                                className="flex items-center space-x-2 px-4 sm:px-6 py-2.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white rounded-xl hover:from-accent-600 hover:to-accent-700 transition-all duration-300 font-semibold shadow-lg shadow-accent-500/60 hover:scale-105"
+                            >
+                                <span className="hidden sm:inline">LOGIN</span>
+                                <User className="w-5 h-5 sm:hidden" />
+                            </button>
+                        )}
+
+                        <button className="hidden md:flex items-center space-x-2 px-3 py-2 hover:bg-white/5 rounded-xl transition-colors">
+                            <Globe className="w-5 h-5 text-white" />
+                            <img src="https://flagcdn.com/w20/in.png" alt="India" className="w-5 h-4 rounded" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Search */}
+                <div className="md:hidden pb-4">
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by Brand or Category"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 bg-dark-100/40 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400"
+                        />
                     </div>
                 </div>
             </div>
         </nav>
-    );
-};
+    )
+}
 
-export default Navbar;
+export default Navbar
 
