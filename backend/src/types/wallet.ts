@@ -23,12 +23,6 @@ export interface WalletTransactionResponse {
   updatedAt: string;
 }
 
-export interface WalletBalanceResponse {
-  balance: number;
-  balanceFormatted: string;
-  balanceInRupees: number;
-}
-
 export interface GetTransactionsOptions {
   page?: number;
   limit?: number;
