@@ -1,27 +1,6 @@
 import { brandRepository } from '../../repositories/brandRepository';
+import { BrandResponse } from '../../types/brand';
 import { AppError } from '../../middleware/errorHandler';
-
-/**
- * Simple brand response structure matching frontend
- */
-export interface BrandResponse {
-  id: string;
-  name: string;
-  logo: string;
-  category: string;
-  description: string;
-  vouchersSold: number;
-  popularity: number;
-  variants: Array<{
-    id: string;
-    name: string;
-    originalPrice: number;
-    salePrice: number;
-    discountPercent: number;
-    description: string;
-    vouchersSold: number;
-  }>;
-}
 
 /**
  * Get all brands - Single API endpoint
@@ -67,4 +46,3 @@ export const getAllBrandsService = async (): Promise<BrandResponse[]> => {
     throw new AppError('Failed to fetch brands', 500, 'BRANDS_FETCH_FAILED');
   }
 };
-

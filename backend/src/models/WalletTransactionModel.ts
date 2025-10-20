@@ -1,32 +1,29 @@
 import { ulid } from 'ulid';
 
-// Transaction type enum for type safety
 export enum TransactionType {
   CREDIT = 'CREDIT',
   DEBIT = 'DEBIT',
   REFUND = 'REFUND'
 }
 
-// Transaction status enum for type safety
 export enum TransactionStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED'
 }
 
-// WalletTransaction class - exact DynamoDB item structure with constructor and methods
 export class WalletTransaction {
-  readonly userId: string;           // Partition Key (immutable)
-  readonly transactionId: string;    // Sort Key - ULID (immutable)
-  readonly createdAt: string;        // ISO timestamp (immutable)
+  readonly userId: string;
+  readonly transactionId: string;
+  readonly createdAt: string;
   
   type: TransactionType;
-  amount: number;                    // In cents/paise
-  balanceAfter: number;             // In cents/paise
+  amount: number;
+  balanceAfter: number;
   description: string;
-  orderId?: string;                 // Optional - for order-related transactions
+  orderId?: string;
   status: TransactionStatus;
-  updatedAt: string;                // ISO timestamp
+  updatedAt: string;
 
   constructor(data: {
     userId: string;
@@ -40,15 +37,12 @@ export class WalletTransaction {
     createdAt?: string;
     updatedAt?: string;
   }) {
-    // Validate required fields
     this.validateRequiredFields(data);
     
-    // Immutable fields
     this.userId = data.userId;
     this.transactionId = data.transactionId;
     this.createdAt = data.createdAt ?? new Date().toISOString();
     
-    // Mutable fields
     this.type = data.type;
     this.amount = this.validateAmount(data.amount);
     this.balanceAfter = this.validateBalance(data.balanceAfter);
@@ -58,7 +52,6 @@ export class WalletTransaction {
     this.updatedAt = data.updatedAt ?? new Date().toISOString();
   }
 
-  // Create new transaction instance with validation
   static create(data: {
     userId: string;
     type: TransactionType;
@@ -73,7 +66,6 @@ export class WalletTransaction {
     });
   }
 
-  // Update transaction data with validation
   update(data: Partial<{
     status: TransactionStatus;
     description: string;
@@ -92,7 +84,6 @@ export class WalletTransaction {
     return this;
   }
 
-  // Status operations
   markAsCompleted(): WalletTransaction {
     return this.update({ status: TransactionStatus.COMPLETED });
   }
@@ -105,7 +96,6 @@ export class WalletTransaction {
     return this.update({ status: TransactionStatus.PENDING });
   }
 
-  // Computed properties
   get isCompleted(): boolean {
     return this.status === TransactionStatus.COMPLETED;
   }
@@ -130,7 +120,6 @@ export class WalletTransaction {
     return this.type === TransactionType.REFUND;
   }
 
-  // Get formatted amount for display
   get formattedAmount(): string {
     const amountInRupees = this.amount / 100;
     return `₹${amountInRupees.toLocaleString('en-IN', {
@@ -139,7 +128,6 @@ export class WalletTransaction {
     })}`;
   }
 
-  // Get formatted balance for display
   get formattedBalanceAfter(): string {
     const balanceInRupees = this.balanceAfter / 100;
     return `₹${balanceInRupees.toLocaleString('en-IN', {
@@ -148,7 +136,6 @@ export class WalletTransaction {
     })}`;
   }
 
-  // Private validation methods
   private validateRequiredFields(data: any): void {
     const required = ['userId', 'transactionId', 'type', 'amount', 'balanceAfter', 'description'];
     for (const field of required) {
@@ -189,7 +176,6 @@ export class WalletTransaction {
   }
 }
 
-// Table configuration
 export const WALLET_TRANSACTION_TABLE = process.env.WALLET_TRANSACTIONS_TABLE || 'giftify-wallet-transactions';
 export const TRANSACTION_ID_GSI = 'TransactionIdIndex';
-export const USER_TRANSACTION_HISTORY_GSI = 'UserTransactionHistoryIndex'; 
+export const USER_TRANSACTION_HISTORY_GSI = 'UserTransactionHistoryIndex';

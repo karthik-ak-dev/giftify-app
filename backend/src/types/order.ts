@@ -60,18 +60,6 @@ export interface OrderResponse {
   daysSinceCreated: number;
 }
 
-export interface CancelOrderResponse {
-  orderId: string;
-  status: OrderStatus;
-  refundAmount: number;
-  formattedRefundAmount: string;
-  transactionId: string;
-  newWalletBalance: number;
-  formattedNewWalletBalance: string;
-  message: string;
-  cancelledAt: string;
-}
-
 export interface CreateOrderResponse {
   orderId: string;
   status: OrderStatus;

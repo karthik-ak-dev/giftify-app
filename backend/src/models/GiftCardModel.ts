@@ -1,27 +1,24 @@
-import { ulid } from 'ulid';
-
-// GiftCard class - exact DynamoDB item structure with constructor and methods
 export class GiftCard {
-  readonly giftCardId: string;       // ULID - Primary Key (immutable)
-  readonly brandId: string;          // Brand reference (immutable)
-  readonly variantId: string;        // Variant reference (immutable) - GSI1 PK
-  readonly brandName: string;        // Brand name (immutable)
-  readonly variantName: string;      // Variant name (immutable)
-  readonly denomination: number;     // Face value in rupees (immutable)
-  readonly giftCardNumber: string;   // Encrypted card number (immutable)
-  readonly giftCardPin: string;      // Encrypted PIN (immutable)
-  readonly expiryTime: string;       // ISO timestamp when card expires (immutable) - GSI1 SK
-  readonly purchasePrice: number;    // Purchase price in cents/paise (immutable)
-  readonly createdAt: string;        // ISO timestamp (immutable)
+  readonly giftCardId: string;
+  readonly brandId: string;
+  readonly variantId: string;
+  readonly brandName: string;
+  readonly variantName: string;
+  readonly denomination: number;
+  readonly giftCardNumber: string;
+  readonly giftCardPin: string;
+  readonly expiryTime: string;
+  readonly purchasePrice: number;
+  readonly createdAt: string;
   
-  usedByOrder?: string;              // Order ID if used - GSI2 PK
-  usedByUser?: string;               // User ID if used - GSI3 PK
-  usedAt?: string;                   // ISO timestamp when used
-  reservedByOrder?: string;          // Order ID if reserved (temporary allocation)
-  reservedByUser?: string;           // User ID if reserved
-  reservedAt?: string;               // ISO timestamp when reserved
-  reservationExpiresAt?: string;     // ISO timestamp when reservation expires
-  updatedAt: string;                 // ISO timestamp
+  usedByOrder?: string;
+  usedByUser?: string;
+  usedAt?: string;
+  reservedByOrder?: string;
+  reservedByUser?: string;
+  reservedAt?: string;
+  reservationExpiresAt?: string;
+  updatedAt: string;
 
   constructor(data: {
     giftCardId: string;
@@ -44,23 +41,20 @@ export class GiftCard {
     createdAt?: string;
     updatedAt?: string;
   }) {
-    // Validate required fields
     this.validateRequiredFields(data);
     
-    // Immutable fields
     this.giftCardId = data.giftCardId;
     this.brandId = data.brandId;
     this.variantId = data.variantId;
     this.brandName = this.validateName(data.brandName, 'brand name');
     this.variantName = this.validateName(data.variantName, 'variant name');
     this.denomination = this.validateDenomination(data.denomination);
-    this.giftCardNumber = data.giftCardNumber; // Assumed to be already encrypted
-    this.giftCardPin = data.giftCardPin; // Assumed to be already encrypted
+    this.giftCardNumber = data.giftCardNumber;
+    this.giftCardPin = data.giftCardPin;
     this.expiryTime = this.validateExpiryTime(data.expiryTime);
     this.purchasePrice = this.validatePrice(data.purchasePrice);
     this.createdAt = data.createdAt ?? new Date().toISOString();
     
-    // Mutable fields
     this.usedByOrder = data.usedByOrder;
     this.usedByUser = data.usedByUser;
     this.usedAt = data.usedAt;
@@ -71,28 +65,6 @@ export class GiftCard {
     this.updatedAt = data.updatedAt ?? new Date().toISOString();
   }
 
-  // Create new gift card instance with validation
-  static create(data: {
-    brandId: string;
-    variantId: string;
-    brandName: string;
-    variantName: string;
-    denomination: number;
-    giftCardNumber: string;
-    giftCardPin: string;
-    purchasePrice: number;
-    expiryYears?: number; // Defaults to 1 year
-  }): GiftCard {
-    const expiryTime = GiftCard.generateExpiryTime(data.expiryYears);
-    
-    return new GiftCard({
-      giftCardId: ulid(),
-      expiryTime,
-      ...data
-    });
-  }
-
-  // Reserve gift card atomically (temporary allocation)
   reserve(orderId: string, userId: string, reservationMinutes: number = 10): GiftCard {
     if (this.isUsed) {
       throw new Error('Gift card is already used');
@@ -117,7 +89,6 @@ export class GiftCard {
     return this;
   }
 
-  // Confirm reservation and mark as used
   confirmReservation(): GiftCard {
     if (!this.isReserved) {
       throw new Error('Gift card is not reserved');
@@ -127,12 +98,10 @@ export class GiftCard {
       throw new Error('Reservation has expired');
     }
 
-    // Move from reserved to used
     this.usedByOrder = this.reservedByOrder;
     this.usedByUser = this.reservedByUser;
     this.usedAt = new Date().toISOString();
     
-    // Clear reservation fields
     this.reservedByOrder = undefined;
     this.reservedByUser = undefined;
     this.reservedAt = undefined;
@@ -142,7 +111,6 @@ export class GiftCard {
     return this;
   }
 
-  // Release reservation (make available again)
   releaseReservation(): GiftCard {
     if (!this.isReserved) {
       throw new Error('Gift card is not reserved');
@@ -156,37 +124,6 @@ export class GiftCard {
     return this;
   }
 
-  // Mark gift card as used (direct usage without reservation)
-  markAsUsed(orderId: string, userId: string): GiftCard {
-    if (this.isUsed) {
-      throw new Error('Gift card is already used');
-    }
-    
-    if (this.isReserved && !this.isReservationExpired) {
-      throw new Error('Gift card is reserved by another order');
-    }
-    
-    if (this.isExpired) {
-      throw new Error('Gift card has expired');
-    }
-
-    this.usedByOrder = orderId;
-    this.usedByUser = userId;
-    this.usedAt = new Date().toISOString();
-    
-    // Clear any expired reservation
-    if (this.isReservationExpired) {
-      this.reservedByOrder = undefined;
-      this.reservedByUser = undefined;
-      this.reservedAt = undefined;
-      this.reservationExpiresAt = undefined;
-    }
-    
-    this.updatedAt = new Date().toISOString();
-    return this;
-  }
-
-  // Release gift card (mark as unused)
   release(): GiftCard {
     if (!this.isUsed) {
       throw new Error('Gift card is not currently used');
@@ -199,7 +136,6 @@ export class GiftCard {
     return this;
   }
 
-  // Computed properties
   get isUsed(): boolean {
     return !!this.usedByOrder;
   }
@@ -215,81 +151,10 @@ export class GiftCard {
     return new Date(this.reservationExpiresAt) <= new Date();
   }
 
-  get isAvailable(): boolean {
-    return !this.isUsed && !this.isExpired && (!this.isReserved || this.isReservationExpired);
-  }
-
   get isExpired(): boolean {
     return new Date(this.expiryTime) <= new Date();
   }
 
-  get daysUntilExpiry(): number {
-    const now = new Date();
-    const expiry = new Date(this.expiryTime);
-    const diffTime = expiry.getTime() - now.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
-
-  get isExpiringSoon(): boolean {
-    return this.daysUntilExpiry <= 30 && this.daysUntilExpiry > 0;
-  }
-
-  // Get formatted values for display
-  get formattedDenomination(): string {
-    return `₹${this.denomination.toLocaleString('en-IN')}`;
-  }
-
-  get formattedPurchasePrice(): string {
-    const priceInRupees = this.purchasePrice / 100;
-    return `₹${priceInRupees.toLocaleString('en-IN', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}`;
-  }
-
-  get formattedExpiryDate(): string {
-    return new Date(this.expiryTime).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
-  // Get card status summary
-  getStatus(): {
-    status: 'AVAILABLE' | 'USED' | 'EXPIRED';
-    isUsed: boolean;
-    isExpired: boolean;
-    isExpiringSoon: boolean;
-    daysUntilExpiry: number;
-  } {
-    let status: 'AVAILABLE' | 'USED' | 'EXPIRED';
-    
-    if (this.isExpired) {
-      status = 'EXPIRED';
-    } else if (this.isUsed) {
-      status = 'USED';
-    } else {
-      status = 'AVAILABLE';
-    }
-
-    return {
-      status,
-      isUsed: this.isUsed,
-      isExpired: this.isExpired,
-      isExpiringSoon: this.isExpiringSoon,
-      daysUntilExpiry: this.daysUntilExpiry
-    };
-  }
-
-  // Static utility methods
-  static generateExpiryTime(years: number = 1): string {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() + years);
-    return date.toISOString();
-  }
-
-  // Private validation methods
   private validateRequiredFields(data: any): void {
     const required = [
       'giftCardId', 'brandId', 'variantId', 'brandName', 'variantName',
@@ -348,10 +213,7 @@ export class GiftCard {
   }
 }
 
-// Table configuration
 export const GIFT_CARD_TABLE = process.env.GIFT_CARDS_TABLE || 'giftify-gift-cards';
-
-// GSI configurations for optimized queries
-export const VARIANT_EXPIRY_GSI = 'VariantExpiryIndex';        // variantId + expiryTime
-export const ORDER_CARDS_GSI = 'OrderCardsIndex';              // usedByOrder
-export const USER_CARDS_GSI = 'UserCardsIndex';                // usedByUser 
+export const VARIANT_EXPIRY_GSI = 'VariantExpiryIndex';
+export const ORDER_CARDS_GSI = 'OrderCardsIndex';
+export const USER_CARDS_GSI = 'UserCardsIndex';

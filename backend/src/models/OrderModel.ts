@@ -1,6 +1,5 @@
 import { ulid } from 'ulid';
 
-// Order status enum for type safety
 export enum OrderStatus {
   PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
@@ -10,7 +9,6 @@ export enum OrderStatus {
   FAILED = 'FAILED'
 }
 
-// Status display names mapping
 export const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatus, string> = {
   [OrderStatus.PENDING]: 'Pending',
   [OrderStatus.PROCESSING]: 'Processing',
@@ -20,21 +18,19 @@ export const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatus, string> = {
   [OrderStatus.FAILED]: 'Failed'
 };
 
-// Order item interface for type safety
 export interface OrderItem {
-  brandId: string;           // Brand ID (e.g., 'amazon')
-  brandName: string;         // Brand name (e.g., 'Amazon')
-  variantId: string;         // Variant ID (e.g., 'amazon-500')
-  variantName: string;       // Variant name (e.g., '₹500 Gift Card')
-  unitPrice: number;         // Price per item in cents/paise
-  requestedQuantity: number; // Requested quantity
-  fulfilledQuantity: number; // Fulfilled quantity
-  totalPrice: number;        // Total price in cents/paise
-  fulfilledPrice: number;    // Fulfilled price in cents/paise
-  refundedPrice: number;     // Refunded price in cents/paise
+  brandId: string;
+  brandName: string;
+  variantId: string;
+  variantName: string;
+  unitPrice: number;
+  requestedQuantity: number;
+  fulfilledQuantity: number;
+  totalPrice: number;
+  fulfilledPrice: number;
+  refundedPrice: number;
 }
 
-// Fulfillment details interface
 export interface FulfillmentDetails {
   attemptedAt?: string;
   fulfilledAt?: string;
@@ -50,19 +46,18 @@ export interface FulfillmentDetails {
   }>;
 }
 
-// Order class - exact DynamoDB item structure with constructor and methods
 export class Order {
-  readonly orderId: string;          // ULID - Primary Key (immutable)
-  readonly userId: string;           // User reference (immutable)
-  readonly createdAt: string;        // ISO timestamp (immutable)
+  readonly orderId: string;
+  readonly userId: string;
+  readonly createdAt: string;
   
   status: OrderStatus;
-  totalAmount: number;               // Total order amount in cents/paise
-  paidAmount: number;                // Amount debited from wallet
-  refundAmount: number;              // Amount refunded due to partial fulfillment
+  totalAmount: number;
+  paidAmount: number;
+  refundAmount: number;
   items: OrderItem[];
   fulfillmentDetails?: FulfillmentDetails;
-  updatedAt: string;                 // ISO timestamp
+  updatedAt: string;
 
   constructor(data: {
     orderId: string;
@@ -76,15 +71,12 @@ export class Order {
     createdAt?: string;
     updatedAt?: string;
   }) {
-    // Validate required fields
     this.validateRequiredFields(data);
     
-    // Immutable fields
     this.orderId = data.orderId;
     this.userId = data.userId;
     this.createdAt = data.createdAt ?? new Date().toISOString();
     
-    // Mutable fields
     this.status = data.status ?? OrderStatus.PENDING;
     this.totalAmount = this.validateAmount(data.totalAmount, 'total amount');
     this.paidAmount = this.validateAmount(data.paidAmount, 'paid amount');
@@ -94,14 +86,12 @@ export class Order {
     this.updatedAt = data.updatedAt ?? new Date().toISOString();
   }
 
-  // Create new order instance with validation
   static create(data: {
     userId: string;
     totalAmount: number;
     paidAmount: number;
     items: Omit<OrderItem, 'fulfilledQuantity' | 'fulfilledPrice' | 'refundedPrice'>[];
   }): Order {
-    // Initialize fulfillment fields for items
     const orderItems: OrderItem[] = data.items.map(item => ({
       ...item,
       fulfilledQuantity: 0,
@@ -116,12 +106,10 @@ export class Order {
     });
   }
 
-  // Get display name for order status
   static getStatusDisplayName(status: OrderStatus): string {
     return ORDER_STATUS_DISPLAY_NAMES[status] || status;
   }
 
-  // Update order status with validation
   updateStatus(status: OrderStatus): Order {
     this.validateStatusTransition(this.status, status);
     this.status = status;
@@ -129,12 +117,10 @@ export class Order {
     return this;
   }
 
-  // Mark order as processing
   markAsProcessing(): Order {
     return this.updateStatus(OrderStatus.PROCESSING);
   }
 
-  // Mark order as fulfilled
   markAsFulfilled(fulfillmentDetails?: Partial<FulfillmentDetails>): Order {
     this.updateStatus(OrderStatus.FULFILLED);
     this.fulfillmentDetails = {
@@ -147,7 +133,6 @@ export class Order {
     return this;
   }
 
-  // Mark order as partially fulfilled
   markAsPartiallyFulfilled(refundAmount: number, fulfillmentDetails?: Partial<FulfillmentDetails>): Order {
     this.updateStatus(OrderStatus.PARTIALLY_FULFILLED);
     this.refundAmount = this.validateAmount(refundAmount, 'refund amount');
@@ -161,7 +146,6 @@ export class Order {
     return this;
   }
 
-  // Mark order as failed
   markAsFailed(refundAmount?: number): Order {
     this.updateStatus(OrderStatus.FAILED);
     if (refundAmount !== undefined) {
@@ -176,7 +160,6 @@ export class Order {
     return this;
   }
 
-  // Cancel order
   cancel(): Order {
     if (this.status === OrderStatus.FULFILLED) {
       throw new Error('Cannot cancel a fulfilled order');
@@ -184,25 +167,8 @@ export class Order {
     return this.updateStatus(OrderStatus.CANCELLED);
   }
 
-  // Add fulfillment details
-  addFulfillmentDetails(details: Partial<FulfillmentDetails>): Order {
-    this.fulfillmentDetails = {
-      partialFulfillment: this.fulfillmentDetails?.partialFulfillment ?? false,
-      refundProcessed: this.fulfillmentDetails?.refundProcessed ?? false,
-      ...this.fulfillmentDetails,
-      ...details
-    };
-    this.updatedAt = new Date().toISOString();
-    return this;
-  }
-
-  // Computed properties
   get isPending(): boolean {
     return this.status === OrderStatus.PENDING;
-  }
-
-  get isProcessing(): boolean {
-    return this.status === OrderStatus.PROCESSING;
   }
 
   get isFulfilled(): boolean {
@@ -225,19 +191,10 @@ export class Order {
     return this.isFulfilled || this.isPartiallyFulfilled || this.isFailed;
   }
 
-  get hasRefund(): boolean {
-    return this.refundAmount > 0;
+  get statusDisplayName(): string {
+    return Order.getStatusDisplayName(this.status);
   }
 
-  get totalItemCount(): number {
-    return this.items.reduce((sum, item) => sum + item.requestedQuantity, 0);
-  }
-
-  get fulfilledItemCount(): number {
-    return this.items.reduce((sum, item) => sum + item.fulfilledQuantity, 0);
-  }
-
-  // Get formatted amounts for display
   get formattedTotalAmount(): string {
     return this.formatAmount(this.totalAmount);
   }
@@ -250,35 +207,6 @@ export class Order {
     return this.formatAmount(this.refundAmount);
   }
 
-  // Get display name for current status
-  get statusDisplayName(): string {
-    return Order.getStatusDisplayName(this.status);
-  }
-
-  // Get order summary
-  getSummary(): {
-    orderId: string;
-    status: OrderStatus;
-    totalAmount: number;
-    formattedTotalAmount: string;
-    itemCount: number;
-    fulfilledItemCount: number;
-    hasRefund: boolean;
-    isCompleted: boolean;
-  } {
-    return {
-      orderId: this.orderId,
-      status: this.status,
-      totalAmount: this.totalAmount,
-      formattedTotalAmount: this.formattedTotalAmount,
-      itemCount: this.totalItemCount,
-      fulfilledItemCount: this.fulfilledItemCount,
-      hasRefund: this.hasRefund,
-      isCompleted: this.isCompleted
-    };
-  }
-
-  // Private methods
   private formatAmount(amount: number): string {
     const amountInRupees = amount / 100;
     return `₹${amountInRupees.toLocaleString('en-IN', {
@@ -310,7 +238,6 @@ export class Order {
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error('Order must have at least one item');
     }
-
     return items.map(item => this.validateOrderItem(item));
   }
 
@@ -360,7 +287,6 @@ export class Order {
   }
 }
 
-// Table configuration
 export const ORDER_TABLE = process.env.ORDERS_TABLE || 'giftify-orders';
 export const USER_ORDERS_GSI = 'UserOrdersIndex';
-export const ORDER_STATUS_GSI = 'OrderStatusIndex'; 
+export const ORDER_STATUS_GSI = 'OrderStatusIndex';

@@ -1,26 +1,24 @@
 import { ulid } from 'ulid';
 
-// User status enum for type safety
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   SUSPENDED = 'SUSPENDED',
   DELETED = 'DELETED'
 }
 
-// User class - exact DynamoDB item structure with constructor and methods
 export class User {
-  readonly userId: string;           // ULID - Primary Key (immutable)
-  readonly email: string;            // GSI1 Partition Key (immutable)
-  readonly createdAt: string;        // ISO timestamp (immutable)
+  readonly userId: string;
+  readonly email: string;
+  readonly createdAt: string;
   
   firstName: string;
   lastName: string;
-  passwordHash: string;              // Stored in DB but filtered out in API responses
+  passwordHash: string;
   isEmailVerified: boolean;
   status: UserStatus;
-  walletBalance: number;             // In cents/paise
-  updatedAt: string;                 // ISO timestamp
-  lastLoginAt?: string;              // Optional - ISO timestamp
+  walletBalance: number;
+  updatedAt: string;
+  lastLoginAt?: string;
 
   constructor(data: {
     userId: string;
@@ -35,15 +33,12 @@ export class User {
     updatedAt?: string;
     lastLoginAt?: string;
   }) {
-    // Validate required fields
     this.validateRequiredFields(data);
     
-    // Immutable fields
     this.userId = data.userId;
     this.email = this.validateEmail(data.email);
     this.createdAt = data.createdAt ?? new Date().toISOString();
     
-    // Mutable fields
     this.firstName = this.validateName(data.firstName, 'firstName');
     this.lastName = this.validateName(data.lastName, 'lastName');
     this.passwordHash = data.passwordHash;
@@ -54,7 +49,6 @@ export class User {
     this.lastLoginAt = data.lastLoginAt;
   }
 
-  // Create new user instance with validation
   static create(data: {
     email: string;
     firstName: string;
@@ -67,7 +61,6 @@ export class User {
     });
   }
 
-  // Update user data with validation
   update(data: Partial<{
     firstName: string;
     lastName: string;
@@ -106,69 +99,15 @@ export class User {
     return this;
   }
 
-  // Wallet operations
-  addToWallet(amount: number): User {
-    if (amount <= 0) {
-      throw new Error('Amount must be positive');
-    }
-    return this.update({ walletBalance: this.walletBalance + amount });
+  get isActive(): boolean {
+    return this.status === UserStatus.ACTIVE;
   }
 
-  deductFromWallet(amount: number): User {
-    if (amount <= 0) {
-      throw new Error('Amount must be positive');
-    }
-    if (this.walletBalance < amount) {
-      throw new Error('Insufficient wallet balance');
-    }
-    return this.update({ walletBalance: this.walletBalance - amount });
-  }
-
-  // Status operations
-  activate(): User {
-    return this.update({ status: UserStatus.ACTIVE });
-  }
-
-  suspend(): User {
-    return this.update({ status: UserStatus.SUSPENDED });
-  }
-
-  markAsDeleted(): User {
-    return this.update({ status: UserStatus.DELETED });
-  }
-
-  // Verification operations
-  verifyEmail(): User {
-    return this.update({ isEmailVerified: true });
-  }
-
-  // Update last login
-  updateLastLogin(): User {
-    return this.update({ lastLoginAt: new Date().toISOString() });
-  }
-
-  // Get user data without sensitive fields for API responses
   toPublic() {
     const { passwordHash, ...publicData } = this;
     return publicData;
   }
 
-  // Get full name
-  get fullName(): string {
-    return `${this.firstName} ${this.lastName}`;
-  }
-
-  // Check if user is active
-  get isActive(): boolean {
-    return this.status === UserStatus.ACTIVE;
-  }
-
-  // Check if user has sufficient balance
-  hasSufficientBalance(amount: number): boolean {
-    return this.walletBalance >= amount;
-  }
-
-  // Private validation methods
   private validateRequiredFields(data: any): void {
     const required = ['userId', 'email', 'firstName', 'lastName', 'passwordHash'];
     for (const field of required) {
@@ -207,6 +146,5 @@ export class User {
   }
 }
 
-// Table configuration
 export const USER_TABLE = process.env.USERS_TABLE || 'giftify-users';
-export const USER_EMAIL_GSI = 'EmailIndex'; 
+export const USER_EMAIL_GSI = 'EmailIndex';

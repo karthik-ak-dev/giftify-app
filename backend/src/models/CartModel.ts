@@ -1,25 +1,23 @@
 import { ulid } from 'ulid';
 
-// Cart item interface for type safety
 export interface CartItem {
-  brandId: string;           // Brand ID (e.g., 'amazon')
-  brandName: string;         // Brand name (e.g., 'Amazon')
-  variantId: string;         // Variant ID (e.g., 'amazon-500')
-  variantName: string;       // Variant name (e.g., '₹500 Gift Card')
-  quantity: number;          // Quantity of items
-  unitPrice: number;         // Price per item in cents/paise
-  totalPrice: number;        // Total price in cents/paise
+  brandId: string;
+  brandName: string;
+  variantId: string;
+  variantName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
 }
 
-// Cart class - exact DynamoDB item structure with constructor and methods
 export class Cart {
-  readonly userId: string;           // Primary Key (immutable)
-  readonly createdAt: string;        // ISO timestamp (immutable)
+  readonly userId: string;
+  readonly createdAt: string;
   
   items: CartItem[];
-  totalAmount: number;               // Sum of all item totalPrices in cents/paise
-  totalItems: number;                // Sum of all quantities
-  updatedAt: string;                 // ISO timestamp
+  totalAmount: number;
+  totalItems: number;
+  updatedAt: string;
 
   constructor(data: {
     userId: string;
@@ -29,29 +27,23 @@ export class Cart {
     createdAt?: string;
     updatedAt?: string;
   }) {
-    // Validate required fields
     this.validateRequiredFields(data);
     
-    // Immutable fields
     this.userId = data.userId;
     this.createdAt = data.createdAt ?? new Date().toISOString();
     
-    // Mutable fields
     this.items = data.items ? this.validateItems(data.items) : [];
     this.totalAmount = data.totalAmount ?? 0;
     this.totalItems = data.totalItems ?? 0;
     this.updatedAt = data.updatedAt ?? new Date().toISOString();
     
-    // Recalculate totals to ensure consistency
     this.recalculateTotals();
   }
 
-  // Create new cart instance
   static create(userId: string): Cart {
     return new Cart({ userId });
   }
 
-  // Add item to cart
   addItem(item: Omit<CartItem, 'totalPrice'>): Cart {
     const validatedItem = this.validateCartItem(item);
     const cartItem: CartItem = {
@@ -59,18 +51,15 @@ export class Cart {
       totalPrice: validatedItem.quantity * validatedItem.unitPrice
     };
 
-    // Check if item already exists
     const existingItemIndex = this.items.findIndex(
       existing => existing.variantId === cartItem.variantId
     );
 
     if (existingItemIndex >= 0) {
-      // Update existing item
       this.items[existingItemIndex].quantity += cartItem.quantity;
       this.items[existingItemIndex].totalPrice = 
         this.items[existingItemIndex].quantity * this.items[existingItemIndex].unitPrice;
     } else {
-      // Add new item
       this.items.push(cartItem);
     }
 
@@ -79,7 +68,6 @@ export class Cart {
     return this;
   }
 
-  // Update item quantity
   updateItemQuantity(variantId: string, quantity: number): Cart {
     if (quantity <= 0) {
       throw new Error('Quantity must be positive');
@@ -98,7 +86,6 @@ export class Cart {
     return this;
   }
 
-  // Remove item from cart
   removeItem(variantId: string): Cart {
     const initialLength = this.items.length;
     this.items = this.items.filter(item => item.variantId !== variantId);
@@ -112,7 +99,6 @@ export class Cart {
     return this;
   }
 
-  // Clear all items from cart
   clear(): Cart {
     this.items = [];
     this.totalAmount = 0;
@@ -121,26 +107,10 @@ export class Cart {
     return this;
   }
 
-  // Get item by variant ID
-  getItem(variantId: string): CartItem | undefined {
-    return this.items.find(item => item.variantId === variantId);
-  }
-
-  // Check if cart contains item
   hasItem(variantId: string): boolean {
     return this.items.some(item => item.variantId === variantId);
   }
 
-  // Computed properties
-  get isEmpty(): boolean {
-    return this.items.length === 0;
-  }
-
-  get itemCount(): number {
-    return this.items.length;
-  }
-
-  // Get formatted total amount for display
   get formattedTotalAmount(): string {
     const amountInRupees = this.totalAmount / 100;
     return `₹${amountInRupees.toLocaleString('en-IN', {
@@ -149,22 +119,6 @@ export class Cart {
     })}`;
   }
 
-  // Get cart summary
-  getSummary(): {
-    itemCount: number;
-    totalItems: number;
-    totalAmount: number;
-    formattedTotalAmount: string;
-  } {
-    return {
-      itemCount: this.itemCount,
-      totalItems: this.totalItems,
-      totalAmount: this.totalAmount,
-      formattedTotalAmount: this.formattedTotalAmount
-    };
-  }
-
-  // Private methods
   private recalculateTotals(): void {
     this.totalAmount = this.items.reduce((sum, item) => sum + item.totalPrice, 0);
     this.totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -224,5 +178,4 @@ export class Cart {
   }
 }
 
-// Table configuration
-export const CART_TABLE = process.env.CART_TABLE || 'giftify-cart'; 
+export const CART_TABLE = process.env.CART_TABLE || 'giftify-cart';
