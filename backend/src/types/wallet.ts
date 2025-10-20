@@ -29,17 +29,6 @@ export interface WalletBalanceResponse {
   balanceInRupees: number;
 }
 
-export interface TopupResponse {
-  transactionId: string;
-  amount: number;
-  amountFormatted: string;
-  newBalance: number;
-  newBalanceFormatted: string;
-  status: TransactionStatus;
-  description: string;
-  createdAt: string;
-}
-
 export interface GetTransactionsOptions {
   page?: number;
   limit?: number;

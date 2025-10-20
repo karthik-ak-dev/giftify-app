@@ -150,17 +150,6 @@ export const userSchemas = {
 
 // Wallet Schemas
 export const walletSchemas = {
-  topup: Joi.object({
-    amount: commonPatterns.amount,
-    description: Joi.string()
-      .max(APP_CONSTANTS.VALIDATION_RULES.DESCRIPTION_MAX_LENGTH)
-      .trim()
-      .optional()
-      .messages({
-        'string.max': `Description must not exceed ${APP_CONSTANTS.VALIDATION_RULES.DESCRIPTION_MAX_LENGTH} characters`
-      })
-  }),
-  
   getTransactions: Joi.object({
     page: commonPatterns.pagination.page,
     limit: commonPatterns.pagination.limit,

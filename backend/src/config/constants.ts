@@ -54,7 +54,6 @@ export const APP_CONSTANTS = {
     ACCESS_DENIED: 'ACCESS_DENIED',
     
     // System
-    TOPUP_FAILED: 'TOPUP_FAILED',
     INTERNAL_ERROR: 'INTERNAL_ERROR'
   } as const,
   
