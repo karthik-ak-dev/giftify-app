@@ -1,4 +1,4 @@
-import { PutCommand, GetCommand, DeleteCommand, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { User, USER_TABLE, USER_EMAIL_GSI } from '../models/UserModel';
 import { docClient } from '../utils/database';
 
@@ -7,7 +7,7 @@ export class UserRepository {
     const command = new PutCommand({
       TableName: USER_TABLE,
       Item: user,
-      ConditionExpression: 'attribute_not_exists(userId) AND attribute_not_exists(email)' // Prevent duplicate user or email
+      ConditionExpression: 'attribute_not_exists(userId) AND attribute_not_exists(email)'
     });
     
     try {
@@ -46,7 +46,7 @@ export class UserRepository {
   }
 
   async save(user: User): Promise<User> {
-    user.update({}); // This updates the updatedAt timestamp
+    user.update({});
     
     const command = new PutCommand({
       TableName: USER_TABLE,
@@ -55,31 +55,6 @@ export class UserRepository {
     
     await docClient.send(command);
     return user;
-  }
-
-  async updateWalletBalance(user: User, newBalance: number): Promise<User> {
-    user.update({ walletBalance: newBalance });
-    
-    const command = new UpdateCommand({
-      TableName: USER_TABLE,
-      Key: { userId: user.userId },
-      UpdateExpression: 'SET walletBalance = :balance, updatedAt = :updatedAt',
-      ExpressionAttributeValues: {
-        ':balance': user.walletBalance,
-        ':updatedAt': user.updatedAt
-      },
-      ConditionExpression: 'attribute_exists(userId)' // Ensure user exists
-    });
-    
-    try {
-      await docClient.send(command);
-      return user;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        throw new Error('User not found');
-      }
-      throw error;
-    }
   }
 
   async updateLastLogin(user: User): Promise<User> {
@@ -93,7 +68,7 @@ export class UserRepository {
         ':lastLogin': user.lastLoginAt,
         ':updatedAt': user.updatedAt
       },
-      ConditionExpression: 'attribute_exists(userId)' // Ensure user exists
+      ConditionExpression: 'attribute_exists(userId)'
     });
     
     try {
@@ -102,74 +77,6 @@ export class UserRepository {
     } catch (error: any) {
       if (error.name === 'ConditionalCheckFailedException') {
         throw new Error('User not found');
-      }
-      throw error;
-    }
-  }
-
-  // Advanced user operations
-  async updateUserStatus(user: User, status: 'ACTIVE' | 'SUSPENDED' | 'DELETED'): Promise<User> {
-    switch (status) {
-      case 'ACTIVE':
-        user.activate();
-        break;
-      case 'SUSPENDED':
-        user.suspend();
-        break;
-      case 'DELETED':
-        user.markAsDeleted();
-        break;
-    }
-    
-    const command = new UpdateCommand({
-      TableName: USER_TABLE,
-      Key: { userId: user.userId },
-      UpdateExpression: 'SET #status = :status, updatedAt = :updatedAt',
-      ExpressionAttributeNames: {
-        '#status': 'status'
-      },
-      ExpressionAttributeValues: {
-        ':status': user.status,
-        ':updatedAt': user.updatedAt
-      },
-      ConditionExpression: 'attribute_exists(userId)' // Ensure user exists
-    });
-    
-    try {
-      await docClient.send(command);
-      return user;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        throw new Error('User not found');
-      }
-      throw error;
-    }
-  }
-
-  async verifyEmail(user: User): Promise<User> {
-    user.verifyEmail();
-    
-    const command = new UpdateCommand({
-      TableName: USER_TABLE,
-      Key: { userId: user.userId },
-      UpdateExpression: 'SET isEmailVerified = :verified, updatedAt = :updatedAt',
-      ExpressionAttributeValues: {
-        ':verified': user.isEmailVerified,
-        ':updatedAt': user.updatedAt
-      },
-      ConditionExpression: 'attribute_exists(userId) AND isEmailVerified = :false', // Only verify if not already verified
-      ExpressionAttributeNames: {},
-    });
-    
-    // Add false to condition values
-    command.input.ExpressionAttributeValues![':false'] = false;
-    
-    try {
-      await docClient.send(command);
-      return user;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        throw new Error('User not found or email already verified');
       }
       throw error;
     }
@@ -212,45 +119,6 @@ export class UserRepository {
       throw error;
     }
   }
-
-  async delete(user: User): Promise<void> {
-    const command = new DeleteCommand({
-      TableName: USER_TABLE,
-      Key: { userId: user.userId },
-      ConditionExpression: '#status = :deleted OR #status = :suspended', // Only delete if already marked as deleted or suspended
-      ExpressionAttributeNames: {
-        '#status': 'status'
-      },
-      ExpressionAttributeValues: {
-        ':deleted': 'DELETED',
-        ':suspended': 'SUSPENDED'
-      }
-    });
-    
-    try {
-      await docClient.send(command);
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        throw new Error('Cannot delete active users. Mark as deleted first.');
-      }
-      throw error;
-    }
-  }
-
-  // Validation and utility methods
-  async validateUserExists(userId: string): Promise<void> {
-    const user = await this.findById(userId);
-    if (!user) {
-      throw new Error(`User not found: ${userId}`);
-    }
-  }
-
-  async validateEmailNotExists(email: string, excludeUserId?: string): Promise<void> {
-    const existingUser = await this.findByEmail(email);
-    if (existingUser && existingUser.userId !== excludeUserId) {
-      throw new Error('Email already registered');
-    }
-  }
 }
 
-export const userRepository = new UserRepository(); 
+export const userRepository = new UserRepository();
