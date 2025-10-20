@@ -4,6 +4,12 @@
 
 This project uses separate serverless configurations for **Stage** and **Production** environments to maintain clean separation and different settings for each environment.
 
+**Architecture Highlights**:
+- Unified Brand model (simplified from separate Product/Variant models)
+- Single brands API endpoint with frontend-based filtering
+- Wallet balance included in user profile (no separate endpoint)
+- 14 total API endpoints for efficient operations
+
 ## 🏗️ Infrastructure Overview
 
 ### **Stage Environment (`serverless-stage.yml`)**
@@ -31,8 +37,7 @@ API Gateway: giftify-backend-stage
 DynamoDB Tables:
 ├── giftify-backend-stage-users
 ├── giftify-backend-stage-wallet-transactions
-├── giftify-backend-stage-products
-├── giftify-backend-stage-product-variants
+├── giftify-backend-stage-brands
 ├── giftify-backend-stage-cart
 ├── giftify-backend-stage-orders
 └── giftify-backend-stage-gift-cards
@@ -49,8 +54,7 @@ API Gateway: giftify-backend-prod
 DynamoDB Tables:
 ├── giftify-backend-prod-users
 ├── giftify-backend-prod-wallet-transactions
-├── giftify-backend-prod-products
-├── giftify-backend-prod-product-variants
+├── giftify-backend-prod-brands
 ├── giftify-backend-prod-cart
 ├── giftify-backend-prod-orders
 └── giftify-backend-prod-gift-cards
@@ -158,7 +162,7 @@ cp env.stage.example .env.stage
 npm run deploy:stage
 
 # 3. Test stage deployment
-curl https://your-stage-api-url/api/products
+curl https://your-stage-api-url/brands
 
 # 4. Get stage endpoint
 npm run info:stage
@@ -174,7 +178,7 @@ cp env.prod.example .env.prod
 npm run deploy:prod
 
 # 3. Test production deployment
-curl https://your-prod-api-url/api/products
+curl https://your-prod-api-url/brands
 
 # 4. Get production endpoint
 npm run info:prod
@@ -187,27 +191,35 @@ After deployment, your API will be available at:
 **Stage**: `https://your-stage-id.execute-api.us-east-1.amazonaws.com/stage`
 **Production**: `https://your-prod-id.execute-api.us-east-1.amazonaws.com/prod`
 
-### **Available Endpoints**:
+### **Available Endpoints** (14 total):
 ```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/refresh
-GET    /api/users/profile
-PUT    /api/users/profile
-GET    /api/wallet/balance
-POST   /api/wallet/topup
-GET    /api/wallet/transactions
-GET    /api/products
-GET    /api/cart
-POST   /api/cart/items
-PUT    /api/cart/items
-DELETE /api/cart/items
-DELETE /api/cart
-POST   /api/orders
-GET    /api/orders
-GET    /api/orders/:id
-POST   /api/orders/:id/cancel
+🔐 Authentication (3 endpoints)
+POST   /auth/register
+POST   /auth/login
+POST   /auth/refresh
+
+👤 User Profile (2 endpoints)
+GET    /users/profile
+PUT    /users/profile
+
+💰 Wallet (1 endpoint)
+GET    /wallet/transactions
+
+🎁 Brands (1 endpoint)
+GET    /brands
+
+🛒 Cart (3 endpoints)
+GET    /cart
+PUT    /cart/manage
+DELETE /cart/clear
+
+📦 Orders (4 endpoints)
+POST   /orders/create
+GET    /orders
+GET    /orders/:orderId
 ```
+
+**Note**: Wallet balance is included in `GET /users/profile` response.
 
 ## 🧪 Testing
 
@@ -218,11 +230,14 @@ POST   /api/orders/:id/cancel
    - `accessToken`: Will be set automatically after login
 
 ### **Test Flow**
-1. **Register**: `POST /api/auth/register`
-2. **Login**: `POST /api/auth/login` (saves tokens)
-3. **Get Products**: `GET /api/products`
-4. **Add to Cart**: `POST /api/cart/items`
-5. **Create Order**: `POST /api/orders`
+1. **Register**: `POST /auth/register`
+2. **Login**: `POST /auth/login` (saves tokens automatically)
+3. **Get Profile**: `GET /users/profile` (includes wallet balance)
+4. **Get Brands**: `GET /brands` (all brands with variants)
+5. **Add to Cart**: `PUT /cart/manage`
+6. **View Cart**: `GET /cart`
+7. **Create Order**: `POST /orders/create`
+8. **View Orders**: `GET /orders`
 
 ## 🔍 Monitoring
 

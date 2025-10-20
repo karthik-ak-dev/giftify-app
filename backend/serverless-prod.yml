@@ -5,10 +5,12 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs18.x
-  region: ${opt:region, 'ap-southeast-1'}
+  region: ${opt:region, 'ap-south-1'}
   stage: prod
   memorySize: 512  # Higher memory for production
   timeout: 30
+  apiName: ${self:service}-${self:provider.stage}-apigw
+  endpointType: REGIONAL
   environment:
     NODE_ENV: production
     STAGE: ${self:provider.stage}
@@ -66,6 +68,7 @@ custom:
 
 functions:
   api:
+    name: ${self:service}-${self:provider.stage}-api
     handler: src/app.handler
     reservedConcurrency: 100  # Limit concurrent executions in production
     events:

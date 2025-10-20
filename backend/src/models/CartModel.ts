@@ -178,4 +178,4 @@ export class Cart {
   }
 }
 
-export const CART_TABLE = process.env.CART_TABLE || 'giftify-cart';
+export const CART_TABLE = process.env.CART_TABLE as string;

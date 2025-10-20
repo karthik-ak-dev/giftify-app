@@ -149,4 +149,4 @@ export class Brand {
   }
 }
 
-export const BRAND_TABLE = process.env.BRAND_TABLE || 'giftify-brands';
+export const BRAND_TABLE = process.env.BRAND_TABLE as string;

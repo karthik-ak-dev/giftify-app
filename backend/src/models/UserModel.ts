@@ -146,5 +146,5 @@ export class User {
   }
 }
 
-export const USER_TABLE = process.env.USERS_TABLE || 'giftify-users';
+export const USER_TABLE = process.env.USERS_TABLE as string;
 export const USER_EMAIL_GSI = 'EmailIndex';

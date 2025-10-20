@@ -287,6 +287,6 @@ export class Order {
   }
 }
 
-export const ORDER_TABLE = process.env.ORDERS_TABLE || 'giftify-orders';
+export const ORDER_TABLE = process.env.ORDERS_TABLE as string;
 export const USER_ORDERS_GSI = 'UserOrdersIndex';
 export const ORDER_STATUS_GSI = 'OrderStatusIndex';

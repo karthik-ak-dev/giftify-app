@@ -5,12 +5,14 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs18.x
-  region: ${opt:region, 'ap-southeast-1'}
+  region: ${opt:region, 'ap-south-1'}
   stage: stage
-  memorySize: 256
+  memorySize: 128
   timeout: 30
+  apiName: ${self:service}-${self:provider.stage}-apigw
+  endpointType: REGIONAL
   environment:
-    NODE_ENV: development
+    NODE_ENV: staging
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
     # Table Names (Stage Environment)
@@ -70,6 +72,7 @@ custom:
 
 functions:
   api:
+    name: ${self:service}-${self:provider.stage}-api
     handler: src/app.handler
     events:
       - http:

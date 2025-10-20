@@ -213,7 +213,7 @@ export class GiftCard {
   }
 }
 
-export const GIFT_CARD_TABLE = process.env.GIFT_CARDS_TABLE || 'giftify-gift-cards';
+export const GIFT_CARD_TABLE = process.env.GIFT_CARDS_TABLE as string;
 export const VARIANT_EXPIRY_GSI = 'VariantExpiryIndex';
 export const ORDER_CARDS_GSI = 'OrderCardsIndex';
 export const USER_CARDS_GSI = 'UserCardsIndex';

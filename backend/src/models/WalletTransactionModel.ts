@@ -176,6 +176,6 @@ export class WalletTransaction {
   }
 }
 
-export const WALLET_TRANSACTION_TABLE = process.env.WALLET_TRANSACTIONS_TABLE || 'giftify-wallet-transactions';
+export const WALLET_TRANSACTION_TABLE = process.env.WALLET_TRANSACTIONS_TABLE as string;
 export const TRANSACTION_ID_GSI = 'TransactionIdIndex';
 export const USER_TRANSACTION_HISTORY_GSI = 'UserTransactionHistoryIndex';
