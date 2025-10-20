@@ -5,9 +5,9 @@ export interface CartSummary {
 } 
 
 export interface CartItemWithStock {
+  brandId: string;
+  brandName: string;
   variantId: string;
-  productId: string;
-  productName: string;
   variantName: string;
   quantity: number;
   unitPrice: number;

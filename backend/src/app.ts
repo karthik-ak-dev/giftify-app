@@ -7,7 +7,7 @@ import serverless from 'serverless-http';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import walletRoutes from './routes/wallet';
-import productRoutes from './routes/products';
+import brandRoutes from './routes/brands';
 import cartRoutes from './routes/cart';
 import orderRoutes from './routes/orders';
 
@@ -57,7 +57,7 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/wallet', walletRoutes);
-app.use('/products', productRoutes);
+app.use('/brands', brandRoutes);
 app.use('/cart', cartRoutes);
 app.use('/orders', orderRoutes);
 

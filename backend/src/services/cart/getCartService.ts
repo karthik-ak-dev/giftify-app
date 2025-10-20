@@ -1,5 +1,5 @@
 import { cartRepository } from '../../repositories/cartRepository';
-import { productVariantRepository } from '../../repositories/productVariantRepository';
+import { brandRepository } from '../../repositories/brandRepository';
 import { CartSummary, CartItemWithStock } from '../../types/cart';
 import { formatCurrency } from '../../utils/currency';
 import { AppError } from '../../middleware/errorHandler';
@@ -29,8 +29,8 @@ export const getCartService = async (userId: string): Promise<{
     const itemsWithStock: CartItemWithStock[] = await Promise.all(
       cart.items.map(async (item) => {
         try {
-          const variant = await productVariantRepository.findById(item.variantId);
-          const stockAvailable = variant?.stockQuantity || 0;
+          const result = await brandRepository.findByVariantId(item.variantId);
+          const stockAvailable = result?.variant?.stockQuantity || 0;
           const isInStock = stockAvailable >= item.quantity;
           
           return {

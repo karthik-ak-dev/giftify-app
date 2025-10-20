@@ -1,6 +1,5 @@
 import { cartRepository } from '../../repositories/cartRepository';
-import { productVariantRepository } from '../../repositories/productVariantRepository';
-import { productRepository } from '../../repositories/productRepository';
+import { brandRepository } from '../../repositories/brandRepository';
 import { Cart } from '../../models/CartModel';
 import { AppError } from '../../middleware/errorHandler';
 
@@ -11,24 +10,20 @@ export const manageCartService = async (userId: string, variantId: string, quant
       throw new AppError('Quantity cannot be negative', 400, 'INVALID_QUANTITY');
     }
 
-    // Get variant details first to validate
-    const variant = await productVariantRepository.findById(variantId);
-    if (!variant) {
-      throw new AppError('Product variant not found', 404, 'VARIANT_NOT_FOUND');
+    // Get brand and variant details first to validate
+    const result = await brandRepository.findByVariantId(variantId);
+    if (!result) {
+      throw new AppError('Brand variant not found', 404, 'VARIANT_NOT_FOUND');
     }
+
+    const { brand, variant } = result;
     
-    if (!variant.isActive) {
-      throw new AppError('Product variant is not active', 400, 'VARIANT_INACTIVE');
+    if (!brand.isActive) {
+      throw new AppError('Brand is not active', 400, 'BRAND_INACTIVE');
     }
 
-    // Get product details for complete item information
-    const product = await productRepository.findById(variant.productId);
-    if (!product) {
-      throw new AppError('Product not found', 404, 'PRODUCT_NOT_FOUND');
-    }
-
-    if (!product.isActive) {
-      throw new AppError('Product is not active', 400, 'PRODUCT_INACTIVE');
+    if (variant.isActive === false) {
+      throw new AppError('Variant is not active', 400, 'VARIANT_INACTIVE');
     }
 
     // Get or create cart
@@ -57,17 +52,8 @@ export const manageCartService = async (userId: string, variantId: string, quant
       };
     }
 
-    // Validate quantity constraints
-    if (quantity < variant.minOrderQuantity || quantity > variant.maxOrderQuantity) {
-      throw new AppError(
-        `Quantity must be between ${variant.minOrderQuantity} and ${variant.maxOrderQuantity}`,
-        400,
-        'INVALID_QUANTITY'
-      );
-    }
-
-    // Check stock availability
-    if (quantity > variant.stockQuantity) {
+    // Check stock availability (if stock quantity is defined)
+    if (variant.stockQuantity !== undefined && quantity > variant.stockQuantity) {
       throw new AppError(
         `Only ${variant.stockQuantity} items available in stock`,
         400,
@@ -75,14 +61,14 @@ export const manageCartService = async (userId: string, variantId: string, quant
       );
     }
 
-    // Create cart item data
+    // Create cart item data (convert sale price from rupees to paise)
     const cartItemData = {
+      brandId: brand.brandId,
+      brandName: brand.name,
       variantId,
-      productId: variant.productId,
-      productName: product.name,
       variantName: variant.name,
       quantity,
-      unitPrice: variant.sellingPrice
+      unitPrice: Math.round(variant.salePrice * 100) // Convert rupees to paise
     };
 
     // Add or update item using Cart model methods

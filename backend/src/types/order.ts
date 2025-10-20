@@ -2,9 +2,9 @@ import { OrderStatus } from '../models/OrderModel';
 
 // Enhanced response interfaces for services
 export interface OrderItemResponse {
+  brandId: string;
+  brandName: string;
   variantId: string;
-  productId: string;
-  productName: string;
   variantName: string;
   unitPrice: number;
   requestedQuantity: number;
@@ -97,7 +97,7 @@ export interface CreateOrderResponse {
     };
     giftCards: Array<{
       giftCardId: string;
-      productName: string;
+      brandName: string;
       variantName: string;
       denomination: number;
       giftCardNumber: string;
@@ -106,7 +106,7 @@ export interface CreateOrderResponse {
       denominationFormatted: string;
     }>;
     unavailableItems: Array<{
-      productName: string;
+      brandName: string;
       variantName: string;
       requestedQuantity: number;
       reason: string;

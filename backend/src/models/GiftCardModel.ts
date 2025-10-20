@@ -3,9 +3,9 @@ import { ulid } from 'ulid';
 // GiftCard class - exact DynamoDB item structure with constructor and methods
 export class GiftCard {
   readonly giftCardId: string;       // ULID - Primary Key (immutable)
-  readonly productId: string;        // Product reference (immutable)
+  readonly brandId: string;          // Brand reference (immutable)
   readonly variantId: string;        // Variant reference (immutable) - GSI1 PK
-  readonly productName: string;      // Product name (immutable)
+  readonly brandName: string;        // Brand name (immutable)
   readonly variantName: string;      // Variant name (immutable)
   readonly denomination: number;     // Face value in rupees (immutable)
   readonly giftCardNumber: string;   // Encrypted card number (immutable)
@@ -25,9 +25,9 @@ export class GiftCard {
 
   constructor(data: {
     giftCardId: string;
-    productId: string;
+    brandId: string;
     variantId: string;
-    productName: string;
+    brandName: string;
     variantName: string;
     denomination: number;
     giftCardNumber: string;
@@ -49,9 +49,9 @@ export class GiftCard {
     
     // Immutable fields
     this.giftCardId = data.giftCardId;
-    this.productId = data.productId;
+    this.brandId = data.brandId;
     this.variantId = data.variantId;
-    this.productName = this.validateName(data.productName, 'product name');
+    this.brandName = this.validateName(data.brandName, 'brand name');
     this.variantName = this.validateName(data.variantName, 'variant name');
     this.denomination = this.validateDenomination(data.denomination);
     this.giftCardNumber = data.giftCardNumber; // Assumed to be already encrypted
@@ -73,9 +73,9 @@ export class GiftCard {
 
   // Create new gift card instance with validation
   static create(data: {
-    productId: string;
+    brandId: string;
     variantId: string;
-    productName: string;
+    brandName: string;
     variantName: string;
     denomination: number;
     giftCardNumber: string;
@@ -292,7 +292,7 @@ export class GiftCard {
   // Private validation methods
   private validateRequiredFields(data: any): void {
     const required = [
-      'giftCardId', 'productId', 'variantId', 'productName', 'variantName',
+      'giftCardId', 'brandId', 'variantId', 'brandName', 'variantName',
       'denomination', 'giftCardNumber', 'giftCardPin', 'expiryTime', 'purchasePrice'
     ];
     

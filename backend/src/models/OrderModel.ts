@@ -22,16 +22,16 @@ export const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatus, string> = {
 
 // Order item interface for type safety
 export interface OrderItem {
-  variantId: string;
-  productId: string;
-  productName: string;
-  variantName: string;
-  unitPrice: number;
-  requestedQuantity: number;
-  fulfilledQuantity: number;
-  totalPrice: number;
-  fulfilledPrice: number;
-  refundedPrice: number;
+  brandId: string;           // Brand ID (e.g., 'amazon')
+  brandName: string;         // Brand name (e.g., 'Amazon')
+  variantId: string;         // Variant ID (e.g., 'amazon-500')
+  variantName: string;       // Variant name (e.g., '₹500 Gift Card')
+  unitPrice: number;         // Price per item in cents/paise
+  requestedQuantity: number; // Requested quantity
+  fulfilledQuantity: number; // Fulfilled quantity
+  totalPrice: number;        // Total price in cents/paise
+  fulfilledPrice: number;    // Fulfilled price in cents/paise
+  refundedPrice: number;     // Refunded price in cents/paise
 }
 
 // Fulfillment details interface
@@ -315,7 +315,7 @@ export class Order {
   }
 
   private validateOrderItem(item: any): OrderItem {
-    const required = ['variantId', 'productId', 'productName', 'variantName', 'unitPrice', 'requestedQuantity', 'totalPrice'];
+    const required = ['brandId', 'brandName', 'variantId', 'variantName', 'unitPrice', 'requestedQuantity', 'totalPrice'];
     for (const field of required) {
       if (item[field] === undefined || item[field] === null) {
         throw new Error(`Order item ${field} is required`);
@@ -331,9 +331,9 @@ export class Order {
     }
 
     return {
+      brandId: item.brandId,
+      brandName: item.brandName.trim(),
       variantId: item.variantId,
-      productId: item.productId,
-      productName: item.productName.trim(),
       variantName: item.variantName.trim(),
       unitPrice: item.unitPrice,
       requestedQuantity: item.requestedQuantity,

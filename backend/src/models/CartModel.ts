@@ -2,13 +2,13 @@ import { ulid } from 'ulid';
 
 // Cart item interface for type safety
 export interface CartItem {
-  variantId: string;
-  productId: string;
-  productName: string;
-  variantName: string;
-  quantity: number;
-  unitPrice: number;        // In cents/paise
-  totalPrice: number;       // In cents/paise
+  brandId: string;           // Brand ID (e.g., 'amazon')
+  brandName: string;         // Brand name (e.g., 'Amazon')
+  variantId: string;         // Variant ID (e.g., 'amazon-500')
+  variantName: string;       // Variant name (e.g., '₹500 Gift Card')
+  quantity: number;          // Quantity of items
+  unitPrice: number;         // Price per item in cents/paise
+  totalPrice: number;        // Total price in cents/paise
 }
 
 // Cart class - exact DynamoDB item structure with constructor and methods
@@ -181,7 +181,7 @@ export class Cart {
   }
 
   private validateCartItem(item: any): CartItem {
-    const required = ['variantId', 'productId', 'productName', 'variantName', 'quantity', 'unitPrice'];
+    const required = ['brandId', 'brandName', 'variantId', 'variantName', 'quantity', 'unitPrice'];
     for (const field of required) {
       if (!item[field]) {
         throw new Error(`Cart item ${field} is required`);
@@ -204,8 +204,8 @@ export class Cart {
       throw new Error('Cart item unit price must be an integer (in paise)');
     }
 
-    if (item.productName.trim().length === 0) {
-      throw new Error('Cart item product name cannot be empty');
+    if (item.brandName.trim().length === 0) {
+      throw new Error('Cart item brand name cannot be empty');
     }
 
     if (item.variantName.trim().length === 0) {
@@ -213,9 +213,9 @@ export class Cart {
     }
 
     return {
+      brandId: item.brandId,
+      brandName: item.brandName.trim(),
       variantId: item.variantId,
-      productId: item.productId,
-      productName: item.productName.trim(),
       variantName: item.variantName.trim(),
       quantity: item.quantity,
       unitPrice: item.unitPrice,

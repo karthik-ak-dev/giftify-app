@@ -2,7 +2,7 @@ import { orderRepository } from '../../repositories/orderRepository';
 import { cartRepository } from '../../repositories/cartRepository';
 import { userRepository } from '../../repositories/userRepository';
 import { walletTransactionRepository } from '../../repositories/walletTransactionRepository';
-import { productVariantRepository } from '../../repositories/productVariantRepository';
+import { brandRepository } from '../../repositories/brandRepository';
 import { giftCardRepository } from '../../repositories/giftCardRepository';
 import { Order } from '../../models/OrderModel';
 import { WalletTransaction, TransactionType } from '../../models/WalletTransactionModel';
@@ -154,22 +154,24 @@ async function validateCartAndReserveGiftCards(cartItems: any[], orderId: string
 
   for (const item of cartItems) {
     try {
-      // Validate product variant
-      const variant = await productVariantRepository.findById(item.variantId);
-      if (!variant) {
+      // Validate brand variant
+      const result = await brandRepository.findByVariantId(item.variantId);
+      if (!result) {
         unavailableItems.push({
           ...item,
-          reason: 'Product variant not found',
+          reason: 'Brand variant not found',
           refundAmount: item.totalPrice
         });
         totalUnavailableAmount += item.totalPrice;
         continue;
       }
 
-      if (!variant.isActive) {
+      const { brand, variant } = result;
+
+      if (!brand.isActive || variant.isActive === false) {
         unavailableItems.push({
           ...item,
-          reason: 'Product variant is inactive',
+          reason: 'Brand variant is inactive',
           refundAmount: item.totalPrice
         });
         totalUnavailableAmount += item.totalPrice;
@@ -198,8 +200,9 @@ async function validateCartAndReserveGiftCards(cartItems: any[], orderId: string
         // Partial reservation - split the item
         const availableQuantity = reservedCards.length;
         const unavailableQuantity = item.quantity - availableQuantity;
-        const availableAmount = variant.sellingPrice * availableQuantity;
-        const unavailableAmount = variant.sellingPrice * unavailableQuantity;
+        // Unit price is already in paise from cart
+        const availableAmount = item.unitPrice * availableQuantity;
+        const unavailableAmount = item.unitPrice * unavailableQuantity;
 
         // Add available portion
         availableItems.push({
@@ -275,9 +278,9 @@ function buildOrderItems(cartItems: any[], availableItems: any[], unavailableIte
     const refundedPrice = unavailableItem ? unavailableItem.refundAmount : 0;
 
     return {
+      brandId: cartItem.brandId,
+      brandName: cartItem.brandName,
       variantId: cartItem.variantId,
-      productId: cartItem.productId,
-      productName: cartItem.productName,
       variantName: cartItem.variantName,
       unitPrice: cartItem.unitPrice,
       requestedQuantity: cartItem.quantity,
@@ -349,7 +352,7 @@ function buildOrderResponse(
       },
       giftCards: giftCards.map(gc => ({
         giftCardId: gc.giftCardId,
-        productName: gc.productName || 'Gift Card',
+        brandName: gc.brandName || 'Gift Card',
         variantName: gc.variantName || 'Standard',
         denomination: gc.denomination,
         giftCardNumber: gc.giftCardNumber,
@@ -358,7 +361,7 @@ function buildOrderResponse(
         denominationFormatted: formatCurrency(gc.denomination)
       })),
       unavailableItems: unavailableItems.map(item => ({
-        productName: item.productName,
+        brandName: item.brandName,
         variantName: item.variantName,
         requestedQuantity: item.quantity,
         reason: item.reason,
