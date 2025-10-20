@@ -16,8 +16,7 @@ provider:
     # Table Names (Stage Environment)
     USERS_TABLE: ${self:service}-${self:provider.stage}-users
     WALLET_TRANSACTIONS_TABLE: ${self:service}-${self:provider.stage}-wallet-transactions
-    PRODUCTS_TABLE: ${self:service}-${self:provider.stage}-products
-    PRODUCT_VARIANTS_TABLE: ${self:service}-${self:provider.stage}-product-variants
+    BRAND_TABLE: ${self:service}-${self:provider.stage}-brands
     CART_TABLE: ${self:service}-${self:provider.stage}-cart
     ORDERS_TABLE: ${self:service}-${self:provider.stage}-orders
     GIFT_CARDS_TABLE: ${self:service}-${self:provider.stage}-gift-cards
@@ -49,10 +48,8 @@ provider:
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}/index/*"
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WALLET_TRANSACTIONS_TABLE}"
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WALLET_TRANSACTIONS_TABLE}/index/*"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}/index/*"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCT_VARIANTS_TABLE}"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCT_VARIANTS_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BRAND_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BRAND_TABLE}/index/*"
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CART_TABLE}"
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}"
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}/index/*"
@@ -152,60 +149,18 @@ resources:
           - Key: Service
             Value: Giftify
 
-    # Products Table
-    ProductsTable:
+    # Brands Table (Unified - replaces Products & Product Variants)
+    BrandsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        TableName: ${self:provider.environment.BRAND_TABLE}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: productId
-            AttributeType: S
-          - AttributeName: isActive
-            AttributeType: S
-          - AttributeName: name
+          - AttributeName: brandId
             AttributeType: S
         KeySchema:
-          - AttributeName: productId
+          - AttributeName: brandId
             KeyType: HASH
-        GlobalSecondaryIndexes:
-          - IndexName: ActiveProductsIndex
-            KeySchema:
-              - AttributeName: isActive
-                KeyType: HASH
-              - AttributeName: name
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        Tags:
-          - Key: Environment
-            Value: Stage
-          - Key: Service
-            Value: Giftify
-
-    # Product Variants Table
-    ProductVariantsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.PRODUCT_VARIANTS_TABLE}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: productId
-            AttributeType: S
-          - AttributeName: variantId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: productId
-            KeyType: HASH
-          - AttributeName: variantId
-            KeyType: RANGE
-        GlobalSecondaryIndexes:
-          - IndexName: VariantIdIndex
-            KeySchema:
-              - AttributeName: variantId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
         Tags:
           - Key: Environment
             Value: Stage
@@ -316,4 +271,4 @@ resources:
           - Key: Environment
             Value: Stage
           - Key: Service
-            Value: Giftify 
+            Value: Giftify

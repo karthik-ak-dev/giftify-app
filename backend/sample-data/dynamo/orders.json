@@ -23,20 +23,20 @@
             "status": "FULFILLED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345A1",
-                    "productId": "01HKQM5X8G9YZ2PROD001234567",
-                    "productName": "Amazon Gift Card",
-                    "variantName": "₹500 Amazon Gift Card",
-                    "unitPrice": 50000,
+                    "brandId": "01HKQM5X8G9YZ2BRAND001",
+                    "brandName": "Amazon",
+                    "variantId": "amazon-500",
+                    "variantName": "₹500 Gift Card",
+                    "unitPrice": 48500,
                     "requestedQuantity": 2,
                     "fulfilledQuantity": 2,
-                    "totalPrice": 100000,
-                    "fulfilledPrice": 100000,
+                    "totalPrice": 97000,
+                    "fulfilledPrice": 97000,
                     "refundedPrice": 0
                 }
             ],
-            "totalAmount": 100000,
-            "paidAmount": 100000,
+            "totalAmount": 97000,
+            "paidAmount": 97000,
             "refundAmount": 0,
             "fulfillmentDetails": {
                 "attemptedAt": "2024-01-15T11:25:00.000Z",
@@ -70,115 +70,111 @@
             "status": "PARTIALLY_FULFILLED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345A2",
-                    "productId": "01HKQM5X8G9YZ2PROD001234567",
-                    "productName": "Amazon Gift Card",
-                    "variantName": "₹1000 Amazon Gift Card",
-                    "unitPrice": 100000,
+                    "brandId": "01HKQM5X8G9YZ2BRAND001",
+                    "brandName": "Amazon",
+                    "variantId": "amazon-1000",
+                    "variantName": "₹1000 Gift Card",
+                    "unitPrice": 97000,
                     "requestedQuantity": 3,
                     "fulfilledQuantity": 2,
-                    "totalPrice": 300000,
-                    "fulfilledPrice": 200000,
-                    "refundedPrice": 100000
+                    "totalPrice": 291000,
+                    "fulfilledPrice": 194000,
+                    "refundedPrice": 97000
                 }
             ],
-            "totalAmount": 300000,
-            "paidAmount": 300000,
-            "refundAmount": 100000,
+            "totalAmount": 291000,
+            "paidAmount": 291000,
+            "refundAmount": 97000,
             "fulfillmentDetails": {
-                "attemptedAt": "2024-01-14T18:25:00.000Z",
-                "fulfilledAt": "2024-01-14T18:25:00.000Z",
+                "attemptedAt": "2024-01-14T10:15:00.000Z",
+                "fulfilledAt": "2024-01-14T10:15:15.000Z",
                 "partialFulfillment": true,
                 "refundProcessed": true,
-                "totalGiftCardsAllocated": 2,
-                "giftCards": [
-                    {
-                        "giftCardId": "01HKQM5X8G9YZ2GIFT001234569",
-                        "giftCardNumber": "3456-7890-1234-5678",
-                        "giftCardPin": "9012",
-                        "denomination": 1000,
-                        "expiryTime": "2025-01-14T18:25:00.000Z"
-                    },
-                    {
-                        "giftCardId": "01HKQM5X8G9YZ2GIFT00123456A",
-                        "giftCardNumber": "4567-8901-2345-6789",
-                        "giftCardPin": "3456",
-                        "denomination": 1000,
-                        "expiryTime": "2025-01-14T18:25:00.000Z"
-                    }
-                ]
+                "totalGiftCardsAllocated": 2
             },
-            "createdAt": "2024-01-14T18:20:00.000Z",
-            "updatedAt": "2024-01-14T18:30:20.000Z"
+            "createdAt": "2024-01-14T10:10:00.000Z",
+            "updatedAt": "2024-01-14T10:15:30.000Z"
         },
         {
             "orderId": "01HKQM5X8G9YZ2ORDER0012347",
+            "userId": "01HKQM5X8G9YZ2ABCDEFGH3456",
+            "status": "PENDING",
+            "items": [
+                {
+                    "brandId": "01HKQM5X8G9YZ2BRAND002",
+                    "brandName": "Flipkart",
+                    "variantId": "flipkart-500",
+                    "variantName": "₹500 Gift Voucher",
+                    "unitPrice": 49000,
+                    "requestedQuantity": 2,
+                    "fulfilledQuantity": 0,
+                    "totalPrice": 98000,
+                    "fulfilledPrice": 0,
+                    "refundedPrice": 0
+                },
+                {
+                    "brandId": "01HKQM5X8G9YZ2BRAND003",
+                    "brandName": "Zomato",
+                    "variantId": "zomato-300",
+                    "variantName": "₹300 Food Voucher",
+                    "unitPrice": 28500,
+                    "requestedQuantity": 1,
+                    "fulfilledQuantity": 0,
+                    "totalPrice": 28500,
+                    "fulfilledPrice": 0,
+                    "refundedPrice": 0
+                }
+            ],
+            "totalAmount": 126500,
+            "paidAmount": 126500,
+            "refundAmount": 0,
+            "createdAt": "2024-01-15T14:25:00.000Z",
+            "updatedAt": "2024-01-15T14:25:00.000Z"
+        },
+        {
+            "orderId": "01HKQM5X8G9YZ2ORDER0012348",
             "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
             "status": "CANCELLED",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345C1",
-                    "productId": "01HKQM5X8G9YZ2PROD001234569",
-                    "productName": "Netflix Gift Card",
-                    "variantName": "₹799 Netflix Gift Card (1 Month)",
-                    "unitPrice": 79900,
+                    "brandId": "01HKQM5X8G9YZ2BRAND001",
+                    "brandName": "Amazon",
+                    "variantId": "amazon-2000",
+                    "variantName": "₹2000 Gift Card",
+                    "unitPrice": 194000,
                     "requestedQuantity": 1,
                     "fulfilledQuantity": 0,
-                    "totalPrice": 79900,
+                    "totalPrice": 194000,
                     "fulfilledPrice": 0,
-                    "refundedPrice": 79900
+                    "refundedPrice": 194000
                 }
             ],
-            "totalAmount": 79900,
-            "paidAmount": 79900,
-            "refundAmount": 79900,
-            "fulfillmentDetails": null,
-            "createdAt": "2024-01-13T14:30:00.000Z",
-            "updatedAt": "2024-01-13T15:45:00.000Z"
-        },
-        {
-            "orderId": "01HKQM5X8G9YZ2ORDER0012348",
-            "userId": "01HKQM5X8G9YZ2ABCDEFGH3456",
-            "status": "FAILED",
-            "items": [
-                {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345B2",
-                    "productId": "01HKQM5X8G9YZ2PROD001234568",
-                    "productName": "Flipkart Gift Card",
-                    "variantName": "₹1000 Flipkart Gift Card",
-                    "unitPrice": 100000,
-                    "requestedQuantity": 2,
-                    "fulfilledQuantity": 0,
-                    "totalPrice": 200000,
-                    "fulfilledPrice": 0,
-                    "refundedPrice": 200000
-                }
-            ],
-            "totalAmount": 200000,
-            "paidAmount": 200000,
-            "refundAmount": 200000,
-            "fulfillmentDetails": {
-                "attemptedAt": "2024-01-12T16:10:00.000Z",
-                "partialFulfillment": false,
-                "refundProcessed": true,
-                "totalGiftCardsAllocated": 0,
-                "giftCards": []
-            },
-            "createdAt": "2024-01-12T16:05:00.000Z",
-            "updatedAt": "2024-01-12T16:15:30.000Z"
+            "totalAmount": 194000,
+            "paidAmount": 194000,
+            "refundAmount": 194000,
+            "createdAt": "2024-01-13T09:15:00.000Z",
+            "updatedAt": "2024-01-13T09:20:30.000Z"
         }
     ],
     "notes": [
-        "status uses OrderStatus enum: PENDING, PROCESSING, PARTIALLY_FULFILLED, FULFILLED, CANCELLED, FAILED",
-        "All amounts are in paise (cents)",
-        "items array contains OrderItem objects with exact model structure",
-        "OrderItem fields: variantId, productId, productName, variantName, unitPrice, requestedQuantity, fulfilledQuantity, totalPrice, fulfilledPrice, refundedPrice",
-        "fulfillmentDetails follows FulfillmentDetails interface structure",
-        "fulfillmentDetails is null for cancelled orders before processing",
-        "giftCards array contains actual gift card details for fulfilled items",
-        "orderId, userId, productId, variantId, and giftCardId use valid 26-character ULID format matching validation pattern",
-        "UserOrdersIndex allows efficient user order history queries",
-        "OrderStatusIndex enables status-based order filtering",
-        "fulfilledQuantity + (requestedQuantity - fulfilledQuantity) should equal requestedQuantity"
+        "Each order has unique orderId as primary key",
+        "UserOrdersIndex GSI enables quick lookup of user's orders sorted by date",
+        "OrderStatusIndex GSI enables filtering orders by status (PENDING, FULFILLED, etc.)",
+        "Order items array contains OrderItem objects with brandId and brandName (not productId)",
+        "All prices stored in paise (cents)",
+        "requestedQuantity is what user ordered",
+        "fulfilledQuantity is what was actually fulfilled (may be less if inventory shortage)",
+        "fulfilledPrice = unitPrice * fulfilledQuantity",
+        "refundedPrice = unitPrice * (requestedQuantity - fulfilledQuantity)",
+        "paidAmount is deducted from wallet at order creation",
+        "refundAmount is added back to wallet for unfulfilled items",
+        "fulfillmentDetails contains gift card allocation and status info",
+        "PENDING orders are awaiting processing",
+        "FULFILLED orders have all items delivered",
+        "PARTIALLY_FULFILLED orders have some items delivered, rest refunded",
+        "CANCELLED orders are user-cancelled with full refund",
+        "FAILED orders had processing errors with full refund",
+        "brandId references the Brand table primary key",
+        "variantId is the variant identifier within the brand (e.g., 'amazon-500')"
     ]
 }

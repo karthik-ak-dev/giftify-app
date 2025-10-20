@@ -10,25 +10,25 @@
             "userId": "01HKQM5X8G9YZ2ABCDEFGH1234",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345A1",
-                    "productId": "01HKQM5X8G9YZ2PROD001234567",
-                    "productName": "Amazon Gift Card",
-                    "variantName": "₹500 Amazon Gift Card",
+                    "brandId": "01HKQM5X8G9YZ2BRAND001",
+                    "brandName": "Amazon",
+                    "variantId": "amazon-500",
+                    "variantName": "₹500 Gift Card",
                     "quantity": 2,
-                    "unitPrice": 50000,
-                    "totalPrice": 100000
+                    "unitPrice": 48500,
+                    "totalPrice": 97000
                 },
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345C1",
-                    "productId": "01HKQM5X8G9YZ2PROD001234569",
-                    "productName": "Netflix Gift Card",
-                    "variantName": "₹799 Netflix Gift Card (1 Month)",
+                    "brandId": "01HKQM5X8G9YZ2BRAND003",
+                    "brandName": "Zomato",
+                    "variantId": "zomato-500",
+                    "variantName": "₹500 Food Voucher",
                     "quantity": 1,
-                    "unitPrice": 79900,
-                    "totalPrice": 79900
+                    "unitPrice": 47500,
+                    "totalPrice": 47500
                 }
             ],
-            "totalAmount": 179900,
+            "totalAmount": 144500,
             "totalItems": 3,
             "createdAt": "2024-01-15T10:45:00.000Z",
             "updatedAt": "2024-01-15T11:20:00.000Z"
@@ -37,25 +37,25 @@
             "userId": "01HKQM5X8G9YZ2ABCDEFGH5678",
             "items": [
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345A2",
-                    "productId": "01HKQM5X8G9YZ2PROD001234567",
-                    "productName": "Amazon Gift Card",
-                    "variantName": "₹1000 Amazon Gift Card",
+                    "brandId": "01HKQM5X8G9YZ2BRAND001",
+                    "brandName": "Amazon",
+                    "variantId": "amazon-1000",
+                    "variantName": "₹1000 Gift Card",
                     "quantity": 1,
-                    "unitPrice": 100000,
-                    "totalPrice": 100000
+                    "unitPrice": 97000,
+                    "totalPrice": 97000
                 },
                 {
-                    "variantId": "01HKQM5X8G9YZ2VAR0012345D1",
-                    "productId": "01HKQM5X8G9YZ2PROD00123456B",
-                    "productName": "Starbucks Gift Card",
-                    "variantName": "₹500 Starbucks Gift Card",
+                    "brandId": "01HKQM5X8G9YZ2BRAND002",
+                    "brandName": "Flipkart",
+                    "variantId": "flipkart-500",
+                    "variantName": "₹500 Gift Voucher",
                     "quantity": 2,
-                    "unitPrice": 50000,
-                    "totalPrice": 100000
+                    "unitPrice": 49000,
+                    "totalPrice": 98000
                 }
             ],
-            "totalAmount": 200000,
+            "totalAmount": 195000,
             "totalItems": 3,
             "createdAt": "2024-01-14T16:30:00.000Z",
             "updatedAt": "2024-01-14T17:15:00.000Z"
@@ -72,11 +72,12 @@
     "notes": [
         "Each user has one cart identified by userId",
         "items array contains CartItem objects with exact model structure",
-        "CartItem fields: variantId, productId, productName, variantName, quantity, unitPrice, totalPrice",
+        "CartItem fields: brandId, brandName, variantId, variantName, quantity, unitPrice, totalPrice",
         "All prices are stored in paise (cents)",
         "totalAmount is sum of all item totalPrice values",
         "totalItems is sum of all item quantities",
-        "userId, productId, and variantId use valid 26-character ULID format matching validation pattern",
+        "userId, brandId use valid 26-character ULID format",
+        "variantId is a string identifier (e.g., 'amazon-500')",
         "Empty carts have empty items array but still exist as records",
         "Cart is automatically created when user adds first item",
         "updatedAt changes whenever cart is modified"

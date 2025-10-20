@@ -1,0 +1,156 @@
+{
+    "tableName": "giftify-backend-stage-brands",
+    "description": "Sample data for Brands table - unified model with embedded variants",
+    "primaryKey": {
+        "partitionKey": "brandId (String)"
+    },
+    "sampleItems": [
+        {
+            "brandId": "01HKQM5X8G9YZ2BRAND001",
+            "name": "Amazon",
+            "logo": "https://example.com/logos/amazon.png",
+            "category": "E-commerce",
+            "description": "Shop for millions of products across categories on Amazon India",
+            "vouchersSold": 15420,
+            "popularity": 95,
+            "isActive": true,
+            "termsAndConditions": "Valid for 1 year from date of issue. Can be used for purchases on Amazon.in. Not redeemable for cash. See Amazon.in for complete terms.",
+            "howToRedeem": "Visit Amazon.in, go to Your Account > Gift Cards, enter the gift card number and PIN to add balance to your account.",
+            "variants": [
+                {
+                    "id": "amazon-500",
+                    "name": "₹500 Gift Card",
+                    "originalPrice": 500,
+                    "salePrice": 485,
+                    "discountPercent": 3,
+                    "description": "Amazon India Gift Card worth ₹500",
+                    "vouchersSold": 5240,
+                    "stockQuantity": 500,
+                    "isActive": true
+                },
+                {
+                    "id": "amazon-1000",
+                    "name": "₹1000 Gift Card",
+                    "originalPrice": 1000,
+                    "salePrice": 970,
+                    "discountPercent": 3,
+                    "description": "Amazon India Gift Card worth ₹1000",
+                    "vouchersSold": 6890,
+                    "stockQuantity": 500,
+                    "isActive": true
+                },
+                {
+                    "id": "amazon-2000",
+                    "name": "₹2000 Gift Card",
+                    "originalPrice": 2000,
+                    "salePrice": 1940,
+                    "discountPercent": 3,
+                    "description": "Amazon India Gift Card worth ₹2000",
+                    "vouchersSold": 3290,
+                    "stockQuantity": 300,
+                    "isActive": true
+                }
+            ],
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-15T10:30:00.000Z"
+        },
+        {
+            "brandId": "01HKQM5X8G9YZ2BRAND002",
+            "name": "Flipkart",
+            "logo": "https://example.com/logos/flipkart.png",
+            "category": "E-commerce",
+            "description": "India's leading e-commerce platform for fashion, electronics, and more",
+            "vouchersSold": 12350,
+            "popularity": 88,
+            "isActive": true,
+            "termsAndConditions": "Valid for 1 year from date of issue. Can be used for purchases on Flipkart.com. Not redeemable for cash.",
+            "howToRedeem": "Visit Flipkart.com, go to My Account > Gift Cards, enter the gift card number and PIN to add balance.",
+            "variants": [
+                {
+                    "id": "flipkart-500",
+                    "name": "₹500 Gift Voucher",
+                    "originalPrice": 500,
+                    "salePrice": 490,
+                    "discountPercent": 2,
+                    "description": "Flipkart Gift Voucher worth ₹500",
+                    "vouchersSold": 4120,
+                    "stockQuantity": 400,
+                    "isActive": true
+                },
+                {
+                    "id": "flipkart-1000",
+                    "name": "₹1000 Gift Voucher",
+                    "originalPrice": 1000,
+                    "salePrice": 980,
+                    "discountPercent": 2,
+                    "description": "Flipkart Gift Voucher worth ₹1000",
+                    "vouchersSold": 5890,
+                    "stockQuantity": 400,
+                    "isActive": true
+                },
+                {
+                    "id": "flipkart-2000",
+                    "name": "₹2000 Gift Voucher",
+                    "originalPrice": 2000,
+                    "salePrice": 1960,
+                    "discountPercent": 2,
+                    "description": "Flipkart Gift Voucher worth ₹2000",
+                    "vouchersSold": 2340,
+                    "stockQuantity": 250,
+                    "isActive": true
+                }
+            ],
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-15T10:30:00.000Z"
+        },
+        {
+            "brandId": "01HKQM5X8G9YZ2BRAND003",
+            "name": "Zomato",
+            "logo": "https://example.com/logos/zomato.png",
+            "category": "Food & Dining",
+            "description": "Order food online from your favorite restaurants",
+            "vouchersSold": 8920,
+            "popularity": 82,
+            "isActive": true,
+            "termsAndConditions": "Valid for 6 months. Can be used for food orders on Zomato app. Not applicable on Zomato Gold.",
+            "howToRedeem": "Open Zomato app, go to Profile > Payments, enter voucher code to add credits.",
+            "variants": [
+                {
+                    "id": "zomato-300",
+                    "name": "₹300 Food Voucher",
+                    "originalPrice": 300,
+                    "salePrice": 285,
+                    "discountPercent": 5,
+                    "description": "Zomato Food Voucher worth ₹300",
+                    "vouchersSold": 3240,
+                    "stockQuantity": 350,
+                    "isActive": true
+                },
+                {
+                    "id": "zomato-500",
+                    "name": "₹500 Food Voucher",
+                    "originalPrice": 500,
+                    "salePrice": 475,
+                    "discountPercent": 5,
+                    "description": "Zomato Food Voucher worth ₹500",
+                    "vouchersSold": 4280,
+                    "stockQuantity": 350,
+                    "isActive": true
+                },
+                {
+                    "id": "zomato-1000",
+                    "name": "₹1000 Food Voucher",
+                    "originalPrice": 1000,
+                    "salePrice": 950,
+                    "discountPercent": 5,
+                    "description": "Zomato Food Voucher worth ₹1000",
+                    "vouchersSold": 1400,
+                    "stockQuantity": 200,
+                    "isActive": true
+                }
+            ],
+            "createdAt": "2024-01-01T00:00:00.000Z",
+            "updatedAt": "2024-01-15T10:30:00.000Z"
+        }
+    ]
+}
