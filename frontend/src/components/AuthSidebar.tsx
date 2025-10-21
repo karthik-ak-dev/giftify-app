@@ -24,7 +24,7 @@ const AuthSidebar = () => {
     // Helper to get field CSS classes
     const getFieldClass = (fieldName: string, value: string) => {
         const hasError = hasFieldError(fieldName, value, isSignUp)
-        return hasError ? 'border-red-500/50 focus:ring-red-400' : 'border-white/10 focus:ring-accent-400'
+        return hasError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-neutral-200 focus:border-primary-500 focus:ring-primary-500'
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -97,36 +97,33 @@ const AuthSidebar = () => {
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity"
+                className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-50 transition-opacity animate-fade-in"
                 onClick={closeAuthSidebar}
             />
 
             {/* Sidebar */}
-            <div className="fixed right-0 top-0 h-full w-full max-w-md bg-dark-50 shadow-2xl z-50 flex flex-col">
+            <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-elegant-2xl z-50 flex flex-col animate-slide-down">
                 {/* Header */}
-                <div className="relative p-8 border-b border-white/10">
-                    {/* Decorative Background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent-500/10 via-transparent to-transparent opacity-50" />
-
+                <div className="relative p-8 bg-gradient-to-br from-primary-50 via-white to-accent-50 border-b border-neutral-200">
                     <button
                         onClick={closeAuthSidebar}
-                        className="absolute top-4 right-4 w-10 h-10 rounded-xl hover:bg-white/5 flex items-center justify-center transition-colors z-10"
+                        className="absolute top-4 right-4 w-10 h-10 rounded-xl hover:bg-neutral-100 flex items-center justify-center transition-all elegant-button"
                     >
-                        <X className="w-6 h-6 text-white/70" />
+                        <X className="w-5 h-5 text-neutral-600" />
                     </button>
 
                     <div className="relative">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl flex items-center justify-center shadow-lg shadow-accent-500/30">
+                            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-elegant-lg">
                                 <Sparkles className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-display font-bold text-white">
+                                <h2 className="text-2xl font-display font-bold text-neutral-900">
                                     {isSignUp ? 'Create Account' : 'Welcome Back'}
                                 </h2>
                             </div>
                         </div>
-                        <p className="text-white/60 text-sm ml-15">
+                        <p className="text-neutral-600 text-sm ml-15">
                             {isSignUp
                                 ? 'Start your gifting journey with Giftify'
                                 : 'Login to continue your shopping experience'}
@@ -135,19 +132,19 @@ const AuthSidebar = () => {
                 </div>
 
                 {/* Form */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
                     {/* Backend Error Message */}
                     {error && (
-                        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-scale-in">
+                            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                             <div className="flex-1">
-                                <p className="text-sm text-red-400 font-medium">
+                                <p className="text-sm text-red-700 font-medium">
                                     {error}
                                 </p>
                             </div>
                             <button
                                 onClick={clearError}
-                                className="text-red-400 hover:text-red-300 transition-colors"
+                                className="text-red-500 hover:text-red-700 transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -156,17 +153,17 @@ const AuthSidebar = () => {
 
                     {/* Validation Errors - Only show on submit attempt */}
                     {validationErrors.length > 0 && (
-                        <div className="mb-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                        <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-xl animate-scale-in">
                             <div className="flex items-start gap-3">
-                                <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                                <AlertCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                                 <div className="flex-1">
-                                    <p className="text-sm text-orange-400 font-medium mb-2">
+                                    <p className="text-sm text-orange-700 font-medium mb-2">
                                         Please fix the following issues:
                                     </p>
                                     <ul className="space-y-1">
                                         {validationErrors.map((error, index) => (
-                                            <li key={index} className="text-xs text-orange-300 flex items-start gap-2">
-                                                <span className="text-orange-400 mt-0.5">•</span>
+                                            <li key={index} className="text-xs text-orange-600 flex items-start gap-2">
+                                                <span className="text-orange-500 mt-0.5">•</span>
                                                 {error}
                                             </li>
                                         ))}
@@ -181,12 +178,12 @@ const AuthSidebar = () => {
                             <>
                                 {/* Name Row - First and Last Name */}
                                 <div className="flex gap-3">
-                                    <div className="flex-[6]">
-                                        <label className="block text-sm font-medium text-white/80 mb-2">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-neutral-700 mb-2">
                                             First Name
                                         </label>
                                         <div className="relative">
-                                            <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
+                                            <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                                             <input
                                                 type="text"
                                                 name="firstName"
@@ -194,12 +191,12 @@ const AuthSidebar = () => {
                                                 onChange={handleChange}
                                                 required
                                                 placeholder="John"
-                                                className={`w-full pl-11 pr-3 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('firstName', formData.firstName)}`}
+                                                className={`w-full pl-11 pr-3 py-3 bg-white border-2 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 transition-all ${getFieldClass('firstName', formData.firstName)}`}
                                             />
                                         </div>
                                     </div>
-                                    <div className="flex-[4]">
-                                        <label className="block text-sm font-medium text-white/80 mb-2">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-neutral-700 mb-2">
                                             Last Name
                                         </label>
                                         <input
@@ -209,7 +206,7 @@ const AuthSidebar = () => {
                                             onChange={handleChange}
                                             required
                                             placeholder="Doe"
-                                            className={`w-full px-3 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('lastName', formData.lastName)}`}
+                                            className={`w-full px-3 py-3 bg-white border-2 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 transition-all ${getFieldClass('lastName', formData.lastName)}`}
                                         />
                                     </div>
                                 </div>
@@ -218,11 +215,11 @@ const AuthSidebar = () => {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium text-white/80 mb-2">
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
                                 Email Address
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                                 <input
                                     type="email"
                                     name="email"
@@ -230,31 +227,34 @@ const AuthSidebar = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="you@example.com"
-                                    className={`w-full pl-11 pr-4 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('email', formData.email)}`}
+                                    className={`w-full pl-11 pr-4 py-3 bg-white border-2 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 transition-all ${getFieldClass('email', formData.email)}`}
                                 />
                             </div>
                             {hasFieldError('email', formData.email) && (
-                                <p className="mt-1 text-xs text-red-400">Please enter a valid email address</p>
+                                <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    Please enter a valid email address
+                                </p>
                             )}
                         </div>
 
                         {/* Password */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <label className="block text-sm font-medium text-white/80">
+                                <label className="block text-sm font-medium text-neutral-700">
                                     Password
                                 </label>
                                 {!isSignUp && (
                                     <button
                                         type="button"
-                                        className="text-xs text-accent-400 hover:text-accent-300 font-medium transition-colors"
+                                        className="text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors"
                                     >
                                         Forgot?
                                     </button>
                                 )}
                             </div>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
@@ -262,12 +262,12 @@ const AuthSidebar = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="••••••••"
-                                    className={`w-full pl-11 pr-11 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('password', formData.password)}`}
+                                    className={`w-full pl-11 pr-11 py-3 bg-white border-2 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 transition-all ${getFieldClass('password', formData.password)}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="w-5 h-5" />
@@ -277,12 +277,15 @@ const AuthSidebar = () => {
                                 </button>
                             </div>
                             {hasFieldError('password', formData.password) && (
-                                <p className="mt-1 text-xs text-red-400">Password must be at least 8 characters long</p>
+                                <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    Password must be at least 8 characters long
+                                </p>
                             )}
                             {isSignUp && showPasswordRequirements && (
-                                <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
-                                    <p className="text-xs text-white/70 font-medium mb-2">Password Requirements:</p>
-                                    <div className="space-y-1">
+                                <div className="mt-3 p-4 bg-primary-50 border border-primary-200 rounded-xl">
+                                    <p className="text-xs text-primary-700 font-medium mb-3">Password Requirements:</p>
+                                    <div className="space-y-2">
                                         {(() => {
                                             const requirements = [
                                                 { text: 'At least 8 characters long', met: formData.password.length >= 8 },
@@ -295,11 +298,11 @@ const AuthSidebar = () => {
                                             return requirements.map((req, index) => (
                                                 <div key={index} className="flex items-center gap-2 text-xs">
                                                     {req.met ? (
-                                                        <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
+                                                        <CheckCircle className="w-4 h-4 text-success-500 flex-shrink-0" />
                                                     ) : (
-                                                        <div className="w-3 h-3 border border-white/30 rounded-full flex-shrink-0" />
+                                                        <div className="w-4 h-4 border-2 border-neutral-300 rounded-full flex-shrink-0" />
                                                     )}
-                                                    <span className={req.met ? 'text-green-300' : 'text-white/50'}>
+                                                    <span className={req.met ? 'text-success-600 font-medium' : 'text-neutral-600'}>
                                                         {req.text}
                                                     </span>
                                                 </div>
@@ -314,7 +317,7 @@ const AuthSidebar = () => {
                         <button
                             type="submit"
                             disabled={isLoading || !currentValidation.isValid}
-                            className="w-full py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl font-bold text-base transition-all duration-300 shadow-lg shadow-accent-500/50 hover:scale-[1.02] mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                            className="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl font-bold text-base elegant-button shadow-elegant-lg mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:transform-none flex items-center justify-center gap-2"
                         >
                             {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
                             {isLoading
@@ -326,15 +329,15 @@ const AuthSidebar = () => {
                 </div>
 
                 {/* Footer - Toggle between Login/Signup */}
-                <div className="p-6 border-t border-white/10 bg-dark-100/30">
+                <div className="p-6 border-t border-neutral-200 bg-neutral-50">
                     <div className="text-center">
-                        <p className="text-white/70 text-sm">
+                        <p className="text-neutral-600 text-sm">
                             {isSignUp ? (
                                 <>
                                     Already have an account?{' '}
                                     <button
                                         onClick={toggleMode}
-                                        className="text-accent-400 hover:text-accent-300 font-semibold transition-colors"
+                                        className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
                                     >
                                         Login
                                     </button>
@@ -344,7 +347,7 @@ const AuthSidebar = () => {
                                     Don't have an account?{' '}
                                     <button
                                         onClick={toggleMode}
-                                        className="text-accent-400 hover:text-accent-300 font-semibold transition-colors"
+                                        className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
                                     >
                                         Sign up
                                     </button>

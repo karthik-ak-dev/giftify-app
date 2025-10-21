@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Filter, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Filter, ChevronDown, Star } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -68,12 +68,12 @@ const AllBrands = () => {
             <Navbar />
 
             {/* Header Section */}
-            <section className="pt-8 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-dark-100/40 via-dark-200/30 to-dark-50/50 border-b border-white/10">
+            <section className="pt-8 pb-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 via-white to-accent-50">
                 <div className="max-w-7xl mx-auto">
                     {/* Back Button */}
                     <Link
                         to="/"
-                        className="inline-flex items-center space-x-2 text-white/70 hover:text-accent-300 transition-colors mb-6 group"
+                        className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-600 transition-colors mb-6 group"
                     >
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         <span className="font-medium">Back to Home</span>
@@ -82,34 +82,34 @@ const AllBrands = () => {
                     {/* Page Title & Category Filter */}
                     <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                         <div>
-                            <h1 className="text-5xl font-display font-black text-white mb-3">
+                            <h1 className="text-4xl md:text-5xl font-display font-black text-neutral-900 mb-3">
                                 All Brands
                             </h1>
-                            <p className="text-white/60 text-lg">
+                            <p className="text-neutral-600 text-lg">
                                 {loading ? 'Loading...' : `Discover ${brands.length} brands • Exclusive discounts on all gift cards`}
                             </p>
                         </div>
 
                         {/* Clean Dropdown Filter */}
                         <div className="flex items-center gap-3">
-                            <Filter className="w-4 h-4 text-white/50" />
+                            <Filter className="w-5 h-5 text-neutral-500" />
                             <div className="relative">
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => handleCategoryChange(e.target.value)}
-                                    className="appearance-none bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-xl pl-4 pr-10 py-2.5 font-medium text-sm cursor-pointer focus:outline-none focus:border-accent-400/50 hover:bg-white/15 transition-all duration-200"
+                                    className="appearance-none bg-white border-2 border-neutral-200 text-neutral-900 rounded-xl pl-4 pr-10 py-3 font-medium text-sm cursor-pointer focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500 hover:border-neutral-300 transition-all shadow-elegant"
                                 >
                                     {categories.map((category) => (
                                         <option
                                             key={category}
                                             value={category}
-                                            className="bg-dark-100 text-white"
+                                            className="bg-white text-neutral-900"
                                         >
                                             {category}
                                         </option>
                                     ))}
                                 </select>
-                                <ChevronDown className="w-4 h-4 text-white/60 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                <ChevronDown className="w-5 h-5 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
                         </div>
                     </div>
@@ -122,16 +122,20 @@ const AllBrands = () => {
                     {loading ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                             {[...Array(10)].map((_, i) => (
-                                <div key={i} className="bg-white/5 rounded-2xl h-[240px] animate-pulse" />
+                                <div key={i} className="bg-neutral-200 rounded-2xl h-[260px] animate-pulse" />
                             ))}
                         </div>
                     ) : brands.length === 0 ? (
-                        <div className="text-center py-12">
-                            <p className="text-white/60 text-lg">No brands found in this category.</p>
+                        <div className="text-center py-20">
+                            <div className="w-20 h-20 bg-neutral-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Filter className="w-10 h-10 text-neutral-400" />
+                            </div>
+                            <p className="text-neutral-600 text-lg font-medium">No brands found in this category.</p>
+                            <p className="text-neutral-500 text-sm mt-2">Try selecting a different category</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                            {brands.map((brand) => {
+                            {brands.map((brand, index) => {
                                 // Calculate the highest discount from variants
                                 const maxDiscount = Math.max(...brand.variants.map(v => v.discountPercent))
 
@@ -139,34 +143,42 @@ const AllBrands = () => {
                                     <Link
                                         key={brand.id}
                                         to={`/brand/${brand.id}`}
-                                        className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer border border-white/10 hover:border-accent-400/50 shadow-xl shadow-black/20 hover:shadow-accent-400/30 hover:-translate-y-2 block"
+                                        className="group elegant-card gradient-border overflow-hidden animate-fade-in"
+                                        style={{ animationDelay: `${index * 0.03}s` }}
                                     >
                                         {/* Discount Badge */}
-                                        <div className="absolute top-3 right-3 z-20">
-                                            <div className="bg-accent-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-lg shadow-accent-500/50 backdrop-blur-sm">
-                                                {maxDiscount}% Off
+                                        {maxDiscount > 0 && (
+                                            <div className="absolute top-3 right-3 z-20">
+                                                <div className="bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-elegant-md">
+                                                    {maxDiscount}% OFF
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
 
                                         {/* Logo */}
-                                        <div className="relative flex items-center justify-center h-[160px] overflow-hidden">
+                                        <div className="relative flex items-center justify-center h-[160px] bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
                                             <img
                                                 src={brand.logo}
                                                 alt={brand.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
                                         </div>
 
                                         {/* Brand Info */}
-                                        <div className="bg-dark-50/40 backdrop-blur-md px-4 py-3 border-t border-white/10">
-                                            <h3 className="text-white font-bold text-base text-center truncate group-hover:text-accent-300 transition-colors mb-2">
+                                        <div className="p-4 bg-gradient-to-b from-slate-50 to-white border-t border-slate-200">
+                                            <h3 className="text-slate-900 font-bold text-base text-center truncate group-hover:text-primary-600 transition-colors mb-2">
                                                 {brand.name}
                                             </h3>
-                                            <div className="flex items-center justify-center gap-1.5 text-sm text-green-400 font-semibold">
-                                                <span className="opacity-60">✓</span>
-                                                <span>{(brand.vouchersSold / 1000).toFixed(1)}K+ sold</span>
+                                            <div className="flex items-center justify-center gap-1.5 text-sm">
+                                                <Star className="w-4 h-4 text-success-500 fill-success-500" />
+                                                <span className="text-slate-700 font-medium">
+                                                    {(brand.vouchersSold / 1000).toFixed(1)}K+ sold
+                                                </span>
                                             </div>
                                         </div>
+
+                                        {/* Hover Effect - Bottom Border */}
+                                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-accent-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                                     </Link>
                                 )
                             })}

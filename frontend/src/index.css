@@ -12,9 +12,9 @@ body {
     font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 100%);
+    background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #e0f2fe 100%);
     background-attachment: fixed;
-    color: #ffffff;
+    color: #0f172a;
 }
 
 #root {
@@ -22,10 +22,35 @@ body {
 }
 
 @layer components {
+    .elegant-card {
+        @apply bg-white rounded-2xl transition-all duration-300 ease-in-out border border-neutral-200;
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    .elegant-card:hover {
+        @apply transform -translate-y-1 border-primary-200;
+        box-shadow: 0 12px 24px -4px rgba(14, 165, 233, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+    }
+
+    .elegant-button {
+        @apply transition-all duration-300 ease-in-out;
+    }
+
+    .elegant-button:hover {
+        @apply transform scale-105;
+    }
+
+    .elegant-button:active {
+        @apply transform scale-95;
+    }
+
+    .gradient-text {
+        @apply bg-gradient-to-r from-primary-600 via-primary-500 to-accent-600 bg-clip-text text-transparent;
+    }
+
     .gradient-border {
         position: relative;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: white;
     }
 
     .gradient-border::before {
@@ -33,26 +58,56 @@ body {
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        padding: 1px;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(168, 85, 247, 0.5));
+        padding: 2px;
+        background: linear-gradient(135deg, #0ea5e9, #d946ef, #0ea5e9);
+        background-size: 200% 200%;
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
         opacity: 0;
-        transition: opacity 0.3s;
+        transition: opacity 0.4s ease-in-out;
     }
 
     .gradient-border:hover::before {
         opacity: 1;
+        animation: shimmer 3s linear infinite;
+    }
+
+    .glass-effect {
+        @apply bg-white/80 backdrop-blur-xl border border-white/20;
     }
 
     .card-hover {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        @apply transition-all ease-out;
+        transition-duration: 400ms;
     }
 
     .card-hover:hover {
-        transform: translateY(-8px);
+        @apply transform -translate-y-2;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    .smooth-shadow {
+        box-shadow: 0 1px 3px 0 rgba(14, 165, 233, 0.1), 0 1px 2px -1px rgba(14, 165, 233, 0.1);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .smooth-shadow:hover {
+        box-shadow: 0 20px 25px -5px rgba(14, 165, 233, 0.15), 0 8px 10px -6px rgba(14, 165, 233, 0.1);
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        @apply bg-neutral-100 rounded-full;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        @apply bg-primary-300 rounded-full hover:bg-primary-400;
     }
 
     .scrollbar-hide::-webkit-scrollbar {
@@ -62,5 +117,18 @@ body {
     .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+
+    /* Smooth input transitions */
+    input,
+    textarea,
+    select {
+        @apply transition-all duration-300 ease-in-out;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        @apply ring-2 ring-primary-400 ring-offset-2;
     }
 }

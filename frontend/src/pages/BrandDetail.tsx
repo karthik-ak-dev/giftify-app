@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Plus, Minus } from 'lucide-react'
+import { ArrowLeft, Plus, Minus, Star, TrendingUp } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useCart } from '../context/CartContext'
@@ -64,7 +64,7 @@ const BrandDetail = () => {
             <div className="min-h-screen">
                 <Navbar />
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-white text-xl">Loading...</div>
+                    <div className="text-slate-600 text-xl">Loading...</div>
                 </div>
                 <Footer />
             </div>
@@ -77,8 +77,8 @@ const BrandDetail = () => {
                 <Navbar />
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
-                        <h2 className="text-3xl font-bold text-white mb-4">Brand Not Found</h2>
-                        <Link to="/brands" className="text-accent-400 hover:text-accent-300">
+                        <h2 className="text-3xl font-bold text-slate-900 mb-4">Brand Not Found</h2>
+                        <Link to="/brands" className="text-primary-600 hover:text-primary-700">
                             ← Back to All Brands
                         </Link>
                     </div>
@@ -96,24 +96,12 @@ const BrandDetail = () => {
             <Navbar />
 
             {/* Brand Hero Section */}
-            <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-dark-100/40 via-dark-200/30 to-dark-50/50 border-b border-white/10">
-                {/* Decorative Background */}
-                <div className="absolute inset-0 opacity-5">
-                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <pattern id="brand-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <circle cx="20" cy="20" r="1" fill="currentColor" className="text-white" />
-                            </pattern>
-                        </defs>
-                        <rect width="100%" height="100%" fill="url(#brand-grid)" />
-                    </svg>
-                </div>
-
+            <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 via-white to-accent-50">
                 <div className="relative max-w-7xl mx-auto">
                     {/* Back Button */}
                     <Link
                         to="/brands"
-                        className="inline-flex items-center space-x-2 text-white/70 hover:text-accent-300 transition-colors mb-8 group"
+                        className="inline-flex items-center space-x-2 text-slate-600 hover:text-primary-600 transition-colors mb-8 group"
                     >
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         <span className="font-medium">Back to All Brands</span>
@@ -123,7 +111,7 @@ const BrandDetail = () => {
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
                         {/* Brand Logo */}
                         <div className="relative">
-                            <div className="w-48 h-36 rounded-2xl flex items-center justify-center overflow-hidden shadow-2xl shadow-black/20 border-2 border-white/20">
+                            <div className="w-48 h-36 rounded-2xl flex items-center justify-center overflow-hidden shadow-elegant-xl border-2 border-slate-200">
                                 <img
                                     src={brand.logo}
                                     alt={brand.name}
@@ -132,7 +120,7 @@ const BrandDetail = () => {
                             </div>
                             {/* Discount Badge */}
                             <div className="absolute -top-3 -right-3">
-                                <div className="bg-accent-500 text-white font-bold text-sm px-4 py-2 rounded-xl shadow-xl shadow-accent-500/50 backdrop-blur-sm">
+                                <div className="bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold text-sm px-4 py-2 rounded-xl shadow-elegant-lg">
                                     {maxDiscount}% Off
                                 </div>
                             </div>
@@ -140,28 +128,28 @@ const BrandDetail = () => {
 
                         {/* Brand Details */}
                         <div className="flex-1">
-                            <div className="inline-block px-4 py-1.5 bg-accent-500/20 border border-accent-400/40 rounded-lg mb-3">
-                                <span className="text-accent-300 text-sm font-semibold">{brand.category}</span>
+                            <div className="inline-block px-4 py-1.5 bg-accent-50 border border-accent-200 rounded-lg mb-3">
+                                <span className="text-accent-700 text-sm font-semibold">{brand.category}</span>
                             </div>
-                            <h1 className="text-5xl font-display font-black text-white mb-4">
+                            <h1 className="text-4xl md:text-5xl font-display font-black text-slate-900 mb-4">
                                 {brand.name} Gift Cards
                             </h1>
-                            <p className="text-white/70 text-lg max-w-2xl">
+                            <p className="text-slate-600 text-lg max-w-2xl mb-6">
                                 {brand.description}
                             </p>
-                            <div className="mt-6 flex items-center gap-3 flex-wrap">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
-                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                                    <span className="text-white/80 text-sm font-medium">In Stock</span>
+                            <div className="flex items-center gap-3 flex-wrap">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-success-50 border border-success-200 rounded-xl">
+                                    <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse" />
+                                    <span className="text-success-700 text-sm font-medium">In Stock</span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
-                                    <span className="text-white/80 text-sm font-medium">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+                                    <span className="text-slate-700 text-sm font-medium">
                                         {brand.variants.length} Variants Available
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-400/30 rounded-xl">
-                                    <span className="text-green-400 text-sm font-semibold">✓</span>
-                                    <span className="text-green-400 text-sm font-semibold">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-success-50 border border-success-200 rounded-xl">
+                                    <Star className="w-4 h-4 text-success-500 fill-success-500" />
+                                    <span className="text-success-700 text-sm font-semibold">
                                         {(brand.vouchersSold / 1000).toFixed(1)}K+ Sold
                                     </span>
                                 </div>
@@ -172,43 +160,53 @@ const BrandDetail = () => {
             </section>
 
             {/* Variants Section */}
-            <section className="py-12 px-4 sm:px-6 lg:px-8">
+            <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-slate-50">
                 <div className="max-w-7xl mx-auto">
                     {/* Section Header */}
                     <div className="mb-8">
-                        <h2 className="text-3xl font-display font-bold text-white mb-2">
+                        <div className="inline-flex items-center space-x-2 bg-primary-50 px-4 py-2 rounded-full mb-4 border border-primary-100">
+                            <TrendingUp className="w-4 h-4 text-primary-600" />
+                            <span className="text-sm font-semibold text-primary-700">Available Variants</span>
+                        </div>
+                        <h2 className="text-3xl font-display font-bold text-slate-900 mb-2">
                             Select Variant
                         </h2>
-                        <p className="text-white/60">
+                        <p className="text-slate-600">
                             Choose your preferred gift card value
                         </p>
                     </div>
 
                     {/* Variants Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {brand.variants.map((variant) => {
+                        {brand.variants.map((variant, index) => {
                             const quantity = getCartQuantity(variant.id)
 
                             return (
                                 <div
                                     key={variant.id}
-                                    className="group relative bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:border-accent-400/50 transition-all duration-300 overflow-hidden hover:shadow-lg hover:shadow-accent-400/20"
+                                    className="group relative elegant-card overflow-hidden animate-fade-in"
+                                    style={{ animationDelay: `${index * 0.05}s` }}
                                 >
                                     {/* Discount Badge */}
-                                    <div className="absolute top-2 right-2 bg-accent-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
-                                        {variant.discountPercent}% OFF
+                                    <div className="absolute top-3 right-3 z-20">
+                                        <div className="bg-gradient-to-r from-accent-500 to-accent-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-elegant-md">
+                                            {variant.discountPercent}% OFF
+                                        </div>
                                     </div>
 
                                     {/* Card Content */}
                                     <div className="p-4">
                                         {/* Value & Price */}
-                                        <div className="mb-3">
-                                            <div className="text-lg font-bold text-white mb-1">
+                                        <div className="mb-4">
+                                            <div className="text-lg font-bold text-slate-900 mb-2">
                                                 {variant.name}
                                             </div>
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-accent-400 font-semibold">₹{variant.salePrice}</span>
-                                                <span className="text-white/40 text-xs line-through">₹{variant.originalPrice}</span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-primary-600 font-bold text-xl">₹{variant.salePrice}</span>
+                                                <span className="text-slate-400 text-sm line-through">₹{variant.originalPrice}</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-1">
+                                                Save ₹{variant.originalPrice - variant.salePrice}
                                             </div>
                                         </div>
 
@@ -216,7 +214,7 @@ const BrandDetail = () => {
                                         {quantity === 0 ? (
                                             <button
                                                 onClick={() => handleQuantityChange(variant, 1)}
-                                                className="w-full py-2.5 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent-500/30 active:scale-95"
+                                                className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl font-semibold text-sm elegant-button flex items-center justify-center gap-2 shadow-elegant-md"
                                             >
                                                 <Plus className="w-4 h-4" strokeWidth={2.5} />
                                                 <span>Add to Cart</span>
@@ -225,22 +223,25 @@ const BrandDetail = () => {
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => handleQuantityChange(variant, -1)}
-                                                    className="w-10 h-10 bg-gradient-to-br from-white/10 to-white/5 hover:from-red-500/20 hover:to-red-600/10 border border-white/20 hover:border-red-400/50 text-white hover:text-red-300 rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-black/10 hover:shadow-red-500/20"
+                                                    className="w-10 h-10 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 text-red-600 hover:text-red-700 rounded-xl transition-all duration-300 flex items-center justify-center elegant-button"
                                                 >
                                                     <Minus className="w-4 h-4" strokeWidth={2.5} />
                                                 </button>
-                                                <div className="flex-1 h-10 bg-gradient-to-br from-accent-500/30 to-accent-600/20 border-2 border-accent-400/50 text-white rounded-xl font-bold text-base flex items-center justify-center shadow-inner backdrop-blur-sm">
+                                                <div className="flex-1 h-10 bg-primary-50 border-2 border-primary-200 text-primary-700 rounded-xl font-bold text-base flex items-center justify-center">
                                                     {quantity}
                                                 </div>
                                                 <button
                                                     onClick={() => handleQuantityChange(variant, 1)}
-                                                    className="w-10 h-10 bg-gradient-to-br from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-accent-500/30 hover:shadow-accent-500/50"
+                                                    className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl transition-all duration-300 flex items-center justify-center elegant-button"
                                                 >
                                                     <Plus className="w-4 h-4" strokeWidth={2.5} />
                                                 </button>
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Hover Effect - Bottom Border */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-accent-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                                 </div>
                             )
                         })}
@@ -254,4 +255,3 @@ const BrandDetail = () => {
 }
 
 export default BrandDetail
-
