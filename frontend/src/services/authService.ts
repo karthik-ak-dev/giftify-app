@@ -1,50 +1,14 @@
 import { API_CONFIG, getApiUrl } from '../config/api';
+import { 
+  RegisterRequest, 
+  LoginRequest, 
+  AuthResponse, 
+  RefreshTokenResponse 
+} from '../types/auth';
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'giftify_access_token';
 const REFRESH_TOKEN_KEY = 'giftify_refresh_token';
-
-// Types
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  success: boolean;
-  message: string;
-  data: {
-    userId: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    walletBalance: number;
-    accessToken: string;
-    refreshToken: string;
-    isEmailVerified: boolean;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-    lastLoginAt?: string;
-  };
-}
-
-export interface RefreshTokenResponse {
-  success: boolean;
-  data: {
-    tokens: {
-      accessToken: string;
-      refreshToken: string;
-    };
-  };
-}
 
 // Token management
 export const tokenService = {

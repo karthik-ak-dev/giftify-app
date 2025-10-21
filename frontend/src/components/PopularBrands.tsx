@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { brandsService } from '../services/brandsService'
-import { Brand } from '../data/brandsData'
+import { Brand } from '../types/brand'
 
 const PopularBrands = () => {
     const [brands, setBrands] = useState<Brand[]>([])

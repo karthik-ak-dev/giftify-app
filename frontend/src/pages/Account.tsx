@@ -7,7 +7,8 @@ import Footer from '../components/Footer'
 import VoucherModal from '../components/VoucherModal'
 import { ordersService } from '../services/ordersService'
 import { Order } from '../data/ordersData'
-import { fetchUserProfile, UserProfile } from '../services/userService'
+import { fetchUserProfile } from '../services/userService'
+import { UserProfile } from '../types/user'
 
 const Account = () => {
     const { user, isAuthenticated, logout } = useAuth()

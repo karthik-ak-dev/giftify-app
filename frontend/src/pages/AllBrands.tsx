@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { brandsService } from '../services/brandsService'
-import { Brand } from '../data/brandsData'
+import { Brand } from '../types/brand'
 
 const AllBrands = () => {
     const [searchParams, setSearchParams] = useSearchParams()

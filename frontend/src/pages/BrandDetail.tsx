@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useCart } from '../context/CartContext'
 import { brandsService } from '../services/brandsService'
-import { Brand } from '../data/brandsData'
+import { Brand } from '../types/brand'
 
 const BrandDetail = () => {
     const { brandSlug } = useParams<{ brandSlug: string }>()

@@ -1,33 +1,39 @@
-// This service layer will be replaced with actual API calls later
-// For now, it uses mock data to simulate API responses
-
-import { brandsData, Brand } from '../data/brandsData'
-
-// Simulates an API call delay
-const simulateApiDelay = (ms: number = 100) => 
-    new Promise(resolve => setTimeout(resolve, ms))
+import { API_CONFIG } from '../config/api'
+import { Brand, BrandsApiResponse } from '../types/brand'
+import { tokenService } from './authService'
 
 // Cache for the API response to avoid multiple calls
 let cachedBrands: Brand[] | null = null
 
-// Single API call that fetches all brands data
-// In production, this will be replaced with: fetch('/api/brands')
+// Fetch all brands from API
 const fetchAllBrandsFromAPI = async (): Promise<Brand[]> => {
     // Return cached data if available
     if (cachedBrands) {
         return cachedBrands
     }
 
-    await simulateApiDelay()
+    const token = tokenService.getAccessToken()
     
-    // In production, replace with:
-    // const response = await fetch('/api/brands')
-    // const data = await response.json()
-    // cachedBrands = data
-    // return data
+    const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BRANDS.ALL}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch brands')
+    }
+
+    const result: BrandsApiResponse = await response.json()
     
-    cachedBrands = brandsData
-    return brandsData
+    if (!result.success) {
+        throw new Error('Failed to fetch brands')
+    }
+
+    cachedBrands = result.data
+    return result.data
 }
 
 export const brandsService = {
@@ -36,7 +42,7 @@ export const brandsService = {
         return fetchAllBrandsFromAPI()
     },
 
-    // Get brands filtered by category (filtering done on frontend)
+    // Get brands filtered by category
     getBrandsByCategory: async (category: string): Promise<Brand[]> => {
         const allBrands = await fetchAllBrandsFromAPI()
         
@@ -49,7 +55,7 @@ export const brandsService = {
         )
     },
 
-    // Get popular brands (sorted by popularity score - filtering done on frontend)
+    // Get popular brands sorted by popularity score
     getPopularBrands: async (limit: number = 6): Promise<Brand[]> => {
         const allBrands = await fetchAllBrandsFromAPI()
         
@@ -58,7 +64,7 @@ export const brandsService = {
             .slice(0, limit)
     },
 
-    // Get single brand by ID (filtering done on frontend)
+    // Get single brand by ID
     getBrandById: async (brandId: string): Promise<Brand | null> => {
         const allBrands = await fetchAllBrandsFromAPI()
         
@@ -66,14 +72,14 @@ export const brandsService = {
         return brand || null
     },
 
-    // Get all categories (extracted from brands data on frontend)
+    // Get all categories
     getCategories: async (): Promise<string[]> => {
         const allBrands = await fetchAllBrandsFromAPI()
         const categories = allBrands.map(brand => brand.category)
         return ['All', ...Array.from(new Set(categories))]
     },
 
-    // Search brands by name (filtering done on frontend)
+    // Search brands by name
     searchBrands: async (query: string): Promise<Brand[]> => {
         const allBrands = await fetchAllBrandsFromAPI()
         
@@ -88,55 +94,8 @@ export const brandsService = {
         )
     },
 
-    // Clear cache (useful for refreshing data)
+    // Clear cache
     clearCache: () => {
         cachedBrands = null
     }
 }
-
-// When switching to production API, replace the entire service with:
-/*
-export const brandsService = {
-    getAllBrands: async (): Promise<Brand[]> => {
-        const response = await fetch('/api/brands')
-        if (!response.ok) throw new Error('Failed to fetch brands')
-        return response.json()
-    },
-
-    getBrandsByCategory: async (category: string): Promise<Brand[]> => {
-        const allBrands = await brandsService.getAllBrands()
-        if (category === 'All' || !category) return allBrands
-        return allBrands.filter(brand => 
-            brand.category.toLowerCase() === category.toLowerCase()
-        )
-    },
-
-    getPopularBrands: async (limit: number = 6): Promise<Brand[]> => {
-        const allBrands = await brandsService.getAllBrands()
-        return [...allBrands]
-            .sort((a, b) => b.popularity - a.popularity)
-            .slice(0, limit)
-    },
-
-    getBrandById: async (brandId: string): Promise<Brand | null> => {
-        const allBrands = await brandsService.getAllBrands()
-        return allBrands.find(b => b.id === brandId) || null
-    },
-
-    getCategories: async (): Promise<string[]> => {
-        const allBrands = await brandsService.getAllBrands()
-        const categories = allBrands.map(brand => brand.category)
-        return ['All', ...Array.from(new Set(categories))]
-    },
-
-    searchBrands: async (query: string): Promise<Brand[]> => {
-        const allBrands = await brandsService.getAllBrands()
-        if (!query) return allBrands
-        const lowerQuery = query.toLowerCase()
-        return allBrands.filter(brand =>
-            brand.name.toLowerCase().includes(lowerQuery) ||
-            brand.description.toLowerCase().includes(lowerQuery)
-        )
-    }
-}
-*/
