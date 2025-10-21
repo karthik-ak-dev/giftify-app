@@ -33,34 +33,29 @@ const BrandDetail = () => {
 
     // Get quantity from global cart
     const getCartQuantity = (variantId: string) => {
-        // Extract numeric value from variant ID (e.g., "amazon-500" -> 500)
-        const variantValue = parseInt(variantId.split('-')[1] || '0')
-        const cartItem = items.find(
-            item => item.brandSlug === brandSlug && item.variantValue === variantValue
-        )
+        const cartItem = items.find(item => item.variantId === variantId)
         return cartItem ? cartItem.quantity : 0
     }
 
-    const handleQuantityChange = (variant: { id: string; name: string; salePrice: number; originalPrice: number }, change: number) => {
+    const handleQuantityChange = async (variant: { id: string; name: string; salePrice: number; originalPrice: number }, change: number) => {
         if (!brand) return
 
         const currentQty = getCartQuantity(variant.id)
         const newQty = currentQty + change
 
-        if (newQty <= 0) {
-            updateQuantity(brandSlug || '', parseInt(variant.id.split('-')[1] || '0'), 0)
-        } else if (currentQty === 0 && change > 0) {
-            // Adding to cart for the first time
-            addToCart({
-                brandSlug: brandSlug || '',
-                brandName: brand.name,
-                brandLogo: brand.logo,
-                variantValue: parseInt(variant.id.split('-')[1] || '0'),
-                variantPrice: variant.salePrice
-            }, change)
-        } else {
-            // Update existing cart item
-            updateQuantity(brandSlug || '', parseInt(variant.id.split('-')[1] || '0'), newQty)
+        try {
+            if (newQty <= 0) {
+                await updateQuantity(variant.id, 0)
+            } else if (currentQty === 0 && change > 0) {
+                // Adding to cart for the first time
+                await addToCart(variant.id, change)
+            } else {
+                // Update existing cart item
+                await updateQuantity(variant.id, newQty)
+            }
+        } catch (error) {
+            console.error('Failed to update cart:', error)
+            // You might want to show an error message to the user
         }
     }
 

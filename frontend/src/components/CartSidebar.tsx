@@ -71,11 +71,13 @@ const CartSidebar = () => {
                         </div>
                     ) : (
                         items.map((item) => {
-                            const discountPercent = ((item.variantValue - item.variantPrice) / item.variantValue * 100).toFixed(1)
+                            const discountPercent = item.variantValue > 0
+                                ? ((item.variantValue - item.variantPrice) / item.variantValue * 100).toFixed(1)
+                                : '0'
 
                             return (
                                 <div
-                                    key={`${item.brandSlug}-${item.variantValue}`}
+                                    key={item.variantId}
                                     className="bg-white/5 rounded-xl border border-white/10 p-4 hover:border-accent-400/30 transition-colors"
                                 >
                                     <div className="flex gap-4">
@@ -94,9 +96,12 @@ const CartSidebar = () => {
                                                 <div>
                                                     <h3 className="text-white font-semibold">{item.brandName}</h3>
                                                     <p className="text-white/60 text-sm">₹{item.variantValue} Gift Card</p>
+                                                    {!item.isInStock && (
+                                                        <p className="text-red-400 text-xs font-semibold mt-1">Out of Stock</p>
+                                                    )}
                                                 </div>
                                                 <button
-                                                    onClick={() => removeFromCart(item.brandSlug, item.variantValue)}
+                                                    onClick={() => removeFromCart(item.variantId)}
                                                     className="w-8 h-8 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group"
                                                 >
                                                     <Trash2 className="w-4 h-4 text-white/40 group-hover:text-red-400" />
@@ -106,7 +111,7 @@ const CartSidebar = () => {
                                             <div className="flex items-center justify-between">
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-accent-400 font-bold">₹{item.variantPrice}</span>
+                                                        <span className="text-accent-400 font-bold">₹{item.variantPrice.toFixed(2)}</span>
                                                         <span className="text-white/40 text-xs line-through">₹{item.variantValue}</span>
                                                         <span className="text-green-400 text-xs font-semibold">{discountPercent}% OFF</span>
                                                     </div>
@@ -115,7 +120,7 @@ const CartSidebar = () => {
                                                 {/* Quantity Controls */}
                                                 <div className="flex items-center gap-2">
                                                     <button
-                                                        onClick={() => updateQuantity(item.brandSlug, item.variantValue, item.quantity - 1)}
+                                                        onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                                                         className="w-7 h-7 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center justify-center"
                                                     >
                                                         <Minus className="w-3 h-3" />
@@ -124,8 +129,9 @@ const CartSidebar = () => {
                                                         {item.quantity}
                                                     </div>
                                                     <button
-                                                        onClick={() => updateQuantity(item.brandSlug, item.variantValue, item.quantity + 1)}
-                                                        className="w-7 h-7 bg-accent-500 hover:bg-accent-600 text-white rounded-lg transition-colors flex items-center justify-center"
+                                                        onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                                                        disabled={!item.isInStock || item.quantity >= item.stockAvailable}
+                                                        className="w-7 h-7 bg-accent-500 hover:bg-accent-600 disabled:bg-accent-500/50 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center"
                                                     >
                                                         <Plus className="w-3 h-3" />
                                                     </button>

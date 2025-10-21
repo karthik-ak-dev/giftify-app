@@ -25,16 +25,18 @@ export const getCartService = async (userId: string): Promise<{
       };
     }
 
-    // Add stock availability to each item
+    // Add stock availability and brand logo to each item
     const itemsWithStock: CartItemWithStock[] = await Promise.all(
       cart.items.map(async (item) => {
         try {
           const result = await brandRepository.findByVariantId(item.variantId);
           const stockAvailable = result?.variant?.stockQuantity || 0;
           const isInStock = stockAvailable >= item.quantity;
+          const brandLogo = result?.brand?.logo || '';
           
           return {
             ...item,
+            brandLogo,
             stockAvailable,
             isInStock
           };
@@ -42,6 +44,7 @@ export const getCartService = async (userId: string): Promise<{
           // If variant lookup fails, mark as out of stock
           return {
             ...item,
+            brandLogo: '',
             stockAvailable: 0,
             isInStock: false
           };

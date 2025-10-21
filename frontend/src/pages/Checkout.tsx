@@ -85,10 +85,12 @@ const Checkout = () => {
                                 <h2 className="text-xl font-bold text-white mb-4">Order Items</h2>
                                 <div className="space-y-4">
                                     {items.map((item) => {
-                                        const discountPercent = ((item.variantValue - item.variantPrice) / item.variantValue * 100).toFixed(1)
+                                        const discountPercent = item.variantValue > 0
+                                            ? ((item.variantValue - item.variantPrice) / item.variantValue * 100).toFixed(1)
+                                            : '0'
 
                                         return (
-                                            <div key={`${item.brandSlug}-${item.variantValue}`} className="flex gap-4 pb-4 border-b border-white/10 last:border-0">
+                                            <div key={item.variantId} className="flex gap-4 pb-4 border-b border-white/10 last:border-0">
                                                 <div className="w-16 h-16 bg-white/95 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                                                     <img
                                                         src={item.brandLogo}
@@ -104,6 +106,9 @@ const Checkout = () => {
                                                         <span className="text-white/40 text-xs line-through">₹{item.variantValue * item.quantity}</span>
                                                         <span className="text-green-400 text-xs font-semibold">{discountPercent}% OFF</span>
                                                     </div>
+                                                    {!item.isInStock && (
+                                                        <p className="text-red-400 text-xs font-semibold mt-1">⚠️ Out of Stock</p>
+                                                    )}
                                                 </div>
                                             </div>
                                         )

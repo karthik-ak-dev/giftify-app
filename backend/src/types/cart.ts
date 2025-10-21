@@ -7,6 +7,7 @@ export interface CartSummary {
 export interface CartItemWithStock {
   brandId: string;
   brandName: string;
+  brandLogo: string;
   variantId: string;
   variantName: string;
   quantity: number;
