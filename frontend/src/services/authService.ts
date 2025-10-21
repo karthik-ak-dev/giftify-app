@@ -1,0 +1,153 @@
+import { API_CONFIG, getApiUrl } from '../config/api';
+
+// Token storage keys
+const ACCESS_TOKEN_KEY = 'giftify_access_token';
+const REFRESH_TOKEN_KEY = 'giftify_refresh_token';
+
+// Types
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: {
+      userId: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      walletBalance: number;
+    };
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+    };
+  };
+}
+
+export interface RefreshTokenResponse {
+  success: boolean;
+  data: {
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+    };
+  };
+}
+
+// Token management
+export const tokenService = {
+  getAccessToken: (): string | null => {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  },
+
+  getRefreshToken: (): string | null => {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  },
+
+  setTokens: (accessToken: string, refreshToken: string): void => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  },
+
+  clearTokens: (): void => {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  },
+};
+
+// API service
+export const authService = {
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+    const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.REGISTER), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Registration failed');
+    }
+
+    const result: AuthResponse = await response.json();
+    
+    // Store tokens
+    if (result.success && result.data.tokens) {
+      tokenService.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+    }
+
+    return result;
+  },
+
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGIN), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Login failed');
+    }
+
+    const result: AuthResponse = await response.json();
+    
+    // Store tokens
+    if (result.success && result.data.tokens) {
+      tokenService.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+    }
+
+    return result;
+  },
+
+  refreshToken: async (): Promise<RefreshTokenResponse> => {
+    const refreshToken = tokenService.getRefreshToken();
+    
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.REFRESH), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      tokenService.clearTokens();
+      throw new Error('Token refresh failed');
+    }
+
+    const result: RefreshTokenResponse = await response.json();
+    
+    // Update tokens
+    if (result.success && result.data.tokens) {
+      tokenService.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+    }
+
+    return result;
+  },
+
+  logout: (): void => {
+    tokenService.clearTokens();
+  },
+};
+

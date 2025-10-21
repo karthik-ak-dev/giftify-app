@@ -1,9 +1,9 @@
-import { X, Mail, Lock, User as UserIcon, Sparkles } from 'lucide-react'
+import { X, Mail, Lock, User as UserIcon, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useState } from 'react'
 
 const AuthSidebar = () => {
-    const { isAuthSidebarOpen, closeAuthSidebar, login, register } = useAuth()
+    const { isAuthSidebarOpen, closeAuthSidebar, login, register, isLoading, error, clearError } = useAuth()
     const [isSignUp, setIsSignUp] = useState(false)
     const [formData, setFormData] = useState({
         email: '',
@@ -12,22 +12,27 @@ const AuthSidebar = () => {
         lastName: ''
     })
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (isSignUp) {
-            register(formData.email, formData.password, formData.firstName, formData.lastName)
-        } else {
-            login(formData.email, formData.password)
-        }
+        try {
+            if (isSignUp) {
+                await register(formData.email, formData.password, formData.firstName, formData.lastName)
+            } else {
+                await login(formData.email, formData.password)
+            }
 
-        // Reset form
-        setFormData({
-            email: '',
-            password: '',
-            firstName: '',
-            lastName: ''
-        })
+            // Reset form on success
+            setFormData({
+                email: '',
+                password: '',
+                firstName: '',
+                lastName: ''
+            })
+        } catch (error) {
+            // Error is handled by AuthContext
+            console.error('Auth error:', error)
+        }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +44,7 @@ const AuthSidebar = () => {
 
     const toggleMode = () => {
         setIsSignUp(!isSignUp)
+        clearError()
         // Reset form when switching
         setFormData({
             email: '',
@@ -93,6 +99,24 @@ const AuthSidebar = () => {
 
                 {/* Form */}
                 <div className="flex-1 overflow-y-auto p-6">
+                    {/* Error Message */}
+                    {error && (
+                        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                                <p className="text-sm text-red-400 font-medium">
+                                    {error}
+                                </p>
+                            </div>
+                            <button
+                                onClick={clearError}
+                                className="text-red-400 hover:text-red-300 transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {isSignUp && (
                             <>
@@ -189,9 +213,14 @@ const AuthSidebar = () => {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl font-bold text-base transition-all duration-300 shadow-lg shadow-accent-500/50 hover:scale-[1.02] mt-8"
+                            disabled={isLoading}
+                            className="w-full py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl font-bold text-base transition-all duration-300 shadow-lg shadow-accent-500/50 hover:scale-[1.02] mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                         >
-                            {isSignUp ? 'Create Account' : 'Login'}
+                            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+                            {isLoading
+                                ? (isSignUp ? 'Creating Account...' : 'Logging in...')
+                                : (isSignUp ? 'Create Account' : 'Login')
+                            }
                         </button>
                     </form>
                 </div>
