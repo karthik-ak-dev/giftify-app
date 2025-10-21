@@ -51,9 +51,11 @@ const Navbar = () => {
                         </button>
 
                         {isInitializing ? (
-                            // Show loading state while checking auth
-                            <div className="w-[88px] h-[42px] flex items-center justify-center">
-                                <div className="w-5 h-5 border-2 border-accent-500 border-t-transparent rounded-full animate-spin"></div>
+                            // Show loading state while checking auth - matches authenticated button size
+                            <div className="flex items-center space-x-2 p-2.5 rounded-xl">
+                                <div className="w-8 h-8 bg-gradient-to-br from-accent-500/30 via-accent-600/30 to-accent-700/30 rounded-full flex items-center justify-center ring-2 ring-accent-400/20">
+                                    <div className="w-4 h-4 border-2 border-accent-400 border-t-transparent rounded-full animate-spin"></div>
+                                </div>
                             </div>
                         ) : isAuthenticated ? (
                             <button

@@ -322,7 +322,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
      */
     useEffect(() => {
         const initializeAuth = async () => {
-            setIsInitializing(true)
+            // Note: isInitializing is already true by default, no need to set it again
 
             const accessToken = tokenService.getAccessToken()
             const refreshToken = tokenService.getRefreshToken()
