@@ -165,7 +165,17 @@ export const walletSchemas = {
 // Cart Schemas
 export const cartSchemas = {
   manageCart: Joi.object({
-    variantId: commonPatterns.ulid,
+    variantId: Joi.string()
+      .pattern(/^[a-z0-9-]+$/)
+      .min(3)
+      .max(100)
+      .required()
+      .messages({
+        'string.pattern.base': 'Variant ID must contain only lowercase letters, numbers, and hyphens',
+        'string.min': 'Variant ID must be at least 3 characters',
+        'string.max': 'Variant ID cannot exceed 100 characters',
+        'any.required': 'Variant ID is required'
+      }),
     quantity: Joi.number()
       .integer()
       .min(0)
