@@ -4,10 +4,10 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   region: ${opt:region, 'ap-south-1'}
   stage: stage
-  memorySize: 128
+  memorySize: 256
   timeout: 30
   apiName: ${self:service}-${self:provider.stage}-apigw
   endpointType: REGIONAL
@@ -74,6 +74,7 @@ functions:
   api:
     name: ${self:service}-${self:provider.stage}-api
     handler: src/app.handler
+    # provisionedConcurrency: 2  # Keep 2 instances warm to reduce cold starts
     events:
       - http:
           path: /{proxy+}
