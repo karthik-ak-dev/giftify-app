@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('')
     const { totalItems, openCart } = useCart()
-    const { isAuthenticated, openAuthSidebar } = useAuth()
+    const { isAuthenticated, isInitializing, openAuthSidebar } = useAuth()
     const navigate = useNavigate()
 
     return (
@@ -50,12 +50,17 @@ const Navbar = () => {
                             )}
                         </button>
 
-                        {isAuthenticated ? (
+                        {isInitializing ? (
+                            // Show loading state while checking auth
+                            <div className="w-[88px] h-[42px] flex items-center justify-center">
+                                <div className="w-5 h-5 border-2 border-accent-500 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                        ) : isAuthenticated ? (
                             <button
                                 onClick={() => navigate('/account')}
-                                className="flex items-center space-x-2 p-2.5 hover:bg-white/5 rounded-xl transition-colors"
+                                className="group relative flex items-center space-x-2 p-2.5 hover:bg-white/5 rounded-xl transition-all duration-300"
                             >
-                                <div className="w-8 h-8 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full flex items-center justify-center">
+                                <div className="w-8 h-8 bg-gradient-to-br from-accent-500 via-accent-600 to-accent-700 rounded-full flex items-center justify-center ring-2 ring-accent-400/30 group-hover:ring-accent-400/50 transition-all">
                                     <User className="w-5 h-5 text-white" />
                                 </div>
                             </button>

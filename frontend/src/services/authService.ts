@@ -21,17 +21,18 @@ export interface AuthResponse {
   success: boolean;
   message: string;
   data: {
-    user: {
-      userId: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      walletBalance: number;
-    };
-    tokens: {
-      accessToken: string;
-      refreshToken: string;
-    };
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    walletBalance: number;
+    accessToken: string;
+    refreshToken: string;
+    isEmailVerified: boolean;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    lastLoginAt?: string;
   };
 }
 
@@ -79,14 +80,25 @@ export const authService = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Registration failed');
+      // Extract detailed error message from nested error field (handle both string and object)
+      let errorMessage = error.message || 'Registration failed';
+      
+      if (error.error) {
+        if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (typeof error.error === 'object' && error.error.message) {
+          errorMessage = error.error.message;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const result: AuthResponse = await response.json();
     
     // Store tokens
-    if (result.success && result.data.tokens) {
-      tokenService.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+    if (result.success && result.data.accessToken && result.data.refreshToken) {
+      tokenService.setTokens(result.data.accessToken, result.data.refreshToken);
     }
 
     return result;
@@ -103,14 +115,25 @@ export const authService = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Login failed');
+      // Extract detailed error message from nested error field (handle both string and object)
+      let errorMessage = error.message || 'Login failed';
+      
+      if (error.error) {
+        if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (typeof error.error === 'object' && error.error.message) {
+          errorMessage = error.error.message;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const result: AuthResponse = await response.json();
     
     // Store tokens
-    if (result.success && result.data.tokens) {
-      tokenService.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+    if (result.success && result.data.accessToken && result.data.refreshToken) {
+      tokenService.setTokens(result.data.accessToken, result.data.refreshToken);
     }
 
     return result;

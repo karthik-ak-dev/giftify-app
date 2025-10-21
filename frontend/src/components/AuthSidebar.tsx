@@ -1,6 +1,7 @@
-import { X, Mail, Lock, User as UserIcon, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
+import { X, Mail, Lock, User as UserIcon, Sparkles, AlertCircle, Loader2, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useState } from 'react'
+import { validateRegistrationForm, validateLoginForm, hasFieldError } from '../utils/validation'
 
 const AuthSidebar = () => {
     const { isAuthSidebarOpen, closeAuthSidebar, login, register, isLoading, error, clearError } = useAuth()
@@ -11,9 +12,33 @@ const AuthSidebar = () => {
         firstName: '',
         lastName: ''
     })
+    const [validationErrors, setValidationErrors] = useState<string[]>([])
+    const [showPasswordRequirements, setShowPasswordRequirements] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+
+    // Get current form validation
+    const currentValidation = isSignUp
+        ? validateRegistrationForm(formData)
+        : validateLoginForm(formData)
+
+    // Helper to get field CSS classes
+    const getFieldClass = (fieldName: string, value: string) => {
+        const hasError = hasFieldError(fieldName, value, isSignUp)
+        return hasError ? 'border-red-500/50 focus:ring-red-400' : 'border-white/10 focus:ring-accent-400'
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        clearError()
+
+        // Validate form
+        if (!currentValidation.isValid) {
+            setValidationErrors(currentValidation.errors)
+            return
+        }
+
+        // Clear validation errors
+        setValidationErrors([])
 
         try {
             if (isSignUp) {
@@ -22,16 +47,15 @@ const AuthSidebar = () => {
                 await login(formData.email, formData.password)
             }
 
-            // Reset form on success
-            setFormData({
-                email: '',
-                password: '',
-                firstName: '',
-                lastName: ''
-            })
+            // Auth was successful - sidebar will close via AuthContext
+            // Reset form state for next time
+            setFormData({ email: '', password: '', firstName: '', lastName: '' })
+            setShowPassword(false)
+            setShowPasswordRequirements(false)
+            setValidationErrors([])
         } catch (error) {
-            // Error is handled by AuthContext
             console.error('Auth error:', error)
+            // Error is already set in AuthContext
         }
     }
 
@@ -40,11 +64,24 @@ const AuthSidebar = () => {
             ...prev,
             [e.target.name]: e.target.value
         }))
+
+        // Clear validation errors when user starts typing
+        if (validationErrors.length > 0) {
+            setValidationErrors([])
+        }
+
+        // Show password requirements for signup
+        if (e.target.name === 'password' && isSignUp) {
+            setShowPasswordRequirements(true)
+        }
     }
 
     const toggleMode = () => {
         setIsSignUp(!isSignUp)
         clearError()
+        setValidationErrors([])
+        setShowPasswordRequirements(false)
+        setShowPassword(false)
         // Reset form when switching
         setFormData({
             email: '',
@@ -99,7 +136,7 @@ const AuthSidebar = () => {
 
                 {/* Form */}
                 <div className="flex-1 overflow-y-auto p-6">
-                    {/* Error Message */}
+                    {/* Backend Error Message */}
                     {error && (
                         <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
@@ -114,6 +151,28 @@ const AuthSidebar = () => {
                             >
                                 <X className="w-4 h-4" />
                             </button>
+                        </div>
+                    )}
+
+                    {/* Validation Errors - Only show on submit attempt */}
+                    {validationErrors.length > 0 && (
+                        <div className="mb-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                            <div className="flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                    <p className="text-sm text-orange-400 font-medium mb-2">
+                                        Please fix the following issues:
+                                    </p>
+                                    <ul className="space-y-1">
+                                        {validationErrors.map((error, index) => (
+                                            <li key={index} className="text-xs text-orange-300 flex items-start gap-2">
+                                                <span className="text-orange-400 mt-0.5">•</span>
+                                                {error}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -135,7 +194,7 @@ const AuthSidebar = () => {
                                                 onChange={handleChange}
                                                 required
                                                 placeholder="John"
-                                                className="w-full pl-11 pr-3 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-all"
+                                                className={`w-full pl-11 pr-3 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('firstName', formData.firstName)}`}
                                             />
                                         </div>
                                     </div>
@@ -150,7 +209,7 @@ const AuthSidebar = () => {
                                             onChange={handleChange}
                                             required
                                             placeholder="Doe"
-                                            className="w-full px-3 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-all"
+                                            className={`w-full px-3 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('lastName', formData.lastName)}`}
                                         />
                                     </div>
                                 </div>
@@ -171,9 +230,12 @@ const AuthSidebar = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="you@example.com"
-                                    className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-all"
+                                    className={`w-full pl-11 pr-4 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('email', formData.email)}`}
                                 />
                             </div>
+                            {hasFieldError('email', formData.email) && (
+                                <p className="mt-1 text-xs text-red-400">Please enter a valid email address</p>
+                            )}
                         </div>
 
                         {/* Password */}
@@ -194,26 +256,64 @@ const AuthSidebar = () => {
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
                                 <input
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
                                     placeholder="••••••••"
-                                    className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-all"
+                                    className={`w-full pl-11 pr-11 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('password', formData.password)}`}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="w-5 h-5" />
+                                    ) : (
+                                        <Eye className="w-5 h-5" />
+                                    )}
+                                </button>
                             </div>
-                            {isSignUp && (
-                                <p className="mt-2 text-xs text-white/50">
-                                    Must be at least 8 characters long
-                                </p>
+                            {hasFieldError('password', formData.password) && (
+                                <p className="mt-1 text-xs text-red-400">Password must be at least 8 characters long</p>
+                            )}
+                            {isSignUp && showPasswordRequirements && (
+                                <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
+                                    <p className="text-xs text-white/70 font-medium mb-2">Password Requirements:</p>
+                                    <div className="space-y-1">
+                                        {(() => {
+                                            const requirements = [
+                                                { text: 'At least 8 characters long', met: formData.password.length >= 8 },
+                                                { text: 'At least one uppercase letter', met: /[A-Z]/.test(formData.password) },
+                                                { text: 'At least one lowercase letter', met: /[a-z]/.test(formData.password) },
+                                                { text: 'At least one number', met: /\d/.test(formData.password) },
+                                                { text: 'At least one special character', met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) }
+                                            ];
+
+                                            return requirements.map((req, index) => (
+                                                <div key={index} className="flex items-center gap-2 text-xs">
+                                                    {req.met ? (
+                                                        <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
+                                                    ) : (
+                                                        <div className="w-3 h-3 border border-white/30 rounded-full flex-shrink-0" />
+                                                    )}
+                                                    <span className={req.met ? 'text-green-300' : 'text-white/50'}>
+                                                        {req.text}
+                                                    </span>
+                                                </div>
+                                            ));
+                                        })()}
+                                    </div>
+                                </div>
                             )}
                         </div>
 
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isLoading || !currentValidation.isValid}
                             className="w-full py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl font-bold text-base transition-all duration-300 shadow-lg shadow-accent-500/50 hover:scale-[1.02] mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                         >
                             {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}

@@ -17,9 +17,7 @@ export interface UserProfile {
 
 export interface UserProfileResponse {
   success: boolean;
-  data: {
-    user: UserProfile;
-  };
+  data: UserProfile;
 }
 
 /**
@@ -50,10 +48,10 @@ export const fetchUserProfile = async (): Promise<UserProfile> => {
 
   const result: UserProfileResponse = await response.json();
   
-  if (!result.success || !result.data.user) {
+  if (!result.success || !result.data) {
     throw new Error('Invalid response from server');
   }
 
-  return result.data.user;
+  return result.data;
 };
 

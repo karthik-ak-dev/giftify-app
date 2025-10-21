@@ -277,14 +277,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             isEmailVerified: profile.isEmailVerified,
                         })
                     } catch (retryError) {
+                        console.error('Retry failed, logging out:', retryError)
                         logout()
                     }
                 } else {
+                    console.log('Token refresh failed, logging out')
                     logout()
                 }
             } else {
-                // Other errors, just clear tokens
-                tokenService.clearTokens()
+                // For other errors, keep tokens but clear user state
+                // Don't logout - tokens might still be valid
+                console.error('Profile load failed with non-auth error:', error)
                 setUser(null)
             }
         }
@@ -393,27 +396,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const response = await authService.login({ email, password })
 
-            if (response.success && response.data.user) {
+            if (response.success && response.data) {
                 setUser({
-                    userId: response.data.user.userId,
-                    email: response.data.user.email,
-                    firstName: response.data.user.firstName,
-                    lastName: response.data.user.lastName,
-                    walletBalance: response.data.user.walletBalance,
-                    isEmailVerified: false, // Backend might not return this, default to false
+                    userId: response.data.userId,
+                    email: response.data.email,
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    walletBalance: response.data.walletBalance,
+                    isEmailVerified: response.data.isEmailVerified || false,
                 })
 
                 // Schedule token refresh after successful login
                 scheduleTokenRefresh()
 
+                // Close sidebar after successful login
+                setIsLoading(false)
                 closeAuthSidebar()
             }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Login failed'
             setError(errorMessage)
-            throw err
-        } finally {
             setIsLoading(false)
+            throw err
         }
     }
 
@@ -452,27 +456,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const response = await authService.register({ email, password, firstName, lastName })
 
-            if (response.success && response.data.user) {
+            if (response.success && response.data) {
                 setUser({
-                    userId: response.data.user.userId,
-                    email: response.data.user.email,
-                    firstName: response.data.user.firstName,
-                    lastName: response.data.user.lastName,
-                    walletBalance: response.data.user.walletBalance,
-                    isEmailVerified: false, // Backend might not return this, default to false
+                    userId: response.data.userId,
+                    email: response.data.email,
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    walletBalance: response.data.walletBalance,
+                    isEmailVerified: response.data.isEmailVerified || false,
                 })
 
                 // Schedule token refresh after successful registration
                 scheduleTokenRefresh()
 
+                // Close sidebar after successful registration
+                setIsLoading(false)
                 closeAuthSidebar()
             }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Registration failed'
             setError(errorMessage)
-            throw err
-        } finally {
             setIsLoading(false)
+            throw err
         }
     }
 
