@@ -1,14 +1,13 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { User, Mail, Package, Wallet, LogOut, Ticket, Phone, Calendar, Gift, ArrowLeft } from 'lucide-react'
+import { User, Mail, Package, Wallet, LogOut, Ticket, Calendar, Gift, ArrowLeft } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import VoucherModal from '../components/VoucherModal'
 import { ordersService } from '../services/ordersService'
 import { Order } from '../data/ordersData'
-import { accountService } from '../services/accountService'
-import { AccountInfo } from '../data/accountData'
+import { fetchUserProfile, UserProfile } from '../services/userService'
 
 const Account = () => {
     const { user, isAuthenticated, logout } = useAuth()
@@ -18,9 +17,9 @@ const Account = () => {
     const [activeTab, setActiveTab] = useState<'profile' | 'orders'>(tabParam || 'profile')
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
     const [orders, setOrders] = useState<Order[]>([])
-    const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null)
+    const [profileData, setProfileData] = useState<UserProfile | null>(null)
     const [loading, setLoading] = useState(false)
-    const [accountLoading, setAccountLoading] = useState(false)
+    const [profileLoading, setProfileLoading] = useState(false)
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -35,24 +34,24 @@ const Account = () => {
         }
     }, [tabParam])
 
-    // Fetch account info when profile tab is active
+    // Fetch profile info when profile tab is active
     useEffect(() => {
-        const fetchAccountInfo = async () => {
+        const loadProfile = async () => {
             if (activeTab === 'profile' && isAuthenticated) {
-                setAccountLoading(true)
+                setProfileLoading(true)
                 try {
-                    const data = await accountService.getAccountInfo(user?.email)
-                    setAccountInfo(data)
+                    const data = await fetchUserProfile()
+                    setProfileData(data)
                 } catch (error) {
-                    console.error('Failed to fetch account info:', error)
+                    console.error('Failed to fetch profile:', error)
                 } finally {
-                    setAccountLoading(false)
+                    setProfileLoading(false)
                 }
             }
         }
 
-        fetchAccountInfo()
-    }, [activeTab, isAuthenticated, user?.email])
+        loadProfile()
+    }, [activeTab, isAuthenticated])
 
     // Fetch orders when orders tab is active
     useEffect(() => {
@@ -78,9 +77,8 @@ const Account = () => {
     }
 
     const handleLogout = () => {
-        // Clear all caches on logout
+        // Clear orders cache on logout
         ordersService.clearCache()
-        accountService.clearCache()
         logout()
         navigate('/')
     }
@@ -157,7 +155,7 @@ const Account = () => {
                         <div className="lg:col-span-3">
                             {activeTab === 'profile' ? (
                                 <div className="space-y-6">
-                                    {accountLoading ? (
+                                    {profileLoading ? (
                                         <div className="space-y-6">
                                             <div className="bg-white/5 rounded-xl h-64 animate-pulse" />
                                             <div className="bg-white/5 rounded-xl h-32 animate-pulse" />
@@ -174,7 +172,7 @@ const Account = () => {
                                                             First Name
                                                         </label>
                                                         <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
-                                                            {accountInfo?.firstName || user.firstName}
+                                                            {profileData?.firstName || user.firstName}
                                                         </div>
                                                     </div>
 
@@ -183,7 +181,7 @@ const Account = () => {
                                                             Last Name
                                                         </label>
                                                         <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
-                                                            {accountInfo?.lastName || user.lastName}
+                                                            {profileData?.lastName || user.lastName}
                                                         </div>
                                                     </div>
 
@@ -193,37 +191,33 @@ const Account = () => {
                                                         </label>
                                                         <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
                                                             <Mail className="w-5 h-5 text-white/40" />
-                                                            {accountInfo?.email || user.email}
+                                                            {profileData?.email || user.email}
                                                         </div>
                                                     </div>
 
-                                                    {accountInfo?.phone && (
-                                                        <div className="md:col-span-2">
-                                                            <label className="block text-sm font-medium text-white/60 mb-2">
-                                                                Phone Number
-                                                            </label>
-                                                            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
-                                                                <Phone className="w-5 h-5 text-white/40" />
-                                                                {accountInfo.phone}
-                                                            </div>
+                                                    <div className="md:col-span-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                            Member Since
+                                                        </label>
+                                                        <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                            <Calendar className="w-5 h-5 text-white/40" />
+                                                            {profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString('en-US', {
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric'
+                                                            }) : 'N/A'}
                                                         </div>
-                                                    )}
+                                                    </div>
 
-                                                    {accountInfo?.joinedDate && (
-                                                        <div className="md:col-span-2">
-                                                            <label className="block text-sm font-medium text-white/60 mb-2">
-                                                                Member Since
-                                                            </label>
-                                                            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
-                                                                <Calendar className="w-5 h-5 text-white/40" />
-                                                                {new Date(accountInfo.joinedDate).toLocaleDateString('en-US', {
-                                                                    year: 'numeric',
-                                                                    month: 'long',
-                                                                    day: 'numeric'
-                                                                })}
-                                                            </div>
+                                                    <div className="md:col-span-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                            Account Status
+                                                        </label>
+                                                        <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                            <div className={`w-2 h-2 rounded-full ${profileData?.status === 'ACTIVE' ? 'bg-green-400' : 'bg-gray-400'}`}></div>
+                                                            {profileData?.status || 'Unknown'}
                                                         </div>
-                                                    )}
+                                                    </div>
                                                 </div>
 
                                                 <div className="mt-6 flex gap-3">
@@ -236,7 +230,7 @@ const Account = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Stats Cards */}
+                                            {/* Stats Cards - Coming Soon */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 backdrop-blur-sm rounded-xl border border-blue-400/30 p-4">
                                                     <div className="flex items-center gap-3 mb-2">
@@ -245,7 +239,7 @@ const Account = () => {
                                                         </div>
                                                         <div>
                                                             <p className="text-white/60 text-sm">Total Orders</p>
-                                                            <p className="text-2xl font-bold text-white">{accountInfo?.totalOrders || 0}</p>
+                                                            <p className="text-2xl font-bold text-white">0</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -257,7 +251,7 @@ const Account = () => {
                                                         </div>
                                                         <div>
                                                             <p className="text-white/60 text-sm">Gift Cards Purchased</p>
-                                                            <p className="text-2xl font-bold text-white">{accountInfo?.totalGiftCards || 0}</p>
+                                                            <p className="text-2xl font-bold text-white">0</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -277,7 +271,7 @@ const Account = () => {
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-3xl font-bold text-white">
-                                                            ₹{accountInfo?.walletBalance.toFixed(2) || '0.00'}
+                                                            ₹{profileData?.walletBalance.toFixed(2) || user.walletBalance.toFixed(2)}
                                                         </div>
                                                     </div>
                                                 </div>
