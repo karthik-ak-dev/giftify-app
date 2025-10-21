@@ -1,13 +1,13 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { User, Mail, Package, Wallet, LogOut, Ticket, Calendar, Gift, ArrowLeft } from 'lucide-react'
+import { User, Mail, Package, Wallet, LogOut, Ticket, Calendar, Gift, ArrowLeft, Edit2, X, Check, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import VoucherModal from '../components/VoucherModal'
 import { ordersService } from '../services/ordersService'
 import { Order } from '../data/ordersData'
-import { fetchUserProfile } from '../services/userService'
+import { fetchUserProfile, updateUserProfile } from '../services/userService'
 import { UserProfile } from '../types/user'
 
 const Account = () => {
@@ -21,6 +21,11 @@ const Account = () => {
     const [profileData, setProfileData] = useState<UserProfile | null>(null)
     const [loading, setLoading] = useState(false)
     const [profileLoading, setProfileLoading] = useState(false)
+    const [isEditing, setIsEditing] = useState(false)
+    const [editForm, setEditForm] = useState({ firstName: '', lastName: '' })
+    const [updateLoading, setUpdateLoading] = useState(false)
+    const [updateError, setUpdateError] = useState<string | null>(null)
+    const [updateSuccess, setUpdateSuccess] = useState(false)
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -82,6 +87,52 @@ const Account = () => {
         ordersService.clearCache()
         logout()
         navigate('/')
+    }
+
+    const handleEditClick = () => {
+        setEditForm({
+            firstName: profileData?.firstName || user.firstName,
+            lastName: profileData?.lastName || user.lastName
+        })
+        setIsEditing(true)
+        setUpdateError(null)
+        setUpdateSuccess(false)
+    }
+
+    const handleCancelEdit = () => {
+        setIsEditing(false)
+        setUpdateError(null)
+        setUpdateSuccess(false)
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditForm({
+            ...editForm,
+            [e.target.name]: e.target.value
+        })
+    }
+
+    const handleSaveProfile = async () => {
+        setUpdateLoading(true)
+        setUpdateError(null)
+        setUpdateSuccess(false)
+
+        try {
+            const updatedProfile = await updateUserProfile({
+                firstName: editForm.firstName,
+                lastName: editForm.lastName
+            })
+            setProfileData(updatedProfile)
+            setIsEditing(false)
+            setUpdateSuccess(true)
+
+            // Clear success message after 3 seconds
+            setTimeout(() => setUpdateSuccess(false), 3000)
+        } catch (error) {
+            setUpdateError(error instanceof Error ? error.message : 'Failed to update profile')
+        } finally {
+            setUpdateLoading(false)
+        }
     }
 
     const selectedOrder = orders.find(order => order.orderId === selectedOrderId)
@@ -165,70 +216,163 @@ const Account = () => {
                                         <>
                                             {/* Profile Info */}
                                             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-                                                <h2 className="text-xl font-bold text-white mb-6">Profile Information</h2>
+                                                <div className="flex items-center justify-between mb-6">
+                                                    <h2 className="text-xl font-bold text-white">Profile Information</h2>
+                                                    {!isEditing && (
+                                                        <button
+                                                            onClick={handleEditClick}
+                                                            className="flex items-center gap-2 px-4 py-2 bg-accent-500/20 hover:bg-accent-500/30 border border-accent-400/40 text-accent-400 rounded-lg font-medium text-sm transition-colors"
+                                                        >
+                                                            <Edit2 className="w-4 h-4" />
+                                                            <span>Edit Profile</span>
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* Success Message */}
+                                                {updateSuccess && (
+                                                    <div className="mb-4 p-4 bg-green-500/20 border border-green-400/40 rounded-xl flex items-center gap-3">
+                                                        <Check className="w-5 h-5 text-green-400" />
+                                                        <span className="text-green-400 font-medium">Profile updated successfully!</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Error Message */}
+                                                {updateError && (
+                                                    <div className="mb-4 p-4 bg-red-500/20 border border-red-400/40 rounded-xl flex items-center gap-3">
+                                                        <X className="w-5 h-5 text-red-400" />
+                                                        <span className="text-red-400 font-medium">{updateError}</span>
+                                                    </div>
+                                                )}
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                     <div>
-                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2 flex items-center gap-2">
                                                             First Name
+                                                            {isEditing && <span className="text-accent-400 text-xs">(Editable)</span>}
                                                         </label>
-                                                        <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
-                                                            {profileData?.firstName || user.firstName}
-                                                        </div>
+                                                        {isEditing ? (
+                                                            <input
+                                                                type="text"
+                                                                name="firstName"
+                                                                value={editForm.firstName}
+                                                                onChange={handleInputChange}
+                                                                className="w-full px-4 py-3 bg-accent-500/10 border-2 border-accent-400/50 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 transition-all"
+                                                                placeholder="Enter first name"
+                                                            />
+                                                        ) : (
+                                                            <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                                {profileData?.firstName || user.firstName}
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     <div>
-                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2 flex items-center gap-2">
                                                             Last Name
+                                                            {isEditing && <span className="text-accent-400 text-xs">(Editable)</span>}
                                                         </label>
-                                                        <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
-                                                            {profileData?.lastName || user.lastName}
-                                                        </div>
+                                                        {isEditing ? (
+                                                            <input
+                                                                type="text"
+                                                                name="lastName"
+                                                                value={editForm.lastName}
+                                                                onChange={handleInputChange}
+                                                                className="w-full px-4 py-3 bg-accent-500/10 border-2 border-accent-400/50 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 transition-all"
+                                                                placeholder="Enter last name"
+                                                            />
+                                                        ) : (
+                                                            <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                                {profileData?.lastName || user.lastName}
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     <div className="md:col-span-2">
-                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2 flex items-center gap-2">
                                                             Email Address
+                                                            {isEditing && (
+                                                                <span className="flex items-center gap-1 text-white/40 text-xs">
+                                                                    <Lock className="w-3 h-3" />
+                                                                    (Read-only)
+                                                                </span>
+                                                            )}
                                                         </label>
-                                                        <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                        <div className={`flex items-center gap-3 px-4 py-3 ${isEditing ? 'bg-white/[0.02] border border-white/5' : 'bg-white/5 border border-white/10'} rounded-xl text-white ${isEditing ? 'opacity-60' : ''} transition-all`}>
                                                             <Mail className="w-5 h-5 text-white/40" />
                                                             {profileData?.email || user.email}
+                                                            {isEditing && <Lock className="w-4 h-4 text-white/30 ml-auto" />}
                                                         </div>
                                                     </div>
 
                                                     <div className="md:col-span-2">
-                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2 flex items-center gap-2">
                                                             Member Since
+                                                            {isEditing && (
+                                                                <span className="flex items-center gap-1 text-white/40 text-xs">
+                                                                    <Lock className="w-3 h-3" />
+                                                                    (Read-only)
+                                                                </span>
+                                                            )}
                                                         </label>
-                                                        <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                        <div className={`flex items-center gap-3 px-4 py-3 ${isEditing ? 'bg-white/[0.02] border border-white/5' : 'bg-white/5 border border-white/10'} rounded-xl text-white ${isEditing ? 'opacity-60' : ''} transition-all`}>
                                                             <Calendar className="w-5 h-5 text-white/40" />
                                                             {profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString('en-US', {
                                                                 year: 'numeric',
                                                                 month: 'long',
                                                                 day: 'numeric'
                                                             }) : 'N/A'}
+                                                            {isEditing && <Lock className="w-4 h-4 text-white/30 ml-auto" />}
                                                         </div>
                                                     </div>
 
                                                     <div className="md:col-span-2">
-                                                        <label className="block text-sm font-medium text-white/60 mb-2">
+                                                        <label className="block text-sm font-medium text-white/60 mb-2 flex items-center gap-2">
                                                             Account Status
+                                                            {isEditing && (
+                                                                <span className="flex items-center gap-1 text-white/40 text-xs">
+                                                                    <Lock className="w-3 h-3" />
+                                                                    (Read-only)
+                                                                </span>
+                                                            )}
                                                         </label>
-                                                        <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                                                        <div className={`flex items-center gap-3 px-4 py-3 ${isEditing ? 'bg-white/[0.02] border border-white/5' : 'bg-white/5 border border-white/10'} rounded-xl text-white ${isEditing ? 'opacity-60' : ''} transition-all`}>
                                                             <div className={`w-2 h-2 rounded-full ${profileData?.status === 'ACTIVE' ? 'bg-green-400' : 'bg-gray-400'}`}></div>
                                                             {profileData?.status || 'Unknown'}
+                                                            {isEditing && <Lock className="w-4 h-4 text-white/30 ml-auto" />}
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-6 flex gap-3">
-                                                    <button className="px-6 py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-semibold transition-colors">
-                                                        Edit Profile
-                                                    </button>
-                                                    <button className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-semibold border border-white/10 transition-colors">
-                                                        Change Password
-                                                    </button>
-                                                </div>
+                                                {isEditing && (
+                                                    <div className="mt-6 flex gap-3">
+                                                        <button
+                                                            onClick={handleSaveProfile}
+                                                            disabled={updateLoading}
+                                                            className="flex items-center gap-2 px-6 py-3 bg-accent-500 hover:bg-accent-600 disabled:bg-accent-500/50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
+                                                        >
+                                                            {updateLoading ? (
+                                                                <>
+                                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                                    <span>Saving...</span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Check className="w-5 h-5" />
+                                                                    <span>Save Changes</span>
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            onClick={handleCancelEdit}
+                                                            disabled={updateLoading}
+                                                            className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold border border-white/10 transition-colors"
+                                                        >
+                                                            <X className="w-5 h-5" />
+                                                            <span>Cancel</span>
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Stats Cards - Coming Soon */}

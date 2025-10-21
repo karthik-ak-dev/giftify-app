@@ -14,5 +14,12 @@ export interface UserProfile {
 export interface UserProfileResponse {
   success: boolean;
   data: UserProfile;
+  message?: string;
+}
+
+export interface UpdateProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
 }
 
