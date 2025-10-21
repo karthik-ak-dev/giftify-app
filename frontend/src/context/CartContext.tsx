@@ -72,7 +72,7 @@ const convertAPICartItem = (apiItem: APICartItem): CartItem => {
 }
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-    const { isAuthenticated } = useAuth()
+    const { isAuthenticated, openAuthSidebar } = useAuth()
     const [items, setItems] = useState<CartItem[]>([])
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -113,7 +113,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     const addToCart = async (variantId: string, quantity: number) => {
         if (!isAuthenticated) {
-            throw new Error('Please login to add items to cart')
+            // Open login sidebar for logged-out users
+            openAuthSidebar()
+            return
         }
 
         setLoading(true)
@@ -158,6 +160,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     const updateQuantity = async (variantId: string, quantity: number) => {
         if (!isAuthenticated) {
+            // Open login sidebar for logged-out users
+            openAuthSidebar()
             return
         }
 
