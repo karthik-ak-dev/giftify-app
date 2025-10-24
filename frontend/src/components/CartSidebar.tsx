@@ -33,9 +33,9 @@ const CartSidebar = () => {
             />
 
             {/* Sidebar */}
-            <div className="fixed right-0 top-0 h-full w-full max-w-md bg-dark-50 shadow-2xl z-50 flex flex-col">
+            <div className="fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-b from-[#2A1260] to-[#1D0F45] shadow-2xl z-50 flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10 bg-dark-100/50">
+                <div className="flex items-center justify-between p-6 border-b border-white/10">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-accent-500/20 rounded-xl flex items-center justify-center">
                             <ShoppingCart className="w-5 h-5 text-accent-400" />
@@ -57,14 +57,14 @@ const CartSidebar = () => {
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
                     {items.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-center">
-                            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                            <div className="w-20 h-20 bg-[#1A0B3F] rounded-full flex items-center justify-center mb-4">
                                 <ShoppingCart className="w-10 h-10 text-white/30" />
                             </div>
                             <h3 className="text-xl font-bold text-white mb-2">Your cart is empty</h3>
                             <p className="text-white/60 mb-6">Add some gift cards to get started!</p>
                             <button
                                 onClick={closeCart}
-                                className="px-6 py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-semibold transition-colors"
+                                className="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-xl font-bold text-base transition-all duration-300 shadow-lg shadow-pink-500/30 hover:scale-105"
                             >
                                 Continue Shopping
                             </button>
@@ -78,7 +78,7 @@ const CartSidebar = () => {
                             return (
                                 <div
                                     key={item.variantId}
-                                    className="bg-white/5 rounded-xl border border-white/10 p-4 hover:border-accent-400/30 transition-colors"
+                                    className="bg-[#1A0B3F] rounded-xl border border-white/10 p-4 hover:border-accent-400/30 transition-colors"
                                 >
                                     <div className="flex gap-4">
                                         {/* Brand Logo */}
@@ -147,7 +147,7 @@ const CartSidebar = () => {
 
                 {/* Footer */}
                 {items.length > 0 && (
-                    <div className="border-t border-white/10 p-6 bg-dark-100/50 space-y-4">
+                    <div className="border-t border-white/20 p-6 bg-[#0F0628] space-y-4">
                         {/* Total */}
                         <div className="flex items-center justify-between">
                             <span className="text-white/70 font-medium">Total Amount</span>

@@ -40,11 +40,11 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3">
                         <button
                             onClick={openCart}
-                            className="flex relative p-2.5 bg-white/95 hover:bg-white transition-all duration-200 border border-white shadow-md"
+                            className="flex relative p-2.5 hover:scale-110 transition-all duration-200"
                         >
-                            <ShoppingCart className="w-5 h-5 text-purple-600" />
+                            <ShoppingCart className="w-6 h-6 text-white" />
                             {totalItems > 0 && (
-                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-xs font-black shadow-elevated">
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-xs font-black shadow-elevated rounded-full">
                                     {totalItems}
                                 </div>
                             )}
@@ -59,11 +59,9 @@ const Navbar = () => {
                         ) : isAuthenticated ? (
                             <button
                                 onClick={() => navigate('/account')}
-                                className="group relative flex items-center space-x-2 p-2.5 bg-white/95 hover:bg-white transition-all duration-200 shadow-md"
+                                className="group relative flex items-center p-2.5 hover:scale-110 transition-all duration-200"
                             >
-                                <div className="w-8 h-8 bg-gradient-cta flex items-center justify-center">
-                                    <User className="w-5 h-5 text-white" />
-                                </div>
+                                <User className="w-6 h-6 text-white" />
                             </button>
                         ) : (
                             <button
