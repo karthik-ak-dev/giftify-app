@@ -102,7 +102,7 @@ const AuthSidebar = () => {
             />
 
             {/* Sidebar */}
-            <div className="fixed right-0 top-0 h-full w-full max-w-md bg-dark-50 shadow-2xl z-50 flex flex-col">
+            <div className="fixed right-0 top-0 h-full w-full max-w-md bg-dark-50/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col">
                 {/* Header */}
                 <div className="relative p-8 border-b border-white/10">
                     {/* Decorative Background */}
@@ -194,7 +194,7 @@ const AuthSidebar = () => {
                                                 onChange={handleChange}
                                                 required
                                                 placeholder="John"
-                                                className={`w-full pl-11 pr-3 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('firstName', formData.firstName)}`}
+                                                className={`w-full pl-11 pr-3 py-3.5 bg-white/15 backdrop-blur-sm border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('firstName', formData.firstName)}`}
                                             />
                                         </div>
                                     </div>
@@ -209,7 +209,7 @@ const AuthSidebar = () => {
                                             onChange={handleChange}
                                             required
                                             placeholder="Doe"
-                                            className={`w-full px-3 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('lastName', formData.lastName)}`}
+                                            className={`w-full px-3 py-3.5 bg-white/15 backdrop-blur-sm border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('lastName', formData.lastName)}`}
                                         />
                                     </div>
                                 </div>
@@ -230,7 +230,7 @@ const AuthSidebar = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="you@example.com"
-                                    className={`w-full pl-11 pr-4 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('email', formData.email)}`}
+                                    className={`w-full pl-11 pr-4 py-3.5 bg-white/15 backdrop-blur-sm border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('email', formData.email)}`}
                                 />
                             </div>
                             {hasFieldError('email', formData.email) && (
@@ -262,7 +262,7 @@ const AuthSidebar = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="••••••••"
-                                    className={`w-full pl-11 pr-11 py-3.5 bg-white/5 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('password', formData.password)}`}
+                                    className={`w-full pl-11 pr-11 py-3.5 bg-white/15 backdrop-blur-sm border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${getFieldClass('password', formData.password)}`}
                                 />
                                 <button
                                     type="button"
@@ -280,7 +280,7 @@ const AuthSidebar = () => {
                                 <p className="mt-1 text-xs text-red-400">Password must be at least 8 characters long</p>
                             )}
                             {isSignUp && showPasswordRequirements && (
-                                <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
+                                <div className="mt-3 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
                                     <p className="text-xs text-white/70 font-medium mb-2">Password Requirements:</p>
                                     <div className="space-y-1">
                                         {(() => {
@@ -326,7 +326,7 @@ const AuthSidebar = () => {
                 </div>
 
                 {/* Footer - Toggle between Login/Signup */}
-                <div className="p-6 border-t border-white/10 bg-dark-100/30">
+                <div className="p-6 border-t border-white/20 bg-dark-100/60 backdrop-blur-md">
                     <div className="text-center">
                         <p className="text-white/70 text-sm">
                             {isSignUp ? (

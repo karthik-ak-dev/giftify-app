@@ -3,7 +3,7 @@ const HeroSection = () => {
         <section className="relative h-[280px] overflow-hidden mx-6 lg:mx-8 mt-6 rounded-3xl">
             {/* Vibrant Purple-to-Pink Gradient Background */}
             <div className="absolute inset-0" style={{
-                background: 'linear-gradient(90deg, #8B5CF6 0%, #A855F7 30%, #D946EF 65%, #EC4899 100%)'
+                background: 'linear-gradient(90deg, #A855F7 0%, #C084FC 30%, #E879F9 60%, #EC4899 100%)'
             }}>
                 <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-400/20 to-transparent"></div>
             </div>
