@@ -1,0 +1,557 @@
+{
+    "profile_name": "Arcade-Dark Dashboard",
+    "design_goal": "A fast, seamless, game-store style dashboard with a vivid dark gradient theme, chunky rounded cards, and neon accent highlights.",
+    "foundations": {
+        "color": {
+            "mode": "dark",
+            "palette": {
+                "bg/deep": "#0E0725",
+                "bg/base": "#140B2D",
+                "bg/elevated": "#1D0F45",
+                "panel": "#24115A",
+                "card": "#2A1260",
+                "surface/hover": "#331A78",
+                "border": "#4C2CA0",
+                "text/high": "#FFFFFF",
+                "text/med": "#E7DFFF",
+                "text/low": "#BFB2EF",
+                "primary": "#8A2BE2",
+                "primary/600": "#6C23CB",
+                "primary/300": "#B27CFF",
+                "accent/pink": "#FF3CAC",
+                "accent/blue": "#2DD4FF",
+                "accent/yellow": "#F9D45C",
+                "success": "#22C55E",
+                "warning": "#F59E0B",
+                "danger": "#EF4444",
+                "brand/glow": "rgba(146, 64, 255, 0.45)"
+            },
+            "gradients": {
+                "brand/radial": {
+                    "type": "radial",
+                    "stops": [
+                        {
+                            "color": "#A855F7",
+                            "at": 0
+                        },
+                        {
+                            "color": "#7C3AED",
+                            "at": 45
+                        },
+                        {
+                            "color": "#0EA5E9",
+                            "at": 100
+                        }
+                    ]
+                },
+                "cta/linear": {
+                    "type": "linear",
+                    "angle": 20,
+                    "stops": [
+                        {
+                            "color": "#FF3CAC",
+                            "at": 0
+                        },
+                        {
+                            "color": "#784BA0",
+                            "at": 50
+                        },
+                        {
+                            "color": "#2B86C5",
+                            "at": 100
+                        }
+                    ]
+                },
+                "card/accent": {
+                    "type": "linear",
+                    "angle": 180,
+                    "stops": [
+                        {
+                            "color": "rgba(255, 60, 172, 0.06)",
+                            "at": 0
+                        },
+                        {
+                            "color": "rgba(45, 212, 255, 0.06)",
+                            "at": 100
+                        }
+                    ]
+                }
+            },
+            "overlays": {
+                "glass/8": "rgba(255,255,255,0.08)",
+                "scrim/60": "rgba(0,0,0,0.60)"
+            }
+        },
+        "typography": {
+            "families": {
+                "display": "'Rounded Sans', 'Poppins', 'Inter', system-ui, sans-serif",
+                "ui": "'Inter', system-ui, sans-serif",
+                "mono": "'JetBrains Mono', ui-monospace, monospace"
+            },
+            "scale": {
+                "display/xxl": {
+                    "size": 56,
+                    "line": 64,
+                    "weight": 800,
+                    "tracking": -0.5
+                },
+                "display/xl": {
+                    "size": 40,
+                    "line": 48,
+                    "weight": 800,
+                    "tracking": -0.25
+                },
+                "h1": {
+                    "size": 28,
+                    "line": 34,
+                    "weight": 800
+                },
+                "h2": {
+                    "size": 22,
+                    "line": 28,
+                    "weight": 700
+                },
+                "h3": {
+                    "size": 18,
+                    "line": 24,
+                    "weight": 700
+                },
+                "label": {
+                    "size": 13,
+                    "line": 16,
+                    "weight": 700,
+                    "transform": "none"
+                },
+                "body": {
+                    "size": 14,
+                    "line": 20,
+                    "weight": 500
+                },
+                "caption": {
+                    "size": 12,
+                    "line": 16,
+                    "weight": 500
+                }
+            }
+        },
+        "radii": {
+            "xs": 8,
+            "sm": 12,
+            "md": 16,
+            "lg": 20,
+            "xl": 24,
+            "2xl": 28,
+            "pill": 999
+        },
+        "spacing": {
+            "xxs": 4,
+            "xs": 8,
+            "sm": 12,
+            "md": 16,
+            "lg": 20,
+            "xl": 24,
+            "2xl": 32,
+            "3xl": 40
+        },
+        "shadows": {
+            "soft": "0 6px 20px rgba(0,0,0,0.3)",
+            "elevated": "0 12px 32px rgba(0,0,0,0.4)",
+            "glow/brand": "0 0 0 2px rgba(178,124,255,0.3), 0 10px 40px rgba(146,64,255,0.35)"
+        },
+        "blur": {
+            "panel": 8,
+            "overlay": 12
+        },
+        "iconography": {
+            "style": "rounded-duotone",
+            "size": {
+                "sm": 16,
+                "md": 20,
+                "lg": 24,
+                "xl": 32
+            },
+            "stroke": 1.75,
+            "color": "currentColor",
+            "tint": "text/low"
+        },
+        "motion": {
+            "durations": {
+                "fast": 120,
+                "base": 200,
+                "slow": 320,
+                "emph": 480
+            },
+            "easing": {
+                "in": "cubic-bezier(0.32, 0, 0.67, 0)",
+                "out": "cubic-bezier(0.33, 1, 0.68, 1)",
+                "inOut": "cubic-bezier(0.65, 0, 0.35, 1)"
+            },
+            "effects": {
+                "hover/lift": {
+                    "translateY": -2,
+                    "shadow": "glow/brand",
+                    "scale": 1.02
+                },
+                "press": {
+                    "translateY": 0,
+                    "scale": 0.98
+                }
+            }
+        },
+        "accessibility": {
+            "min_tap_size": 44,
+            "focus_ring": "0 0 0 3px rgba(45,212,255,0.6)",
+            "contrast_targets": {
+                "text": 4.5,
+                "ui_text": 3.0
+            },
+            "keyboard_nav": true
+        }
+    },
+    "layout": {
+        "grid": {
+            "columns": 12,
+            "gutter": 20,
+            "margin_x": 24,
+            "max_width": 1280
+        },
+        "shell": {
+            "sidebar_width": 272,
+            "sidebar_variant": "permanent-left",
+            "content_padding": 24,
+            "content_bg": "bg/base",
+            "hero_height": 184,
+            "card_grid": {
+                "min_card_width": 220,
+                "gap": 20
+            }
+        }
+    },
+    "components": {
+        "AppShell": {
+            "parts": [
+                "Sidebar",
+                "TopHero",
+                "ContentArea"
+            ],
+            "bg": "bg/deep",
+            "gradient_overlay": "brand/radial"
+        },
+        "Sidebar": {
+            "width": "layout.shell.sidebar_width",
+            "bg": "panel",
+            "radii": "lg",
+            "shadow": "soft",
+            "sections": [
+                "Logo",
+                "PrimaryNav",
+                "CreateAction",
+                "TeamMembers",
+                "Settings/ThemeToggle"
+            ],
+            "item": {
+                "height": 44,
+                "paddingX": 14,
+                "icon_size": 20,
+                "radii": "md",
+                "active_bg": "surface/hover",
+                "active_border": "brand/glow",
+                "active_indicator": {
+                    "width": 4,
+                    "radii": "pill",
+                    "color": "primary/300"
+                }
+            },
+            "create_action": {
+                "style": "gradient-pill",
+                "gradient": "cta/linear",
+                "height": 44,
+                "icon_position": "leading"
+            }
+        },
+        "TopHero": {
+            "height": "layout.shell.hero_height",
+            "bg": "transparent",
+            "panel_bg": "transparent",
+            "content": {
+                "title_typography": "display/xl",
+                "subtitle_typography": "h2",
+                "badges": [
+                    "platform",
+                    "speed"
+                ]
+            },
+            "decoration": {
+                "gradient": "brand/radial",
+                "mascot_placeholder": {
+                    "shape": "circle",
+                    "size": 120,
+                    "glow": "glow/brand"
+                }
+            }
+        },
+        "Toolbar": {
+            "height": 56,
+            "elements": [
+                "SearchInput",
+                "Filters",
+                "Sort",
+                "ToggleView"
+            ],
+            "bg": "transparent"
+        },
+        "Card/Product": {
+            "size": {
+                "width": 220,
+                "minHeight": 260
+            },
+            "radii": "xl",
+            "border": {
+                "color": "border",
+                "width": 1
+            },
+            "bg": [
+                "card",
+                "gradients.card/accent"
+            ],
+            "shadow": "elevated",
+            "padding": 12,
+            "sections": [
+                "Media",
+                "TitleRow",
+                "MetaRow"
+            ],
+            "media": {
+                "radii": "lg",
+                "height": 120,
+                "overlay": "glass/8"
+            },
+            "title": {
+                "typography": "h3",
+                "color": "text/high"
+            },
+            "meta": {
+                "chips": {
+                    "shape": "pill",
+                    "size": "sm",
+                    "bg": "surface/hover",
+                    "gap": 6
+                },
+                "flags": {
+                    "size": 16,
+                    "style": "rounded"
+                }
+            },
+            "states": {
+                "hover": {
+                    "lift": true,
+                    "outline": "brand/glow"
+                },
+                "selected": {
+                    "border": "primary/300",
+                    "shadow": "glow/brand"
+                }
+            }
+        },
+        "Button": {
+            "variants": {
+                "primary": {
+                    "bg": "gradients.cta/linear",
+                    "text": "text/high",
+                    "radii": "pill",
+                    "shadow": "glow/brand",
+                    "height": 40,
+                    "paddingX": 16
+                },
+                "secondary": {
+                    "bg": "transparent",
+                    "border": "border",
+                    "text": "text/med",
+                    "radii": "pill",
+                    "height": 40,
+                    "paddingX": 16
+                },
+                "tertiary": {
+                    "bg": "surface/hover",
+                    "text": "text/high",
+                    "radii": "pill",
+                    "height": 36,
+                    "paddingX": 14
+                }
+            },
+            "icon_button": {
+                "size": 40,
+                "radii": "pill",
+                "bg": "surface/hover"
+            },
+            "states": {
+                "hover": {
+                    "translateY": -1
+                },
+                "focus": {
+                    "ring": "accessibility.focus_ring"
+                },
+                "active": {
+                    "scale": 0.98
+                },
+                "disabled": {
+                    "opacity": 0.5
+                }
+            }
+        },
+        "Badge": {
+            "shape": "pill",
+            "sizes": {
+                "sm": {
+                    "h": 18,
+                    "px": 8
+                },
+                "md": {
+                    "h": 22,
+                    "px": 10
+                }
+            },
+            "tones": {
+                "primary": {
+                    "bg": "primary/600",
+                    "text": "text/high"
+                },
+                "blue": {
+                    "bg": "accent/blue",
+                    "text": "#0B1020"
+                },
+                "pink": {
+                    "bg": "accent/pink",
+                    "text": "#1A0A1F"
+                },
+                "success": {
+                    "bg": "success",
+                    "text": "#04120A"
+                }
+            }
+        },
+        "Input": {
+            "height": 40,
+            "bg": "panel",
+            "border": "border",
+            "radii": "pill",
+            "text": "text/high",
+            "placeholder": "text/low",
+            "icon": {
+                "size": 18,
+                "position": "leading"
+            },
+            "states": {
+                "focus": {
+                    "ring": "accessibility.focus_ring",
+                    "borderColor": "primary/300"
+                },
+                "error": {
+                    "borderColor": "danger"
+                }
+            }
+        },
+        "ToggleTheme": {
+            "type": "switch",
+            "size": {
+                "trackH": 24,
+                "trackW": 44,
+                "thumb": 18
+            },
+            "on_color": "accent/blue",
+            "off_color": "surface/hover"
+        },
+        "List/TeamMember": {
+            "row_height": 44,
+            "avatar": {
+                "size": 28,
+                "shape": "circle"
+            },
+            "name_typography": "body",
+            "role_typography": "caption",
+            "presence_dot": {
+                "size": 8,
+                "colors": {
+                    "online": "#22C55E",
+                    "offline": "#64748B"
+                }
+            }
+        },
+        "Toast": {
+            "radii": "lg",
+            "bg": "panel",
+            "shadow": "elevated",
+            "accent_bar": "primary",
+            "spacing": "md"
+        }
+    },
+    "patterns": {
+        "navigation": {
+            "primary_items": [
+                "Home",
+                "Products",
+                "Check Codes",
+                "Orders",
+                "Invoice",
+                "Wallet",
+                "Transactions"
+            ],
+            "active_behavior": "highlight item with surface/hover + leading indicator",
+            "grouping": "utilities pinned at bottom (theme/settings)"
+        },
+        "content_grid": {
+            "hero_above": true,
+            "cards_per_row": {
+                "min": 4,
+                "max": 6,
+                "responsive": true
+            }
+        },
+        "call_to_action": {
+            "placement": "sidebar persistent",
+            "style": "Button.primary (gradient-pill)"
+        }
+    },
+    "states": {
+        "hover": {
+            "card": "lift + glow/brand",
+            "nav_item": "surface/hover"
+        },
+        "pressed": {
+            "button": "scale 0.98"
+        },
+        "selected": {
+            "card": "border primary/300"
+        },
+        "focus": {
+            "ring": "accessibility.focus_ring"
+        },
+        "disabled": {
+            "opacity": 0.5,
+            "no_glow": true
+        }
+    },
+    "tokens_for_css": {
+        "examples": {
+            "--color-bg": "{color.palette.bg/base}",
+            "--color-card": "{color.palette.card}",
+            "--color-text": "{color.palette.text/high}",
+            "--radius-xl": "{radii.xl}px",
+            "--space-md": "{spacing.md}px",
+            "--shadow-elevated": "{shadows.elevated}",
+            "--focus-ring": "{accessibility.focus_ring}"
+        }
+    },
+    "placeholders_to_avoid_specific_images": {
+        "card/media": "use abstract gradient blocks or iconography",
+        "hero/character": "use generic circular gradient orb with glow"
+    },
+    "replication_notes": {
+        "tone": "playful, high-energy, arcade-inspired",
+        "contrast": "bright accents on deep purple backgrounds",
+        "shape_language": "large rounded rectangles and pill controls",
+        "density": "comfortable; card grid with generous gaps",
+        "lighting": "soft shadows plus subtle neon glows",
+        "motion": "quick hover lifts; gentle scale on press; gradient shimmer optional on prominence"
+    }
+}

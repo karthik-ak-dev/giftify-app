@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar'
 import HeroSection from '../components/HeroSection'
-import CategorySection from '../components/CategorySection'
+// import CategorySection from '../components/CategorySection'
 import PopularBrands from '../components/PopularBrands'
 import Footer from '../components/Footer'
 
@@ -9,7 +9,7 @@ const Home = () => {
         <div className="min-h-screen">
             <Navbar />
             <HeroSection />
-            <CategorySection />
+            {/* <CategorySection /> */}
             <PopularBrands />
             <Footer />
         </div>

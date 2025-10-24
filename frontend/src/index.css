@@ -9,12 +9,13 @@
 }
 
 body {
-    font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 100%);
+    background: linear-gradient(180deg, #A855F7 0%, #9333EA 15%, #8B5CF6 35%, #7C3AED 55%, #6D28D9 75%, #5B21B6 100%);
     background-attachment: fixed;
-    color: #ffffff;
+    background-size: 100% 100%;
+    color: #FFFFFF;
 }
 
 #root {
@@ -22,37 +23,99 @@ body {
 }
 
 @layer components {
-    .gradient-border {
+
+    /* Arcade Card with Glow Effect */
+    .arcade-card {
         position: relative;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(180deg, rgba(42, 18, 96, 0.95) 0%, rgba(29, 15, 69, 0.95) 100%);
+        border: 2px solid rgba(76, 44, 160, 0.5);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        transition: all 200ms cubic-bezier(0.33, 1, 0.68, 1);
     }
 
-    .gradient-border::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 1px;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(168, 85, 247, 0.5));
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.3s;
+    .arcade-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.5), 0 12px 40px rgba(124, 58, 237, 0.5);
+        border-color: rgba(168, 85, 247, 0.7);
+        background: linear-gradient(180deg, rgba(51, 26, 120, 0.95) 0%, rgba(42, 18, 96, 0.95) 100%);
     }
 
-    .gradient-border:hover::before {
-        opacity: 1;
+    /* Gradient Button */
+    .btn-gradient {
+        background: linear-gradient(20deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%);
+        border-radius: 999px;
+        color: #FFFFFF;
+        font-weight: 700;
+        box-shadow: 0 0 0 2px rgba(178, 124, 255, 0.3), 0 10px 40px rgba(146, 64, 255, 0.35);
+        transition: all 200ms cubic-bezier(0.33, 1, 0.68, 1);
     }
 
-    .card-hover {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    .btn-gradient:hover {
+        transform: translateY(-1px);
     }
 
-    .card-hover:hover {
-        transform: translateY(-8px);
+    .btn-gradient:active {
+        transform: scale(0.98);
+    }
+
+    /* Discount Corner Badge - Bottom Right Half Circle */
+    .discount-corner-badge {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF3CAC 100%);
+        color: #FFFFFF;
+        font-weight: 800;
+        padding: 8px 14px 10px 16px;
+        border-top-left-radius: 24px;
+        border-bottom-right-radius: 24px;
+        box-shadow: 0 4px 16px rgba(255, 60, 172, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: all 300ms cubic-bezier(0.33, 1, 0.68, 1);
+        animation: pulse-glow 2.5s ease-in-out infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .discount-corner-badge:hover {
+        transform: scale(1.05) translateY(-2px);
+        box-shadow: 0 6px 24px rgba(255, 60, 172, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 4px 16px rgba(255, 60, 172, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        50% {
+            box-shadow: 0 6px 24px rgba(255, 107, 53, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+    }
+
+    /* Login Button with Orange-to-Pink Gradient */
+    .btn-login {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF3CAC 100%);
+        color: #FFFFFF;
+        font-weight: 700;
+        box-shadow: 0 4px 16px rgba(255, 60, 172, 0.5);
+        transition: all 200ms cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    .btn-login:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 24px rgba(255, 60, 172, 0.7);
+    }
+
+    .btn-login:active {
+        transform: scale(0.98);
+    }
+
+    /* Glass Panel */
+    .glass-panel {
+        background: rgba(109, 40, 217, 0.3);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
     }
 
     .scrollbar-hide::-webkit-scrollbar {
@@ -62,5 +125,15 @@ body {
     .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+
+    /* Hero Glow Orb */
+    .glow-orb {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #A855F7 0%, #7C3AED 45%, #0EA5E9 100%);
+        box-shadow: 0 10px 40px rgba(146, 64, 255, 0.45);
+        filter: blur(1px);
     }
 }

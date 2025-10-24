@@ -181,49 +181,49 @@ const categories = [
         name: 'Online Payments',
         apiCategory: 'E-commerce', // This maps to the category filter
         illustration: CategoryIllustrations.payments,
-        gradient: 'from-primary-400 to-primary-500',
+        gradient: 'from-primary to-accent-pink',
     },
     {
         id: 2,
         name: 'Online Shopping & Retail',
         apiCategory: 'E-commerce',
         illustration: CategoryIllustrations.shopping,
-        gradient: 'from-accent-400 to-accent-500',
+        gradient: 'from-accent-blue to-primary-300',
     },
     {
         id: 3,
         name: 'Food & Beverages',
         apiCategory: 'Food & Dining',
         illustration: CategoryIllustrations.food,
-        gradient: 'from-primary-500 to-primary-600',
+        gradient: 'from-accent-yellow to-accent-pink',
     },
     {
         id: 4,
         name: 'Gaming & Entertainment',
         apiCategory: 'Gaming',
         illustration: CategoryIllustrations.gaming,
-        gradient: 'from-accent-500 to-accent-600',
+        gradient: 'from-primary-600 to-accent-blue',
     },
     {
         id: 5,
         name: 'Footwear & Accessories',
         apiCategory: 'Footwear',
         illustration: CategoryIllustrations.footwear,
-        gradient: 'from-primary-400 to-accent-500',
+        gradient: 'from-accent-pink to-primary-300',
     },
     {
         id: 6,
         name: 'Healthcare & Wellness',
         apiCategory: 'Healthcare',
         illustration: CategoryIllustrations.healthcare,
-        gradient: 'from-primary-500 to-accent-400',
+        gradient: 'from-primary to-accent-blue',
     },
     {
         id: 7,
         name: 'Fashion & Lifestyle',
         apiCategory: 'Fashion',
         illustration: CategoryIllustrations.fashion,
-        gradient: 'from-accent-400 to-primary-500',
+        gradient: 'from-accent-pink to-accent-yellow',
     },
 ]
 
@@ -235,54 +235,42 @@ const CategorySection = () => {
     }
 
     return (
-        <section className="pt-8 pb-12 px-4 sm:px-6 lg:px-8">
+        <section className="pt-8 pb-12 px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
                 <div className="mb-6">
-                    <h2 className="text-4xl font-display font-bold text-white mb-1">
+                    <h2 className="text-h1 font-display text-text-high mb-1">
                         Categories
                     </h2>
-                    <p className="text-white/60 text-sm">Explore gift cards by category</p>
+                    <p className="text-body text-text-low">Explore gift cards by category</p>
                 </div>
 
                 {/* Horizontal Scrollable Categories */}
                 <div className="relative">
-                    <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-hide">
+                    <div className="flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                         {categories.map((category) => (
                             <div
                                 key={category.id}
                                 onClick={() => handleCategoryClick(category.apiCategory)}
-                                className="flex-shrink-0 w-44 bg-dark-50/30 backdrop-blur-xl rounded-2xl overflow-hidden cursor-pointer hover:bg-dark-50/50 transition-all shadow-2xl shadow-black/10 hover:shadow-accent-400/20 group border-2 border-white/20 hover:border-white/40"
+                                className="flex-shrink-0 w-[220px] min-h-[180px] arcade-card cursor-pointer group p-3"
                             >
-                                {/* Top Section - Category Name - Fixed Height */}
-                                <div className="bg-dark-100/60 px-3 py-2.5 border-b border-dark-200/40 h-14 flex items-center justify-center">
-                                    <h3 className="text-white font-semibold text-xs leading-tight line-clamp-2 text-center">
+                                {/* Top Section - Category Name */}
+                                <div className="glass-panel px-3 py-2.5 mb-3">
+                                    <h3 className="text-text-high font-bold text-label leading-tight line-clamp-2 text-center">
                                         {category.name}
                                     </h3>
                                 </div>
 
                                 {/* Bottom Section - Custom Illustration */}
-                                <div className="relative h-36 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100">
-                                    {/* Subtle Pattern */}
-                                    <div className="absolute inset-0 opacity-5">
-                                        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                                            <defs>
-                                                <pattern id={`grid-${category.id}`} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                                    <circle cx="2" cy="2" r="1" fill="currentColor" className="text-primary-600" />
-                                                </pattern>
-                                            </defs>
-                                            <rect width="100%" height="100%" fill={`url(#grid-${category.id})`} />
-                                        </svg>
-                                    </div>
-
+                                <div className="relative h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-panel to-bg-elevated">
                                     {/* Glow effect */}
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className={`w-32 h-32 bg-gradient-to-br ${category.gradient} rounded-full opacity-15 blur-3xl group-hover:opacity-25 transition-opacity`} />
+                                        <div className={`w-24 h-24 bg-gradient-to-br ${category.gradient} rounded-full opacity-20 blur-2xl group-hover:opacity-30 transition-opacity duration-200`} />
                                     </div>
 
                                     {/* Illustration */}
-                                    <div className="absolute inset-0 flex items-center justify-center p-3 pb-4 transform group-hover:scale-110 transition-transform duration-500">
-                                        <div className="w-full h-full max-w-[110px] max-h-[110px]">
+                                    <div className="absolute inset-0 flex items-center justify-center p-3 transform group-hover:scale-110 transition-transform duration-200">
+                                        <div className="w-full h-full max-w-[90px] max-h-[90px]">
                                             {category.illustration}
                                         </div>
                                     </div>
