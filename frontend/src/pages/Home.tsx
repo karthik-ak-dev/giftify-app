@@ -1,16 +1,22 @@
+import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import HeroSection from '../components/HeroSection'
-// import CategorySection from '../components/CategorySection'
-import PopularBrands from '../components/PopularBrands'
+import CategorySection from '../components/CategorySection'
+import BrandsGrid from '../components/BrandsGrid'
 import Footer from '../components/Footer'
 
 const Home = () => {
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+
     return (
         <div className="min-h-screen">
             <Navbar />
             <HeroSection />
-            {/* <CategorySection /> */}
-            <PopularBrands />
+            <CategorySection
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+            />
+            <BrandsGrid selectedCategory={selectedCategory} />
             <Footer />
         </div>
     )

@@ -1,6 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
-import AllBrands from './pages/AllBrands'
 import BrandDetail from './pages/BrandDetail'
 import Checkout from './pages/Checkout'
 import OrderSuccess from './pages/OrderSuccess'
@@ -26,7 +25,7 @@ function App() {
                 <Router>
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/brands" element={<AllBrands />} />
+                        <Route path="/brands" element={<Navigate to="/" replace />} />
                         <Route path="/brand/:brandSlug" element={<BrandDetail />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/order/success" element={<OrderSuccess />} />
