@@ -31,7 +31,7 @@ const BrandsGrid = ({ selectedCategory }: BrandsGridProps) => {
 
     if (loading) {
         return (
-            <section className="py-6 px-6 lg:px-8">
+            <section className="pt-2 pb-6 px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                         {[...Array(20)].map((_, i) => (
@@ -44,7 +44,7 @@ const BrandsGrid = ({ selectedCategory }: BrandsGridProps) => {
     }
 
     return (
-        <section className="py-6 px-6 lg:px-8">
+        <section className="pt-2 pb-6 px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {brands.length === 0 ? (
                     <div className="text-center py-12">
