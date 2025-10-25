@@ -32,10 +32,10 @@ const BrandsGrid = ({ selectedCategory }: BrandsGridProps) => {
     if (loading) {
         return (
             <section className="pt-2 pb-6 px-3 sm:px-6 lg:px-8">
-                <div className="max-w-[1360px] mx-auto">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
-                        {[...Array(20)].map((_, i) => (
-                            <div key={i} className="arcade-card h-[220px] sm:h-[280px] animate-pulse" />
+                <div className="max-w-[1400px] mx-auto">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+                        {[...Array(24)].map((_, i) => (
+                            <div key={i} className="arcade-card h-[180px] sm:h-[240px] animate-pulse" />
                         ))}
                     </div>
                 </div>
@@ -45,13 +45,13 @@ const BrandsGrid = ({ selectedCategory }: BrandsGridProps) => {
 
     return (
         <section className="pt-2 pb-6 px-3 sm:px-6 lg:px-8">
-            <div className="max-w-[1360px] mx-auto">
+            <div className="max-w-[1400px] mx-auto">
                 {brands.length === 0 ? (
                     <div className="text-center py-12">
                         <p className="text-white/60 text-lg">No brands found in this category.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
                         {brands.map((brand) => {
                             const maxDiscount = Math.max(...brand.variants.map(v => v.discountPercent))
 
@@ -59,11 +59,10 @@ const BrandsGrid = ({ selectedCategory }: BrandsGridProps) => {
                                 <Link
                                     key={brand.id}
                                     to={`/brand/${brand.id}`}
-                                    className="arcade-card block group relative overflow-hidden p-2 sm:p-3 pb-3 sm:pb-4 min-h-[220px] sm:min-h-[280px]"
+                                    className="arcade-card block group relative overflow-hidden p-2 sm:p-2.5 pb-3 sm:pb-4 min-h-[180px] sm:min-h-[240px] transition-all duration-300 hover:scale-105 hover:border-[3px] hover:border-purple-300 hover:bg-purple-700/40"
                                 >
                                     {/* Logo Section */}
-                                    <div className="relative flex items-center justify-center h-[100px] sm:h-[140px] overflow-hidden rounded-lg mb-2 sm:mb-3 bg-glass-panel">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-panel to-bg-elevated opacity-40"></div>
+                                    <div className="relative flex items-center justify-center h-[105px] sm:h-[120px] overflow-hidden rounded-lg mb-2 bg-white/5">
                                         <img
                                             src={brand.logo}
                                             alt={brand.name}
@@ -72,8 +71,8 @@ const BrandsGrid = ({ selectedCategory }: BrandsGridProps) => {
                                     </div>
 
                                     {/* Brand Info */}
-                                    <div className="space-y-1 sm:space-y-2 relative mb-5 sm:mb-7">
-                                        <h3 className="text-sm sm:text-h3 text-text-high text-center truncate group-hover:text-primary-300 transition-colors">
+                                    <div className="space-y-0.5 sm:space-y-1 relative mb-10 sm:mb-9">
+                                        <h3 className="text-sm sm:text-h3 text-white text-center truncate group-hover:text-white/90 transition-colors">
                                             {brand.name}
                                         </h3>
                                         <div className="flex items-center justify-center">

@@ -1,11 +1,10 @@
 const HeroSection = () => {
     return (
         <section className="relative h-[280px] overflow-hidden mx-3 sm:mx-6 lg:mx-8 mt-6 rounded-3xl">
-            {/* Vibrant Purple-to-Pink Gradient Background */}
+            {/* Hero Banner Background - Left to Right Gradient */}
             <div className="absolute inset-0" style={{
-                background: 'linear-gradient(90deg, #A855F7 0%, #C084FC 30%, #E879F9 60%, #EC4899 100%)'
+                background: 'linear-gradient(90deg, #B934FE 0%, #C33AFC 20%, #D452FB 40%, #EF73F8 60%, #F997EC 80%, #F99EEA 100%)'
             }}>
-                <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-400/20 to-transparent"></div>
             </div>
 
             {/* Decorative Gradient Orbs */}

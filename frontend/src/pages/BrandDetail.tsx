@@ -172,8 +172,8 @@ const BrandDetail = () => {
                                             {variant.name}
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-primary-300 font-bold text-lg">₹{variant.salePrice}</span>
-                                            <span className="text-white/40 text-sm line-through">₹{variant.originalPrice}</span>
+                                            <span className="text-white font-bold text-lg">₹{variant.salePrice}</span>
+                                            <span className="text-white/60 text-sm line-through">₹{variant.originalPrice}</span>
                                         </div>
                                     </div>
 

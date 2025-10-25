@@ -3,7 +3,7 @@ import { Mail, Facebook, Twitter, Instagram, Youtube } from 'lucide-react'
 
 const Footer = () => {
     return (
-        <footer className="relative mt-20 border-t border-border">
+        <footer className="relative mt-20 border-t border-white/30">
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -106,7 +106,7 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-border">
+                <div className="pt-8 border-t border-white/30">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         <p className="text-caption text-text-low">
                             © 2024 Giftify. All rights reserved
