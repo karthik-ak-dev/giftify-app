@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Plus, Minus } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { Plus, Minus } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useCart } from '../context/CartContext'
@@ -78,9 +78,7 @@ const BrandDetail = () => {
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
                         <h2 className="text-3xl font-bold text-white mb-4">Brand Not Found</h2>
-                        <Link to="/brands" className="text-accent-400 hover:text-accent-300">
-                            ← Back to All Brands
-                        </Link>
+                        <p className="text-white/60">The brand you're looking for doesn't exist.</p>
                     </div>
                 </div>
                 <Footer />
@@ -88,81 +86,55 @@ const BrandDetail = () => {
         )
     }
 
-    // Calculate max discount
-    const maxDiscount = Math.max(...brand.variants.map(v => v.discountPercent))
-
     return (
         <div className="min-h-screen">
             <Navbar />
 
-            {/* Brand Hero Section */}
-            <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-dark-100/40 via-dark-200/30 to-dark-50/50 border-b border-white/10">
-                {/* Decorative Background */}
-                <div className="absolute inset-0 opacity-5">
-                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <pattern id="brand-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <circle cx="20" cy="20" r="1" fill="currentColor" className="text-white" />
-                            </pattern>
-                        </defs>
-                        <rect width="100%" height="100%" fill="url(#brand-grid)" />
-                    </svg>
-                </div>
-
-                <div className="relative max-w-7xl mx-auto">
-                    {/* Back Button */}
-                    <Link
-                        to="/brands"
-                        className="inline-flex items-center space-x-2 text-white/70 hover:text-accent-300 transition-colors mb-8 group"
-                    >
-                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                        <span className="font-medium">Back to All Brands</span>
-                    </Link>
-
-                    {/* Brand Info */}
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-                        {/* Brand Logo */}
-                        <div className="relative">
-                            <div className="w-48 h-36 rounded-2xl flex items-center justify-center overflow-hidden shadow-2xl shadow-black/20 border-2 border-white/20">
+            {/* Modern Brand Header - Open Layout */}
+            <section className="pt-8 pb-6 px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                        {/* Left: Brand Logo */}
+                        <div className="flex-shrink-0">
+                            <div className="relative flex items-center justify-center w-72 h-44 lg:w-[380px] lg:h-56 overflow-hidden rounded-lg bg-glass-panel shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-br from-panel to-bg-elevated opacity-40"></div>
                                 <img
                                     src={brand.logo}
                                     alt={brand.name}
-                                    className="w-full h-full object-cover"
+                                    className="relative w-full h-full object-cover"
                                 />
-                            </div>
-                            {/* Discount Badge */}
-                            <div className="absolute -top-3 -right-3">
-                                <div className="bg-accent-500 text-white font-bold text-sm px-4 py-2 rounded-xl shadow-xl shadow-accent-500/50 backdrop-blur-sm">
-                                    {maxDiscount}% Off
-                                </div>
                             </div>
                         </div>
 
-                        {/* Brand Details */}
-                        <div className="flex-1">
-                            <div className="inline-block px-4 py-1.5 bg-accent-500/20 border border-accent-400/40 rounded-lg mb-3">
-                                <span className="text-accent-300 text-sm font-semibold">{brand.category}</span>
+                        {/* Right: Brand Information */}
+                        <div className="flex-1 space-y-4 text-center lg:text-left flex flex-col justify-center">
+                            {/* Category Badge */}
+                            <div>
+                                <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl shadow-lg shadow-pink-500/30 text-white text-sm font-bold">
+                                    {brand.category}
+                                </span>
                             </div>
-                            <h1 className="text-5xl font-display font-black text-white mb-4">
-                                {brand.name} Gift Cards
+
+                            {/* Brand Name */}
+                            <h1 className="text-4xl lg:text-6xl font-black text-white leading-tight">
+                                {brand.name}
                             </h1>
-                            <p className="text-white/70 text-lg max-w-2xl">
+
+                            {/* Description */}
+                            <p className="text-white/80 text-base lg:text-lg max-w-3xl mx-auto lg:mx-0">
                                 {brand.description}
                             </p>
-                            <div className="mt-6 flex items-center gap-3 flex-wrap">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
-                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                                    <span className="text-white/80 text-sm font-medium">In Stock</span>
-                                </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
-                                    <span className="text-white/80 text-sm font-medium">
+
+                            {/* Stats Row */}
+                            <div className="flex items-center justify-center lg:justify-start gap-3 flex-wrap pt-2">
+                                <div className="px-3 py-2 rounded-pill bg-purple-900/50 border border-purple-700/30">
+                                    <span className="text-cyan-400 font-bold text-sm">
                                         {brand.variants.length} Variants Available
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-400/30 rounded-xl">
-                                    <span className="text-green-400 text-sm font-semibold">✓</span>
-                                    <span className="text-green-400 text-sm font-semibold">
-                                        {(brand.vouchersSold / 1000).toFixed(1)}K+ Sold
+                                <div className="px-3 py-2 rounded-pill bg-purple-900/50 border border-purple-700/30">
+                                    <span className="text-green-400 font-bold text-sm">
+                                        ✓ {(brand.vouchersSold / 1000).toFixed(1)}K+ sold
                                     </span>
                                 </div>
                             </div>
@@ -172,74 +144,72 @@ const BrandDetail = () => {
             </section>
 
             {/* Variants Section */}
-            <section className="py-12 px-4 sm:px-6 lg:px-8">
+            <section className="pb-12 px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Section Header */}
-                    <div className="mb-8">
-                        <h2 className="text-3xl font-display font-bold text-white mb-2">
-                            Select Variant
+                    <div className="mb-6">
+                        <h2 className="text-2xl lg:text-3xl font-black text-white mb-1">
+                            Choose Variant
                         </h2>
-                        <p className="text-white/60">
-                            Choose your preferred gift card value
+                        <p className="text-white/70">
+                            Select your preferred gift card variant
                         </p>
                     </div>
 
                     {/* Variants Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                         {brand.variants.map((variant) => {
                             const quantity = getCartQuantity(variant.id)
 
                             return (
                                 <div
                                     key={variant.id}
-                                    className="group relative bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:border-accent-400/50 transition-all duration-300 overflow-hidden hover:shadow-lg hover:shadow-accent-400/20"
+                                    className="arcade-card group relative p-4 min-h-[200px] flex flex-col"
                                 >
-                                    {/* Discount Badge */}
-                                    <div className="absolute top-2 right-2 bg-accent-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
-                                        {variant.discountPercent}% OFF
+                                    {/* Value & Price */}
+                                    <div className="flex-1 mb-4">
+                                        <div className="text-xl font-black text-white mb-2">
+                                            {variant.name}
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-primary-300 font-bold text-lg">₹{variant.salePrice}</span>
+                                            <span className="text-white/40 text-sm line-through">₹{variant.originalPrice}</span>
+                                        </div>
                                     </div>
 
-                                    {/* Card Content */}
-                                    <div className="p-4">
-                                        {/* Value & Price */}
-                                        <div className="mb-3">
-                                            <div className="text-lg font-bold text-white mb-1">
-                                                {variant.name}
+                                    {/* Add to Cart Button */}
+                                    {quantity === 0 ? (
+                                        <button
+                                            onClick={() => handleQuantityChange(variant, 1)}
+                                            className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/30 hover:scale-105 active:scale-95"
+                                        >
+                                            <Plus className="w-4 h-4" strokeWidth={2.5} />
+                                            <span>Add to Cart</span>
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleQuantityChange(variant, -1)}
+                                                className="w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
+                                            >
+                                                <Minus className="w-4 h-4" strokeWidth={2.5} />
+                                            </button>
+                                            <div className="flex-1 h-10 bg-purple-900/50 border-2 border-purple-700/30 text-white rounded-xl font-bold text-base flex items-center justify-center">
+                                                {quantity}
                                             </div>
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-accent-400 font-semibold">₹{variant.salePrice}</span>
-                                                <span className="text-white/40 text-xs line-through">₹{variant.originalPrice}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Add to Cart Button */}
-                                        {quantity === 0 ? (
                                             <button
                                                 onClick={() => handleQuantityChange(variant, 1)}
-                                                className="w-full py-2.5 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent-500/30 active:scale-95"
+                                                className="w-10 h-10 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-pink-500/30"
                                             >
                                                 <Plus className="w-4 h-4" strokeWidth={2.5} />
-                                                <span>Add to Cart</span>
                                             </button>
-                                        ) : (
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => handleQuantityChange(variant, -1)}
-                                                    className="w-10 h-10 bg-gradient-to-br from-white/10 to-white/5 hover:from-red-500/20 hover:to-red-600/10 border border-white/20 hover:border-red-400/50 text-white hover:text-red-300 rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-black/10 hover:shadow-red-500/20"
-                                                >
-                                                    <Minus className="w-4 h-4" strokeWidth={2.5} />
-                                                </button>
-                                                <div className="flex-1 h-10 bg-gradient-to-br from-accent-500/30 to-accent-600/20 border-2 border-accent-400/50 text-white rounded-xl font-bold text-base flex items-center justify-center shadow-inner backdrop-blur-sm">
-                                                    {quantity}
-                                                </div>
-                                                <button
-                                                    onClick={() => handleQuantityChange(variant, 1)}
-                                                    className="w-10 h-10 bg-gradient-to-br from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-accent-500/30 hover:shadow-accent-500/50"
-                                                >
-                                                    <Plus className="w-4 h-4" strokeWidth={2.5} />
-                                                </button>
-                                            </div>
-                                        )}
+                                        </div>
+                                    )}
+
+                                    {/* Discount Badge - Bottom Right */}
+                                    <div className="absolute bottom-0 right-0 discount-corner-badge">
+                                        <span className="text-sm font-black">{variant.discountPercent}%</span>
+                                        <span className="text-xs font-bold ml-0.5">OFF</span>
                                     </div>
                                 </div>
                             )
