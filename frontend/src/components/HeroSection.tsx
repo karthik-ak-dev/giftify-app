@@ -1,6 +1,6 @@
 const HeroSection = () => {
     return (
-        <section className="relative h-[280px] overflow-hidden mx-6 lg:mx-8 mt-6 rounded-3xl">
+        <section className="relative h-[280px] overflow-hidden mx-3 sm:mx-6 lg:mx-8 mt-6 rounded-3xl">
             {/* Vibrant Purple-to-Pink Gradient Background */}
             <div className="absolute inset-0" style={{
                 background: 'linear-gradient(90deg, #A855F7 0%, #C084FC 30%, #E879F9 60%, #EC4899 100%)'
@@ -24,13 +24,6 @@ const HeroSection = () => {
 
                     {/* Center - Hero Banner Image */}
                     <div className="col-span-12 lg:col-span-6 flex flex-col items-center justify-end">
-                        {/* Mobile Title */}
-                        <div className="lg:hidden mb-4">
-                            <h2 className="text-4xl font-black text-white text-center tracking-wide">
-                                FASTER & SEAMLESS
-                            </h2>
-                        </div>
-
                         {/* Hero Banner Image */}
                         <div className="relative flex items-end justify-center w-full">
                             <img

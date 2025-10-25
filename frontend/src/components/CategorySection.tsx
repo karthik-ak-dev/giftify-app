@@ -22,9 +22,9 @@ const CategorySection = ({ selectedCategory, onCategoryChange }: CategorySection
     }
 
     return (
-        <section className="pt-8 pb-2 px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex justify-center gap-4 overflow-x-auto scrollbar-hide py-1">
+        <section className="pt-8 pb-2 px-3 sm:px-6 lg:px-8">
+            <div className="max-w-[1360px] mx-auto">
+                <div className="flex justify-start lg:justify-center gap-4 overflow-x-auto scrollbar-hide py-1">
                     {categories.map((category) => (
                         <button
                             key={category.id}
