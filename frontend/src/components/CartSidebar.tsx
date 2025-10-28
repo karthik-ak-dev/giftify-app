@@ -82,11 +82,11 @@ const CartSidebar = () => {
                                 >
                                     <div className="flex gap-4">
                                         {/* Brand Logo */}
-                                        <div className="w-16 h-16 bg-white/95 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        <div className="w-20 h-20 flex-shrink-0">
                                             <img
                                                 src={item.brandLogo}
                                                 alt={item.brandName}
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-contain"
                                             />
                                         </div>
 

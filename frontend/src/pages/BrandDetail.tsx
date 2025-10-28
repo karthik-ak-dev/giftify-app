@@ -127,12 +127,12 @@ const BrandDetail = () => {
 
                             {/* Stats Row */}
                             <div className="flex items-center justify-center lg:justify-start gap-3 flex-wrap pt-2">
-                                <div className="px-3 py-2 rounded-pill bg-purple-900/50 border border-purple-700/30">
+                                <div className="px-3 py-2 rounded-pill bg-purple-900/50 border-2 border-white/30">
                                     <span className="text-cyan-400 font-bold text-sm">
                                         {brand.variants.length} Variants Available
                                     </span>
                                 </div>
-                                <div className="px-3 py-2 rounded-pill bg-purple-900/50 border border-purple-700/30">
+                                <div className="px-3 py-2 rounded-pill bg-purple-900/50 border-2 border-white/30">
                                     <span className="text-green-400 font-bold text-sm">
                                         ✓ {(brand.vouchersSold / 1000).toFixed(1)}K+ sold
                                     </span>
