@@ -157,59 +157,69 @@ const BrandDetail = () => {
                     </div>
 
                     {/* Variants Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-6">
                         {brand.variants.map((variant) => {
                             const quantity = getCartQuantity(variant.id)
 
                             return (
                                 <div
                                     key={variant.id}
-                                    className="arcade-card group relative p-4 min-h-[200px] flex flex-col"
+                                    className="arcade-card group relative overflow-hidden p-3 sm:p-4 min-h-[180px] sm:min-h-[220px]"
                                 >
-                                    {/* Value & Price */}
-                                    <div className="flex-1 mb-4">
-                                        <div className="text-xl font-black text-white mb-2">
+                                    {/* Card Content */}
+                                    <div className="flex flex-col h-full">
+                                        {/* Variant Title */}
+                                        <h3 className="text-sm sm:text-base font-bold text-white text-center mb-2 sm:mb-3">
                                             {variant.name}
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-white font-bold text-lg">₹{variant.salePrice}</span>
-                                            <span className="text-white/60 text-sm line-through">₹{variant.originalPrice}</span>
-                                        </div>
-                                    </div>
+                                        </h3>
 
-                                    {/* Add to Cart Button */}
-                                    {quantity === 0 ? (
-                                        <button
-                                            onClick={() => handleQuantityChange(variant, 1)}
-                                            className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-pink-500/30 hover:scale-105 active:scale-95"
-                                        >
-                                            <Plus className="w-4 h-4" strokeWidth={2.5} />
-                                            <span>Add to Cart</span>
-                                        </button>
-                                    ) : (
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => handleQuantityChange(variant, -1)}
-                                                className="w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
-                                            >
-                                                <Minus className="w-4 h-4" strokeWidth={2.5} />
-                                            </button>
-                                            <div className="flex-1 h-10 bg-purple-900/50 border-2 border-purple-700/30 text-white rounded-xl font-bold text-base flex items-center justify-center">
-                                                {quantity}
+                                        {/* Price Info - Enhanced */}
+                                        <div className="flex flex-col items-center mb-3 sm:mb-4">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-xl sm:text-2xl text-white font-black tracking-tight">₹{variant.salePrice}</span>
+                                                <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/40 rounded-full text-[10px] sm:text-xs text-green-400 font-bold">
+                                                    {variant.discountPercent}% OFF
+                                                </span>
                                             </div>
-                                            <button
-                                                onClick={() => handleQuantityChange(variant, 1)}
-                                                className="w-10 h-10 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-pink-500/30"
-                                            >
-                                                <Plus className="w-4 h-4" strokeWidth={2.5} />
-                                            </button>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs sm:text-sm text-white/40 line-through">₹{variant.originalPrice}</span>
+                                                <span className="text-[10px] sm:text-xs text-green-400 font-semibold">Save ₹{variant.originalPrice - variant.salePrice}</span>
+                                            </div>
                                         </div>
-                                    )}
 
-                                    {/* Discount Badge - Bottom Right */}
-                                    <div className="absolute bottom-0 right-0 discount-corner-badge">
-                                        <span className="text-sm font-black">{variant.discountPercent}%</span>
-                                        <span className="text-xs font-bold ml-0.5">OFF</span>
+                                        {/* Spacer */}
+                                        <div className="flex-1"></div>
+
+                                        {/* Add to Cart Button */}
+                                        <div>
+                                            {quantity === 0 ? (
+                                                <button
+                                                    onClick={() => handleQuantityChange(variant, 1)}
+                                                    className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-lg font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 shadow-lg shadow-pink-500/30 hover:scale-105 active:scale-95"
+                                                >
+                                                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={2.5} />
+                                                    <span>Add to Cart</span>
+                                                </button>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => handleQuantityChange(variant, -1)}
+                                                        className="w-9 h-9 sm:w-10 sm:h-10 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
+                                                    >
+                                                        <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={2.5} />
+                                                    </button>
+                                                    <div className="flex-1 h-9 sm:h-10 bg-purple-900/50 border-2 border-purple-700/30 text-white rounded-lg font-bold text-sm sm:text-base flex items-center justify-center">
+                                                        {quantity}
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleQuantityChange(variant, 1)}
+                                                        className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 shadow-lg shadow-pink-500/30"
+                                                    >
+                                                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )
