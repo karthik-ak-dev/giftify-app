@@ -164,7 +164,7 @@ const BrandDetail = () => {
                             return (
                                 <div
                                     key={variant.id}
-                                    className="arcade-card group relative overflow-hidden p-3 sm:p-4 min-h-[180px] sm:min-h-[220px]"
+                                    className="arcade-card group relative overflow-hidden p-3 sm:p-4 min-h-[180px] sm:min-h-[220px] transition-all duration-300 hover:scale-105 hover:border-[3px] hover:border-purple-300 hover:bg-purple-700/40"
                                 >
                                     {/* Card Content */}
                                     <div className="flex flex-col h-full">
